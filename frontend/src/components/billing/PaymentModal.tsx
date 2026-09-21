@@ -174,7 +174,7 @@ export default function PaymentModal({ open, checkout, onClose, onPaid }: Props)
       const order = await api.getBillingOrder(checkout.out_trade_no)
       if (order.status === 'paid') {
         setStatus('paid')
-        handlePaid()
+        onPaid()
       } else {
         setError(
           checkout.pay_mode === 'redirect'

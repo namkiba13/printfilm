@@ -259,9 +259,11 @@ async def enqueue_image_tool(
     )
     db.add(row)
     await db.flush()
-    task_id = _dispatch_tool_image(row.id)
+    task_id = f"local-{row.id}"
     row.task_id = task_id
-    await db.flush()
+    # 后台协程使用独立 session，必须在它读取 ToolRun 前提交。
+    await db.commit()
+    _dispatch_tool_image(row.id)
     return {
         "kind": "image",
         "urls": [],

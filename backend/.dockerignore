@@ -14,7 +14,9 @@ htmlcov
 static/generated
 static/voice_previews
 tests
-scripts
+scripts/*
+!scripts/__init__.py
+!scripts/create_admin.py
 *.md
 .git
 .gitignore

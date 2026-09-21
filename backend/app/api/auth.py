@@ -38,6 +38,8 @@ settings = get_settings()
 
 @router.post("/register", response_model=TokenResponse)
 async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)) -> TokenResponse:
+    if not get_settings().registration_enabled:
+        raise HTTPException(status_code=403, detail="注册暂未开放 / Registration is closed")
     existing = await get_user_by_email(db, body.email)
     if existing:
         raise HTTPException(status_code=400, detail="邮箱已注册")

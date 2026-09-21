@@ -440,12 +440,22 @@ def build_official_rate_rows(
     s = settings or get_settings()
     usd_cny = usd_cny_rate(s)
     items: list[dict[str, Any]] = []
-    for spec in RECOMMENDED_MODELS:
+    from app.services.model_routing_config import infer_model_capability
+    from app.services.tokenfree_video import uses_tokenfree_video
+
+    native = uses_tokenfree_video(base_url=s.openai_base_url)
+    provider = "TokenFree" if native else "94API"
+    specs = RECOMMENDED_MODELS if native else tuple(
+        {"id": mid, "label": mid, "capability": infer_model_capability(mid),
+         "recommended": mid == s.model_llm, "note": "上游当前价目 / Current gateway pricing"}
+        for mid in rates
+    )
+    for spec in specs:
         rate = lookup_rate(str(spec["id"]), rates)
         official_yuan = 0.0
         basis = "missing"
-        rate_label = "TokenFree 价目未收录，请到控制台核对"
-        if spec["capability"] == "video":
+        rate_label = "上游价目未收录，请到控制台核对"
+        if native and spec["capability"] == "video":
             vendor = VENDOR_VIDEO_YUAN_PER_SEC_480P.get(str(spec["id"]))
             if vendor:
                 official_yuan = round(vendor * VIDEO_RATE_SAMPLE_SECONDS, 4)
@@ -457,7 +467,7 @@ def build_official_rate_rows(
                     f"预估按火山 480P 约 {vendor:.3f} 元/秒"
                     f"（{VIDEO_RATE_SAMPLE_SECONDS:g}秒 ¥{official_yuan:.2f}；720P×2 / 1080P×4）{listed}"
                 )
-        elif spec["capability"] == "image" and (
+        elif native and spec["capability"] == "image" and (
             "sunburst" in str(spec["id"]).lower() or "gpt-image-2-5" in str(spec["id"]).lower()
         ):
             from app.services.billing.pricing import kie_fen_per_credit
@@ -473,16 +483,16 @@ def build_official_rate_rows(
         elif rate and rate.billing == "per_call":
             official_yuan = rate.cny_per_call
             basis = "per_call"
-            rate_label = f"TokenFree ${rate.usd_per_call:.4f}/次 ≈ ¥{official_yuan:.4f}"
+            rate_label = f"{provider} ${rate.usd_per_call:.4f}/次 ≈ ¥{official_yuan:.4f}"
         elif rate and rate.billing == "token":
             official_yuan = rate.cny_out_per_1m
             basis = "token"
-            rate_label = f"TokenFree 输入 ¥{rate.cny_in_per_1m:.4f} / 输出 ¥{rate.cny_out_per_1m:.4f} 每百万"
+            rate_label = f"{provider} 输入 ¥{rate.cny_in_per_1m:.4f} / 输出 ¥{rate.cny_out_per_1m:.4f} 每百万"
         items.append(
             {
                 "id": spec["id"],
                 "label": spec["label"],
-                "provider": "tokenfree",
+                "provider": provider.lower(),
                 "capability": spec["capability"],
                 "recommended": bool(spec["recommended"]),
                 "note": spec["note"],

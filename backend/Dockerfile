@@ -16,6 +16,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
+COPY scripts ./scripts
 COPY static ./static
 
 RUN mkdir -p /app/static/generated /app/static/voice_previews
@@ -23,6 +24,6 @@ RUN mkdir -p /app/static/generated /app/static/voice_previews
 EXPOSE 8000
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=40s --retries=8 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=4)"
+    CMD python -c "import json,urllib.request; assert json.load(urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=4))['ok']"
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]

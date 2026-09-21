@@ -7,6 +7,7 @@ POST /v1/videos、GET /v1/videos/:id、GET /v1/videos/:id/content。
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import urlsplit
 
 from app.services.media_ref_limits import MAX_REFERENCE_IMAGES
 from app.services.tokenfree_gateway import TOKENFREE_CHANNEL_ID
@@ -23,14 +24,10 @@ VIDEO_FAILED_STATUSES = {"failed", "cancelled", "canceled", "expired", "failure"
 
 def uses_tokenfree_video(*, base_url: str = "", channel_id: str = "") -> bool:
     """判断该基址/渠道是否走 New API 视频路径（而非方舟原生）。"""
-    if (channel_id or "").strip().lower() == TOKENFREE_CHANNEL_ID:
-        return True
     raw = (base_url or "").strip().lower()
-    if "tokenfree.com" in raw:
-        return True
-    if "volces.com" in raw or "volcengineapi.com" in raw:
-        return False
-    return False
+    if raw:
+        return urlsplit(raw).hostname in {"tokenfree.com", "www.tokenfree.com"}
+    return (channel_id or "").strip().lower() == TOKENFREE_CHANNEL_ID
 
 
 def remap_video_path(path: str, *, base_url: str = "", channel_id: str = "") -> str:

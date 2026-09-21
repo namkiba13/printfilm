@@ -467,7 +467,11 @@ class ArkGateway:
     # 按逻辑路由解析 ARK 渠道凭证
     def _resolve_ark_route(self, capability: str, model_id: str | None) -> ResolvedModelRoute | None:
         logical_id = resolve_logical_model_id(capability, model_id)
-        return resolve_logical_model(capability, logical_id)
+        route = resolve_logical_model(capability, logical_id)
+        if not route and not getattr(self.settings, f"model_{capability}", "") and not self.settings.ark_mock:
+            label = "图像" if capability == "image" else "视频"
+            raise RuntimeError(f"{label}模型未配置 / {capability.title()} model not configured. 请联系管理员。")
+        return route
 
     def _route_headers(self, route: ResolvedModelRoute | None = None) -> dict[str, str]:
         if route and route.api_key:
@@ -761,6 +765,7 @@ class ArkGateway:
         只软化用户正文并保留设定板前缀；InputTextSensitive 时仍用简化三视图重试，
         最后一档才缩成「三视图+服装风格」。不做空主体 / CG 厚涂兜底。
         """
+        self._resolve_ark_route("image", model)
         resolved = (model or "").strip()
         if not resolved or resolved in {"ark-seedream"} or resolved.startswith("kie-"):
             ark_model = None
@@ -1137,6 +1142,7 @@ class ArkGateway:
         generate_audio: bool = False,
         extra_image_urls: list[str] | None = None,
     ) -> str:
+        self._resolve_ark_route("video", self.settings.model_video)
         if self.mock:
             digest = hashlib.md5(f"{image_url}:{prompt}".encode()).hexdigest()[:10]
             return f"mock-task-{digest}"
@@ -1312,6 +1318,7 @@ class ArkGateway:
 
         文案/策略拦截时追加 CG 厚涂提示词重试一次；参考图真人隐私拦截不重试。
         """
+        self._resolve_ark_route("video", str(body.get("model") or ""))
         if self.mock:
             digest = hashlib.md5(json.dumps(body, sort_keys=True, default=str).encode()).hexdigest()[
                 :10

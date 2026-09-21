@@ -1,16 +1,17 @@
-"""开源版固定对接 TokenFree New API，不允许切换其它上游。"""
+"""单个 OpenAI 兼容网关；Base URL 从部署环境读取，保留旧渠道 ID 兼容数据库。"""
 
 from __future__ import annotations
 
 from typing import Any
 
+from app.config import Settings
 from app.schemas_routing import SystemModelChannel
 
 TOKENFREE_CHANNEL_ID = "tokenfree"
-TOKENFREE_CHANNEL_NAME = "TokenFree New API"
+TOKENFREE_CHANNEL_NAME = "94API" if "94api.dev" in Settings().openai_base_url else "New API"
 # New API OpenAI 兼容根路径（/channels 是控制台，不是接口）
-TOKENFREE_BASE_URL = "https://www.tokenfree.com/v1"
-TOKENFREE_CONSOLE_URL = "https://www.tokenfree.com/channels"
+TOKENFREE_BASE_URL = Settings().openai_base_url.strip().rstrip("/")
+TOKENFREE_CONSOLE_URL = TOKENFREE_BASE_URL.removesuffix("/v1")
 # New API 内部额度：500000 quota = 1 USD
 TOKENFREE_QUOTA_PER_USD = 500_000
 
@@ -47,7 +48,7 @@ def locked_tokenfree_channel(
     models: list[str] | None = None,
     enabled: bool = True,
 ) -> SystemModelChannel:
-    """构造不可改 Base URL / 协议的唯一渠道。"""
+    """构造部署环境指定的渠道；后台负责 Key 与模型选择。"""
     key = (api_key or "").strip()
     return SystemModelChannel(
         id=TOKENFREE_CHANNEL_ID,
@@ -82,8 +83,8 @@ def apply_tokenfree_flat_overlay(flat: dict[str, Any], channels: list[SystemMode
     if channel is None:
         return flat
     out = dict(flat)
-    out["openai_base_url"] = TOKENFREE_BASE_URL
-    out["ark_base_url"] = TOKENFREE_BASE_URL
+    out["openai_base_url"] = channel.base_url
+    out["ark_base_url"] = channel.base_url
     key = (channel.api_key or "").strip()
     if key:
         out["openai_api_key"] = key

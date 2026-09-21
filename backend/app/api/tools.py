@@ -120,6 +120,8 @@ async def run_tool(
         else:
             raise ValueError("未知工具")
         await db.commit()
+    except HTTPException:
+        raise
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:  # noqa: BLE001

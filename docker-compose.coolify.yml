@@ -1,0 +1,79 @@
+# Coolify builds this fork; only web/admin-web receive HTTPS domains.
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: printfilm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: printfilm
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U printfilm -d printfilm"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  api:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://printfilm:${POSTGRES_PASSWORD}@postgres:5432/printfilm
+      DATABASE_URL_SYNC: postgresql+psycopg2://printfilm:${POSTGRES_PASSWORD}@postgres:5432/printfilm
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:?}
+      OPENAI_API_KEY: ${API94_KEY:?}
+      ARK_API_KEY: ${API94_KEY:?}
+      OPENAI_BASE_URL: https://94api.dev/v1
+      ARK_BASE_URL: https://94api.dev/v1
+      MODEL_LLM: ${MODEL_LLM:-gpt-5.6-luna}
+      MODEL_IMAGE: ""
+      MODEL_VIDEO: ""
+      MODEL_AUDIO: ""
+      ARK_MOCK: "false"
+      DEBUG: "false"
+      BILLING_ENABLED: "false"
+      BILLING_SIGNUP_GRANT_FEN: "0"
+      REGISTRATION_ENABLED: "false"
+      OSS_ENABLED: "false"
+      PUBLIC_BASE_URL: https://film.94api.dev
+      CORS_ORIGINS: https://film.94api.dev,https://film-admin.94api.dev
+      TASK_RUNTIME_MAX_CONCURRENCY: "2"
+      INITIAL_ADMIN_EMAIL: ${INITIAL_ADMIN_EMAIL:-}
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD:-}
+    volumes:
+      - media:/app/static/generated
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    expose: ["80"]
+    depends_on:
+      api:
+        condition: service_healthy
+  admin-web:
+    build: ./admin
+    restart: unless-stopped
+    expose: ["80"]
+    depends_on:
+      api:
+        condition: service_healthy
+volumes:
+  pgdata:
+  redisdata:
+  media:

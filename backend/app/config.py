@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     sql_echo: bool = False
     secret_key: str = "dev-secret-change-me"
     access_token_expire_minutes: int = 60 * 24 * 7
+    registration_enabled: bool = True
 
     database_url: str = "postgresql+asyncpg://printfilm:change-me-strong-db-password@127.0.0.1:15432/printfilm"
     database_url_sync: str = "postgresql+psycopg2://printfilm:change-me-strong-db-password@127.0.0.1:15432/printfilm"

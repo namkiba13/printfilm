@@ -491,12 +491,9 @@ async def _compose_runtime_state(db: AsyncSession) -> tuple[list[SystemModelChan
     flat = apply_tokenfree_flat_overlay(flat, channels)
     if default_models.text_model:
         flat["model_llm"] = default_models.text_model
-    if default_models.image_model:
-        flat["model_image"] = default_models.image_model
-    if default_models.video_model:
-        flat["model_video"] = default_models.video_model
-    if default_models.audio_model:
-        flat["model_audio"] = default_models.audio_model
+    flat["model_image"] = default_models.image_model or ""
+    flat["model_video"] = default_models.video_model or ""
+    flat["model_audio"] = default_models.audio_model or ""
     return channels, logical_models, default_models, flat, app_row
 
 

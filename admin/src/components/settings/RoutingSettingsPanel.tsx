@@ -26,8 +26,7 @@ type CapabilityFilter = Capability | "all";
 const CAPABILITY_ORDER: Capability[] = ["text", "image", "video", "audio"];
 
 const TOKENFREE_CHANNEL_ID = "tokenfree";
-const TOKENFREE_BASE_URL = "https://www.tokenfree.com/v1";
-const TOKENFREE_CONSOLE_URL = "https://www.tokenfree.com/channels";
+const DEFAULT_BASE_URL = "https://94api.dev/v1";
 
 const CAPABILITY_LABELS: Record<Capability, string> = {
   text: "文本",
@@ -106,6 +105,8 @@ export function RoutingSettingsPanel() {
   const [modelCapFilter, setModelCapFilter] = useState<CapabilityFilter>("all");
 
   const channel = data?.system_channels.find((item) => item.id === TOKENFREE_CHANNEL_ID) ?? data?.system_channels[0];
+  const TOKENFREE_BASE_URL = channel?.base_url || DEFAULT_BASE_URL;
+  const TOKENFREE_CONSOLE_URL = TOKENFREE_BASE_URL.replace(/\/v1\/?$/, "");
   const hasSavedKey = Boolean(channel?.has_api_key);
   const hasKey = hasSavedKey || Boolean(apiKeyInput.trim());
 
@@ -202,7 +203,7 @@ export function RoutingSettingsPanel() {
         : [
             {
               id: TOKENFREE_CHANNEL_ID,
-              name: "TokenFree New API",
+              name: "94API",
               base_url: TOKENFREE_BASE_URL,
               api_key: "",
               has_api_key: hasSavedKey,
@@ -278,7 +279,7 @@ export function RoutingSettingsPanel() {
           system_channels: [
             {
               id: TOKENFREE_CHANNEL_ID,
-              name: "TokenFree New API",
+              name: channel?.name || "94API",
               base_url: TOKENFREE_BASE_URL,
               api_key: apiKeyInput.trim() || undefined,
               api_format: "openai",
@@ -332,8 +333,8 @@ export function RoutingSettingsPanel() {
       ) : null}
 
       <SettingsPanel
-        title="TokenFree New API"
-        description="上游已锁定，不可切换。到控制台创建令牌后粘贴 Key，拉取模型并勾选后保存。"
+        title={channel?.name || "94API"}
+        description="接口地址由部署环境 OPENAI_BASE_URL 配置。填写 Key 后拉取并选择可用模型；未配置的图像/视频能力不可用。"
       >
         <div className="settings-field-grid">
           <LabeledControl label="接口地址" className="settings-field-span-full">
@@ -354,7 +355,7 @@ export function RoutingSettingsPanel() {
               <input
                 className="settings-input is-secret"
                 type="password"
-                placeholder={hasSavedKey ? "已保存，留空则不修改" : "粘贴 TokenFree API Key"}
+                placeholder={hasSavedKey ? "已保存，留空则不修改" : "粘贴 API Key"}
                 value={apiKeyInput}
                 onChange={(e) => setApiKeyInput(e.target.value)}
               />
