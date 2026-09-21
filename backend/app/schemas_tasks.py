@@ -33,7 +33,7 @@ class TaskCreateRequest(BaseModel):
     scheduled_at: datetime | None = None
     defer_activation: bool = Field(
         default=False,
-        description="True 时 next_action_at 留空，等待同 batch 前置任务完成后激活",
+        description='When True, next_action_at is left blank and activated after preceding tasks in the same batch are completed',
     )
     payload: dict[str, Any] | None = None
     result_payload: dict[str, Any] | None = None
@@ -245,7 +245,7 @@ class AdminUsageEventBriefOut(BaseModel):
     cost_fen: int = 0
     estimated: bool = False
     billing_basis: str = "estimate"
-    billing_basis_label: str = "估算"
+    billing_basis_label: str = 'Estimated'
     created_at: datetime | None = None
 
     model_config = {"from_attributes": True}
@@ -270,7 +270,7 @@ class AdminUsageEventOut(BaseModel):
     cost_fen: int = 0
     estimated: bool = False
     billing_basis: str = "estimate"
-    billing_basis_label: str = "估算"
+    billing_basis_label: str = 'Estimated'
     created_at: datetime | None = None
     task_domain: str | None = None
     task_type: str | None = None

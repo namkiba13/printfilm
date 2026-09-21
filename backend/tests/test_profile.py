@@ -30,10 +30,10 @@ def test_prepare_profile_update_allows_empty_phone():
 
 
 def test_prepare_profile_update_rejects_bad_phone():
-    with pytest.raises(ProfileError, match="手机号"):
+    with pytest.raises(ProfileError, match='phone number'):
         prepare_profile_update(nickname="创作者", email="a@b.com", phone="abc")
 
 
 def test_prepare_profile_update_rejects_blank_nickname():
-    with pytest.raises(ProfileError, match="用户名"):
+    with pytest.raises(ProfileError, match='Username'):
         prepare_profile_update(nickname="  ", email="a@b.com", phone="")

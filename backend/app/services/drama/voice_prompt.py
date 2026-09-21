@@ -84,7 +84,7 @@ def normalize_voice_prompt_text(raw: str) -> str:
 def fallback_voice_prompt(asset: DramaAsset, summary_char: dict[str, Any] | None = None) -> str:
     params = asset.params if isinstance(asset.params, dict) else {}
     summary = summary_char or {}
-    name = asset.name or "角色"
+    name = asset.name or 'Role'
     role = str(params.get("roleType") or summary.get("roleType") or "").strip()
     personality = str(params.get("personality") or summary.get("personality") or "").strip()
     visual = str(params.get("visualImage") or summary.get("visualImage") or "").strip()
@@ -140,7 +140,7 @@ async def suggest_voice_prompt_for_character(
     prompt = normalize_voice_prompt_text(raw)
     if len(prompt) < 8:
         prompt = fallback_voice_prompt(asset, summary_char)
-    name = asset.name or "角色"
+    name = asset.name or 'Role'
     speaker = infer_drama_speaker_from_prompt(prompt, character_name=name, asset_id=asset.id)
     sample_text = build_voice_sample_text(prompt, name, short=False)
     return prompt, speaker, sample_text

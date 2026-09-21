@@ -37,7 +37,7 @@ function EpisodesRedirect() {
         const path = await resolveStoryboardPath(pid)
         if (!cancelled) navigate(path, { replace: true })
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '无法进入分镜')
+        if (!cancelled) setError(err instanceof Error ? err.message : "Unable to open storyboard")
       }
     })()
     return () => {
@@ -48,7 +48,7 @@ function EpisodesRedirect() {
   return (
     <AppShell active="drama" flush>
       <div className="drama-workspace-status">
-        {error || '正在进入分镜…'}
+        {error || "Entering Storyboard…"}
       </div>
     </AppShell>
   )

@@ -141,7 +141,7 @@ async def synthesize_voice_asset(
     ark = get_ark()
     prompt = (voice_prompt or "").strip()
     if not prompt:
-        raise ValueError("缺少音色描述 prompt")
+        raise ValueError('Voice description prompt is missing')
     display_name = normalize_character_name(character_name or asset.name)
     # Seedance reference_audio 须 ≥1.8s（落盘目标 ≥2s）；默认用较长试听句
     text = (sample_text or "").strip() or build_voice_sample_text(prompt, display_name, short=False)

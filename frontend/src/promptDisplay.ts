@@ -6,14 +6,15 @@ export function scenePromptForDisplay(raw: string | null | undefined): string {
     return scene[1].replace(/^[，,。\s]+|[，,。\s]+$/g, '').trim()
   }
   const boilerplate = [
-    '同一画风',
-    '全片必须保持',
-    '凡出现人物',
-    '禁止写实',
-    '禁止换脸',
-    '禁止镜头间切换',
-    '必须严格沿用',
-    '画面干净无文字',
+    '同一画风', '全片必须保持', '凡出现人物', '禁止写实', '禁止换脸', '禁止镜头间切换', '必须严格沿用', '画面干净无文字',
+    "Same Visual Style",
+    "Must remain consistent throughout",
+    "Whenever people appear",
+    "No photorealism",
+    "No face swapping",
+    "No switching between shots",
+    "Must strictly reuse",
+    "Clean visuals with no text",
   ]
   return raw
     .split(/[，,\n]/)

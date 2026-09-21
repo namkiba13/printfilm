@@ -49,7 +49,7 @@ export function CharacterVoicePreviewButton({
 
   function handlePreview() {
     if (!src) {
-      onError?.('试听地址无效')
+      onError?.("Preview URL is invalid")
       return
     }
     if (playing) {
@@ -67,7 +67,7 @@ export function CharacterVoicePreviewButton({
     setPlaying(true)
     void sharedAudio.play().catch(() => {
       setPlaying(false)
-      onError?.('播放失败')
+      onError?.("Playback failed")
     })
   }
 
@@ -91,10 +91,10 @@ export function CharacterVoicePreviewButton({
         e.stopPropagation()
         handlePreview()
       }}
-      title={label ? `试听：${label}` : '试听音色'}
+      title={label ? `Preview: ${label}` : "Preview Voice"}
     >
       {playing ? <Pause size={14} strokeWidth={1.8} aria-hidden /> : <Volume2 size={14} strokeWidth={1.8} aria-hidden />}
-      {playing ? '停止' : '试听'}
+      {playing ? "Stop" : "Preview"}
     </button>
   )
 }

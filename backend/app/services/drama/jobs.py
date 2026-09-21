@@ -101,7 +101,7 @@ async def _reset_fragment_video_generation(
         status = str(gen.get("status") or "") if isinstance(gen, dict) else ""
         if status not in ACTIVE_VIDEO_GEN_STATUSES:
             continue
-        params["generation"] = {"status": "cancelled", "error": "任务已取消"}
+        params["generation"] = {"status": "cancelled", "error": 'Task cancelled'}
         frag.params = params
         changed += 1
     if changed:
@@ -467,7 +467,7 @@ async def run_episode_scripts_job(
                 count_completed_episodes(existing, total),
                 total,
                 phase="generating",
-                message=f"分集大纲就绪，开始生成 {count_completed_episodes(existing, total)}/{total}",
+                message=f'Episode outline ready; starting generation {count_completed_episodes(existing, total)}/{total}',
             )
 
             guard = 0
@@ -529,15 +529,15 @@ async def run_episode_scripts_job(
                     done_now,
                     total,
                     phase="generating",
-                    message=f"分集剧本进度 {done_now}/{total}",
+                    message=f'Episode script progress {done_now}/{total}',
                 )
                 guard += 1
                 if guard > max(total * 2, 24):
                     raise RuntimeError(
-                        f"分集生成未完成（{count_completed_episodes(existing, total)}/{total}）"
+                        f'Episode generation incomplete ({count_completed_episodes(existing, total)}/{total})'
                     )
                 if not batch:
-                    raise RuntimeError("分集生成无进度")
+                    raise RuntimeError('No progress in episode generation')
 
             params = dict(script.params or {})
             params["episode_content_status"] = "completed"
@@ -546,7 +546,7 @@ async def run_episode_scripts_job(
             params["episode_content_progress"] = {"done": total, "total": total}
             script.params = params
             await db.commit()
-            await _sync_task_progress(total, total, phase="succeeded", message=f"分集剧本全部完成 {total}/{total}")
+            await _sync_task_progress(total, total, phase="succeeded", message=f'All episode scripts completed {total}/{total}')
             logger.info("分集剧本全部完成 project_id=%s total=%s", project_id, total)
             return {"ok": True, "project_id": project_id, "total": total}
         except Exception as exc:  # noqa: BLE001
@@ -631,7 +631,7 @@ async def _run_single_episode_script_job(
         try:
             if mode == "summary":
                 if len(ep_creative) < 20:
-                    raise ValueError("请先填写本集原始创意（至少 20 字）")
+                    raise ValueError('Please enter the original idea for this episode first (at least 20 characters)')
                 batch = await run_episode_summary_from_creative(
                     summary,
                     existing,
@@ -654,7 +654,7 @@ async def _run_single_episode_script_job(
                 )
             elif mode == "full":
                 if len(ep_creative) < 20:
-                    raise ValueError("请先填写本集原始创意（至少 20 字）")
+                    raise ValueError('Please enter the original idea for this episode first (at least 20 characters)')
                 batch = await run_episode_full_from_creative(
                     summary,
                     existing,
@@ -667,7 +667,7 @@ async def _run_single_episode_script_job(
             elif mode == "brief":
                 ep_body = str((current or {}).get("body") or (current or {}).get("content") or "").strip()
                 if len(ep_body) < 80:
-                    raise ValueError("请先有本集剧本内容，再补齐创意与摘要")
+                    raise ValueError('Please provide script content for this episode before completing the idea and summary')
                 batch = await run_episode_brief_from_body(
                     summary,
                     existing,
@@ -679,7 +679,7 @@ async def _run_single_episode_script_job(
                 )
             else:
                 if not draft or len(draft) < 20:
-                    raise ValueError("请先输入本集剧本草稿，再让 AI 优化")
+                    raise ValueError('Please enter a draft script for this episode before asking AI to optimize it')
                 batch = await run_episode_script_from_draft(
                     summary,
                     existing,
@@ -759,7 +759,7 @@ async def _run_single_episode_script_job(
                         event_type="task.progress",
                         status=task_row.status,
                         phase="succeeded",
-                        message=f"第 {episode_number} 集已生成（{mode}）",
+                        message=f'Episode {episode_number} generated ({mode})',
                         payload={
                             "episode_number": episode_number,
                             "generate_mode": mode,
@@ -1048,7 +1048,7 @@ async def submit_fragment_video_task(task: TaskRun) -> dict[str, Any]:
     episode_id = int(task.episode_id or payload.get("episode_id") or 0)
     user_id = int(task.requested_by)
     if fragment_id <= 0 or episode_id <= 0:
-        raise ValueError("任务缺少 episode_id / fragment_id")
+        raise ValueError('Task is missing episode_id / fragment_id')
 
     async with AsyncSessionLocal() as db:
         task_row = await get_task_for_runtime(db, task.id)
@@ -1060,11 +1060,11 @@ async def submit_fragment_video_task(task: TaskRun) -> dict[str, Any]:
             options=[selectinload(DramaEpisode.project).selectinload(DramaProject.script)],
         )
         if not ep or not ep.project:
-            raise ValueError("分集或项目不存在")
+            raise ValueError('Episode or project does not exist')
         project = ep.project
         user = await db.get(User, user_id)
         if not user:
-            raise ValueError("用户不存在")
+            raise ValueError('User does not exist')
         frag = await db.get(
             DramaEpisodeFragment,
             fragment_id,
@@ -1075,12 +1075,12 @@ async def submit_fragment_video_task(task: TaskRun) -> dict[str, Any]:
             ],
         )
         if not frag or frag.episode_id != episode_id:
-            raise ValueError("分镜不存在")
+            raise ValueError('Shot does not exist')
 
         if _is_episode_video_cancelled(episode_id):
             params = dict(frag.params or {})
             params.pop("generation_attempts", None)
-            params["generation"] = {"status": "cancelled", "error": "任务已取消"}
+            params["generation"] = {"status": "cancelled", "error": 'Task cancelled'}
             frag.params = params
             await db.commit()
             return {"ok": False, "cancelled": True}
@@ -1154,7 +1154,7 @@ async def submit_fragment_video_task(task: TaskRun) -> dict[str, Any]:
                 event_type="task.prepared",
                 status=task_row.status,
                 phase=task_row.current_step_key,
-                message="参考资源就绪，重新入队提交",
+                message='Reference resources ready; requeued for submission',
             )
             await db.commit()
             return {"deferred": True, "nio_phase": "submit"}
@@ -1194,7 +1194,7 @@ async def submit_fragment_video_task(task: TaskRun) -> dict[str, Any]:
             "phase": "polling",
             "attempts": attempts,
             "attempt_limit": max_attempts,
-            "message": "上游生成中",
+            "message": 'Upstream generation in progress',
             "provider_task_id": provider_task_id,
         }
         frag.params = params
@@ -1219,7 +1219,7 @@ async def submit_fragment_video_task(task: TaskRun) -> dict[str, Any]:
             event_type="task.registered",
             status=task_row.status,
             phase=task_row.current_step_key,
-            message="已注册上游，Selector 非阻塞轮询",
+            message='Upstream registered; Selector is polling without blocking',
             payload={"provider_task_id": provider_task_id},
         )
         await db.commit()
@@ -1349,7 +1349,7 @@ async def _settle_cancelled_after_finalized(db: AsyncSession, task_id: int) -> b
         event_type="task.cancelled",
         status="cancelled",
         phase="fragment_video",
-        message="取消在成片收尾窗口内生效，成片已交付，按实际用量结算",
+        message='Cancellation takes effect during the finalization window; the finished film has been delivered and billing is based on actual usage',
     )
     await db.commit()
     return True
@@ -1683,7 +1683,7 @@ async def run_asset_image_job(
         except Exception as exc:  # noqa: BLE001
             from app.services.exc_format import format_exception_message
 
-            err_text = format_exception_message(exc, fallback="生图失败", limit=500)
+            err_text = format_exception_message(exc, fallback='Image Generation Failed', limit=500)
             if asset_id:
                 asset = await db.get(DramaAsset, asset_id)
                 if asset:
@@ -1807,7 +1807,7 @@ async def run_asset_video_job(
         except Exception as exc:  # noqa: BLE001
             from app.services.exc_format import format_exception_message
 
-            err_text = format_exception_message(exc, fallback="生视频失败", limit=500)
+            err_text = format_exception_message(exc, fallback='Video Generation Failed', limit=500)
             asset = await db.get(DramaAsset, asset_id)
             if asset:
                 params = dict(asset.params or {})

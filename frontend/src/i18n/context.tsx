@@ -39,7 +39,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const setLocale = useCallback((next: Locale) => {
     applyLocale(next, true)
-    setLocaleState(next)
+    setLocaleState('en')
   }, [])
 
   const t = useCallback<TFunction>(

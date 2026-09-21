@@ -17,7 +17,7 @@ router = APIRouter()
 
 @router.get("/queues", response_model=AdminQueuesOut)
 async def admin_queues(
-    detail: bool = Query(default=False, description="保留参数，任务中心请用 /admin/tasks"),
+    detail: bool = Query(default=False, description='Retained parameter; use /admin/tasks for the task center'),
     _admin: User = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db),
 ) -> AdminQueuesOut:

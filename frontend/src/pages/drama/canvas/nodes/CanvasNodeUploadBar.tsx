@@ -61,17 +61,17 @@ export function CanvasNodeUploadBar({
     if (!file) return
 
     if (!file.type.startsWith('image/')) {
-      setErrorMessage('请选择图片文件')
+      setErrorMessage("Please select an image file")
       return
     }
     if (file.size > 20 * 1024 * 1024) {
-      setErrorMessage('图片不能超过 20MB')
+      setErrorMessage("Image cannot exceed 20MB")
       return
     }
 
     setUploading(true)
     void uploadNodeMedia(nodeId, file)
-      .catch((err) => setErrorMessage(err instanceof Error ? err.message : '上传失败'))
+      .catch((err) => setErrorMessage(err instanceof Error ? err.message : "Upload Failed"))
       .finally(() => setUploading(false))
   }
 
@@ -83,11 +83,11 @@ export function CanvasNodeUploadBar({
       const assetId = await ensureNodeAsset(nodeId)
       const list = await dramaApi.listAssets(projectId)
       const asset = list.find((a) => a.id === assetId)
-      if (!asset) throw new Error('角色资产不存在')
+      if (!asset) throw new Error("Character asset does not exist")
       const { character } = await generateAndBindCharacterVoice(projectId, asset)
       syncNodeFromAsset(nodeId, character)
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : '音色生成失败')
+      setErrorMessage(err instanceof Error ? err.message : "Voice generation failed")
     } finally {
       setVoiceLoading(false)
     }
@@ -110,7 +110,7 @@ export function CanvasNodeUploadBar({
           onClick={() => fileInputRef.current?.click()}
         >
           {uploading ? <Loader2 size={14} className="fc-spin" /> : <Upload size={14} strokeWidth={1.8} />}
-          {uploading ? '上传中…' : '上传图片'}
+          {uploading ? "Uploading…" : "Upload Image"}
         </button>
         <button
           type="button"
@@ -119,8 +119,7 @@ export function CanvasNodeUploadBar({
           onClick={() => setPickerOpen(true)}
         >
           <FolderOpen size={14} strokeWidth={1.8} />
-          从资产库选择
-        </button>
+          {"Select from asset library"}</button>
         {DRAMA_VOICE_BINDING_ENABLED && isCharacter ? (
           hasVoice && voiceUrl ? (
             <CharacterVoicePreviewButton
@@ -136,14 +135,14 @@ export function CanvasNodeUploadBar({
               className="fc-toolbar-chip"
               disabled={uploading || voiceLoading}
               onClick={() => void handleGenerateVoice()}
-              title="按角色设定 AI 生成音色"
+              title={"AI-generate a voice based on the character settings"}
             >
               {voiceLoading ? (
                 <Loader2 size={14} className="fc-spin" />
               ) : (
                 <AudioLines size={14} strokeWidth={1.8} />
               )}
-              {voiceLoading ? '生成中…' : '生成音色'}
+              {voiceLoading ? "Generating…" : "Generate voice"}
             </button>
           )
         ) : null}
@@ -155,8 +154,8 @@ export function CanvasNodeUploadBar({
         projectId={projectId}
         defaultTab="all"
         allowedTypes={canvasKindToLibraryTypes(kind)}
-        title="从资产库选择"
-        confirmLabel="确认使用"
+        title={"Select from asset library"}
+        confirmLabel={"Confirm Use"}
         onPick={async (source) => {
           await applyLibraryMediaToNode(nodeId, source)
         }}

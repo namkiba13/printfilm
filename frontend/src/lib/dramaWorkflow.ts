@@ -2,8 +2,8 @@ import type { DramaProject, DramaProjectListItem } from '../api/drama'
 
 export type DramaWorkflow = 'script' | 'canvas'
 
-const CANVAS_SOURCE_MARKER = '自由画布创作项目'
-const CANVAS_TITLE_MARKER = '自由画布'
+const CANVAS_SOURCE_MARKER = "Free Canvas Creation Project"
+const CANVAS_TITLE_MARKER = "Free Canvas"
 
 type WorkflowSource = {
   workflow?: string | null
@@ -48,10 +48,10 @@ export function dramaProjectEntryPath(
 /** 列表卡片 meta 文案 */
 export function formatDramaCardMeta(item: DramaProjectListItem): string {
   if (isCanvasWorkflow(item)) {
-    return `自由画布 · ${item.asset_count || 0} 节点资产`
+    return `Free Canvas · ${item.asset_count || 0} node assets`
   }
   if (item.has_script) {
-    return `已写剧本 · ${item.episode_count || 0} 集 · ${item.asset_count || 0} 资产`
+    return `Script written · ${item.episode_count || 0} episodes · ${item.asset_count || 0} assets`
   }
-  return `草稿 · 待写剧本 · ${item.asset_count || 0} 资产`
+  return `Draft · Script pending · ${item.asset_count || 0} assets`
 }

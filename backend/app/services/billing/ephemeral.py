@@ -72,7 +72,7 @@ async def create_ephemeral_task_row(
                 event_type="task.created",
                 status=task.status,
                 phase=task.current_step_key,
-                message=f"轻量任务 {task_type}",
+                message=f'Lightweight task {task_type}',
                 payload={"ephemeral": True},
             ),
         )
@@ -119,7 +119,7 @@ async def run_billed_ephemeral(
     except ValueError:
         task.status = "failed"
         task.error_code = "insufficient_balance"
-        task.error_message = "余额不足"
+        task.error_message = 'Insufficient Balance'
         # 未预扣成功，保持 none，勿标 skipped（skipped 表示全局关闭计费）
         task.billing_status = "none"
         await db.flush()
@@ -133,7 +133,7 @@ async def run_billed_ephemeral(
         task.id,
         event_type="task.started",
         status=task.status,
-        message="轻量任务开始",
+        message='Lightweight task started',
     )
     await db.flush()
 
@@ -150,7 +150,7 @@ async def run_billed_ephemeral(
             task.id,
             event_type="task.completed",
             status=task.status,
-            message="轻量任务完成",
+            message='Lightweight task completed',
         )
     except Exception as exc:
         task.status = "failed"
@@ -222,7 +222,7 @@ async def run_billed_ephemeral_deferred(
     except ValueError:
         task.status = "failed"
         task.error_code = "insufficient_balance"
-        task.error_message = "余额不足"
+        task.error_message = 'Insufficient Balance'
         task.billing_status = "none"
         await db.flush()
         raise
@@ -235,7 +235,7 @@ async def run_billed_ephemeral_deferred(
         task.id,
         event_type="task.started",
         status=task.status,
-        message="轻量视频任务开始",
+        message='Lightweight video task started',
     )
     await db.flush()
 
@@ -245,7 +245,7 @@ async def run_billed_ephemeral_deferred(
             result = await executor()
         provider_id = _extract_provider_task_id(result)
         if not provider_id:
-            raise RuntimeError("上游未返回 task_id")
+            raise RuntimeError('The upstream service did not return task_id')
         task.status = "awaiting_poll"
         task.provider_task_id = provider_id
         task.progress_percent = 30
@@ -256,7 +256,7 @@ async def run_billed_ephemeral_deferred(
             task.id,
             event_type="task.submitted",
             status=task.status,
-            message="已提交上游，等待轮询",
+            message='Submitted to upstream service; waiting for polling',
             payload={"provider_task_id": provider_id},
         )
     except Exception as exc:
@@ -373,12 +373,12 @@ async def settle_deferred_video_poll(
             task.id,
             event_type="task.completed",
             status=task.status,
-            message="视频生成完成",
+            message='Video generation completed',
         )
     else:
         task.status = "failed"
         task.error_code = "upstream_failed"
-        task.error_message = (error or "生成失败")[:500]
+        task.error_message = (error or 'Generation Failed')[:500]
         task.finished_at = now
         await append_task_event(
             db,

@@ -23,7 +23,7 @@ export function RuntimeSettingsPanel() {
       const data = await api<AdminModelSettings>("/api/admin/settings/models");
       setForm(data);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "加载失败");
+      toast.error(err instanceof Error ? err.message : "Failed to Load");
     } finally {
       setLoading(false);
     }
@@ -39,8 +39,8 @@ export function RuntimeSettingsPanel() {
         id: item.capability,
         label: item.label,
         ready: item.ready,
-        readyText: item.model || "就绪",
-        pendingText: "未就绪",
+        readyText: item.model || "Ready",
+        pendingText: "Not Ready",
       })),
     [form?.readiness],
   );
@@ -73,9 +73,9 @@ export function RuntimeSettingsPanel() {
       };
       await api("/api/admin/settings/models", { method: "PATCH", body: JSON.stringify(body) });
       await load();
-      toast.success("运行参数已保存");
+      toast.success("Runtime parameters saved");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "保存失败");
+      toast.error(err instanceof Error ? err.message : "Save failed");
     } finally {
       setSaving(false);
     }
@@ -88,15 +88,15 @@ export function RuntimeSettingsPanel() {
   return (
     <SettingsTabShell onSave={() => void handleSave()} saving={saving}>
       <SettingsStatusBar
-        title="路由就绪状态"
+        title={"Route Readiness Status"}
         items={
           statusItems.length > 0
             ? statusItems
-            : [{ id: "empty", label: "能力路由", ready: false, pendingText: "请先在「模型」填写 Key 并选择模型" }]
+            : [{ id: "empty", label: "Capability Routing", ready: false, pendingText: "Please enter a Key and select a model under “Models” first" }]
         }
         extra={
           <span className="settings-status-extra">
-            {form.readiness?.every((item) => item.ready) ? "四类能力已就绪" : "请在「模型」填写 TokenFree Key 并选择模型"}
+            {form.readiness?.every((item) => item.ready) ? "All four capabilities are ready" : "Please enter a TokenFree Key and select a model under “Models”"}
           </span>
         }
       />
@@ -104,32 +104,32 @@ export function RuntimeSettingsPanel() {
       <div className="settings-routing-grid">
         <SettingsPanel
           className="settings-panel--compact"
-          title="1. 质量与默认值"
-          description="生图尺寸、视频清晰度、Seedance 时长与轮询"
+          title={"1. Quality and Defaults"}
+          description={"Image generation size, video quality, Seedance duration, and polling"}
         >
           <div className="settings-field-grid">
-            <LabeledControl label="默认生图尺寸">
+            <LabeledControl label={"Default Image Generation Size"}>
               <input
                 className="settings-input"
                 value={form.ark_image_size}
                 onChange={(e) => patchField("ark_image_size", e.target.value)}
               />
             </LabeledControl>
-            <LabeledControl label="默认视频清晰度">
+            <LabeledControl label={"Default Video Quality"}>
               <input
                 className="settings-input"
                 value={form.ark_video_resolution}
                 onChange={(e) => patchField("ark_video_resolution", e.target.value)}
               />
             </LabeledControl>
-            <LabeledControl label="默认视频比例">
+            <LabeledControl label={"Default Video Aspect Ratio"}>
               <input
                 className="settings-input"
                 value={form.ark_video_ratio}
                 onChange={(e) => patchField("ark_video_ratio", e.target.value)}
               />
             </LabeledControl>
-            <LabeledControl label="Seedance 最小时长（秒）">
+            <LabeledControl label={"Seedance Minimum Duration (seconds)"}>
               <input
                 className="settings-input"
                 type="number"
@@ -138,7 +138,7 @@ export function RuntimeSettingsPanel() {
                 onChange={(e) => patchField("seedance_duration_min", Number(e.target.value))}
               />
             </LabeledControl>
-            <LabeledControl label="Seedance 最大时长（秒）">
+            <LabeledControl label={"Seedance Maximum Duration (seconds)"}>
               <input
                 className="settings-input"
                 type="number"
@@ -147,7 +147,7 @@ export function RuntimeSettingsPanel() {
                 onChange={(e) => patchField("seedance_duration_max", Number(e.target.value))}
               />
             </LabeledControl>
-            <LabeledControl label="视频轮询间隔（秒）">
+            <LabeledControl label={"Video Polling Interval (seconds)"}>
               <input
                 className="settings-input"
                 type="number"
@@ -156,7 +156,7 @@ export function RuntimeSettingsPanel() {
                 onChange={(e) => patchField("ark_video_poll_interval", Number(e.target.value))}
               />
             </LabeledControl>
-            <LabeledControl label="视频轮询超时（秒）">
+            <LabeledControl label={"Video Polling Timeout (seconds)"}>
               <input
                 className="settings-input"
                 type="number"
@@ -169,11 +169,11 @@ export function RuntimeSettingsPanel() {
 
         <SettingsPanel
           className="settings-panel--compact"
-          title="2. 并发与限制"
-          description="管线并发、任务槽位与漫剧分镜上限"
+          title={"2. Concurrency and Limits"}
+          description={"Pipeline concurrency, task slots, and AI Drama storyboard limit"}
         >
           <div className="settings-field-grid">
-            <LabeledControl label="生图并发">
+            <LabeledControl label={"Image Generation Concurrency"}>
               <input
                 className="settings-input"
                 type="number"
@@ -182,7 +182,7 @@ export function RuntimeSettingsPanel() {
                 onChange={(e) => patchField("pipeline_image_concurrency", Number(e.target.value))}
               />
             </LabeledControl>
-            <LabeledControl label="视频并发">
+            <LabeledControl label={"Video Concurrency"}>
               <input
                 className="settings-input"
                 type="number"
@@ -191,7 +191,7 @@ export function RuntimeSettingsPanel() {
                 onChange={(e) => patchField("pipeline_video_concurrency", Number(e.target.value))}
               />
             </LabeledControl>
-            <LabeledControl label="配音并发">
+            <LabeledControl label={"Voiceover Concurrency"}>
               <input
                 className="settings-input"
                 type="number"
@@ -200,7 +200,7 @@ export function RuntimeSettingsPanel() {
                 onChange={(e) => patchField("pipeline_audio_concurrency", Number(e.target.value))}
               />
             </LabeledControl>
-            <LabeledControl label="任务平台槽位（全站）">
+            <LabeledControl label={"Task Platform Slots (Global)"}>
               <input
                 className="settings-input"
                 type="number"
@@ -209,7 +209,7 @@ export function RuntimeSettingsPanel() {
                 onChange={(e) => patchField("task_runtime_max_concurrency", Number(e.target.value))}
               />
             </LabeledControl>
-            <LabeledControl label="单用户任务槽位">
+            <LabeledControl label={"Per-User Task Slots"}>
               <input
                 className="settings-input"
                 type="number"
@@ -218,7 +218,7 @@ export function RuntimeSettingsPanel() {
                 onChange={(e) => patchField("task_user_max_concurrency", Number(e.target.value))}
               />
             </LabeledControl>
-            <LabeledControl label="Selector 轮询并发">
+            <LabeledControl label={"Selector Polling Concurrency"}>
               <input
                 className="settings-input"
                 type="number"
@@ -227,7 +227,7 @@ export function RuntimeSettingsPanel() {
                 onChange={(e) => patchField("task_poll_max_concurrency", Number(e.target.value))}
               />
             </LabeledControl>
-            <LabeledControl label="单用户漫剧视频在途上限">
+            <LabeledControl label={"Per-User AI Drama Video In-Flight Limit"}>
               <input
                 className="settings-input"
                 type="number"
@@ -236,7 +236,7 @@ export function RuntimeSettingsPanel() {
                 onChange={(e) => patchField("drama_user_video_job_limit", Number(e.target.value))}
               />
             </LabeledControl>
-            <LabeledControl label="分镜视频最大尝试次数">
+            <LabeledControl label={"Maximum Storyboard Video Attempts"}>
               <input
                 className="settings-input"
                 type="number"
@@ -248,26 +248,25 @@ export function RuntimeSettingsPanel() {
           </div>
           <div className="settings-toggle-row mt-3">
             <div>
-              <strong>ARK Mock 模式</strong>
-              <span>开发环境模拟生成，不调用真实上游</span>
+              <strong>{"ARK Mock Mode"}</strong>
+              <span>{"Simulated generation in development environments; does not call real upstream services"}</span>
             </div>
             <Switch checked={form.ark_mock} onCheckedChange={(v) => patchField("ark_mock", v)} />
           </div>
         </SettingsPanel>
       </div>
 
-      <SettingsPanel className="settings-panel--compact" title="3. 运行时摘要" description="当前生效的 Worker / Selector 槽位">
+      <SettingsPanel className="settings-panel--compact" title={"3. Runtime Summary"} description={"Currently Active Worker / Selector Slots"}>
         <div className="settings-runtime-summary">
           <div className="settings-runtime-summary-row">
             <Activity className="h-4 w-4 text-[var(--admin-forest)]" />
             <span>
-              Worker 槽位 <strong>{form.task_runtime_max_concurrency}</strong> · 单用户{" "}
+              {"Worker Slots"}<strong>{form.task_runtime_max_concurrency}</strong> {"· Per User"}{" "}
               <strong>{form.task_user_max_concurrency}</strong>
             </span>
           </div>
           <p className="settings-runtime-summary-hint">
-            Selector 每轮最多 {form.task_poll_max_concurrency} 路上游非阻塞查询；awaiting_poll 不计入 Worker 占用。
-          </p>
+            {"Selector: Up to {form.task_poll_max_concurrency} upstream non-blocking queries per round; awaiting_poll does not count toward Worker usage."}{form.task_poll_max_concurrency} {"upstream non-blocking queries; awaiting_poll does not count toward Worker usage."}</p>
         </div>
       </SettingsPanel>
     </SettingsTabShell>

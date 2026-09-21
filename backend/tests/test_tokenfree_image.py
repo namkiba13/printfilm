@@ -88,7 +88,7 @@ def test_failed_responses_payload_is_user_error_not_missing_url():
         "error": {"code": "server_error", "message": "The task failed."},
         "metadata": {"task_status": "failed", "task_id": "task_x"},
     }
-    with pytest.raises(RuntimeError, match="出图上游任务失败") as ei:
+    with pytest.raises(RuntimeError, match='upstream image-generation task failed') as ei:
         raise_tokenfree_image_if_failed(payload)
     assert "Seedream missing url" not in str(ei.value)
     assert "resp_" not in str(ei.value)
@@ -96,7 +96,7 @@ def test_failed_responses_payload_is_user_error_not_missing_url():
     assert is_tokenfree_retryable_image_error(status_code=200, body=body) is True
     assert is_tokenfree_retryable_image_error(status_code=400, body=body) is False
     http_msg = tokenfree_image_user_error(model="gpt-image-2", status_code=200, body=body)
-    assert "出图上游任务失败" in http_msg
+    assert "upstream image-generation task failed" in http_msg
     assert "resp_" not in http_msg
 
 
@@ -123,7 +123,7 @@ def test_sunburst_model_not_found_is_channel_dead():
         '"message":"分组 default 下模型 gpt-image-2-5-sunburst 无可用的渠道distributor"}}'
     )
     assert is_tokenfree_no_distributor(status_code=503, body=body) is True
-    assert "暂时失败" in tokenfree_image_user_error(
+    assert 'temporarily failed' in tokenfree_image_user_error(
         model="gpt-image-2-5-sunburst", status_code=503, body=body
     )
 
@@ -141,8 +141,8 @@ def test_tokenfree_image_user_error_does_not_nudge_switch_model():
     protocol = '{"error":{"code":"task_protocol_error","message":"Task protocol request failed"}}'
     for mid in ("gpt-image-2-5", "seedream-5-0-pro"):
         msg = tokenfree_image_user_error(model=mid, status_code=502, body=protocol)
-        assert "请改用 gpt-image-2-5" not in msg
-        assert "暂时失败" in msg
+        assert 'switch to gpt-image-2-5' not in msg
+        assert 'temporarily failed' in msg
 
 
 def test_raise_seedream_http_error_tokenfree_vs_ark():
@@ -150,7 +150,7 @@ def test_raise_seedream_http_error_tokenfree_vs_ark():
     from app.services.ark import _raise_seedream_http_error
 
     protocol = '{"error":{"code":"task_protocol_error","message":"Task protocol request failed"}}'
-    with pytest.raises(RuntimeError, match="暂时失败"):
+    with pytest.raises(RuntimeError, match='temporarily failed'):
         _raise_seedream_http_error(502, protocol, model="gpt-image-2-5", tokenfree=True)
     with pytest.raises(RuntimeError, match="Seedream error 502"):
         _raise_seedream_http_error(502, protocol, model="gpt-image-2-5", tokenfree=False)
@@ -170,7 +170,7 @@ def test_raise_seedream_http_error_tokenfree_moderation_uses_audit_text():
     from app.services.ark import _raise_seedream_http_error
 
     body = '{"error":{"code":"InputTextSensitive","message":"text sensitive"}}'
-    with pytest.raises(RuntimeError, match="内容审核"):
+    with pytest.raises(RuntimeError, match='content review'):
         _raise_seedream_http_error(400, body, model="gpt-image-2-5", tokenfree=True)
 
 
@@ -275,7 +275,7 @@ async def test_seedream_once_does_not_fall_back_to_kie(monkeypatch):
 
     monkeypatch.setattr("app.services.ark.httpx.AsyncClient", _FakeClient)
     monkeypatch.setattr(gw, "_resolve_ark_route", lambda *args, **kwargs: None)
-    with pytest.raises(RuntimeError, match="暂时失败"):
+    with pytest.raises(RuntimeError, match='temporarily failed'):
         await gw._seedream_once(
             "湖",
             None,
@@ -334,7 +334,7 @@ async def test_seedream_once_http200_failed_task(monkeypatch):
     monkeypatch.setattr("app.services.ark.httpx.AsyncClient", _FakeClient)
     monkeypatch.setattr("app.services.ark.post_until_not_rate_limited", _no_retry)
     monkeypatch.setattr(gw, "_resolve_ark_route", lambda *args, **kwargs: None)
-    with pytest.raises(RuntimeError, match="出图上游任务失败") as ei:
+    with pytest.raises(RuntimeError, match='upstream image-generation task failed') as ei:
         await gw._seedream_once(
             "湖",
             None,

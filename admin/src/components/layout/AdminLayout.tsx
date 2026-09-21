@@ -74,26 +74,26 @@ const navGroups: NavGroup[] = [
 
   {
 
-    label: "概览",
+    label: "Overview",
 
-    items: [{ to: "/", label: "仪表盘", icon: LayoutDashboard, end: true }],
+    items: [{ to: "/", label: "Dashboard", icon: LayoutDashboard, end: true }],
 
   },
 
   {
 
-    label: "业务",
+    label: "Business",
 
     items: [
 
-      { to: "/users", label: "用户管理", icon: Users },
+      { to: "/users", label: "User Management", icon: Users },
 
-      { to: "/orders", label: "订单流水", icon: Receipt },
-      { to: "/finance", label: "财务列表", icon: Wallet },
+      { to: "/orders", label: "Order Transactions", icon: Receipt },
+      { to: "/finance", label: "Finance List", icon: Wallet },
 
-      { to: "/projects", label: "科普项目", icon: Clapperboard },
+      { to: "/projects", label: "Short Video Projects", icon: Clapperboard },
 
-      { to: "/works", label: "作品审核", icon: FileVideo },
+      { to: "/works", label: "Work Review", icon: FileVideo },
 
     ],
 
@@ -101,17 +101,17 @@ const navGroups: NavGroup[] = [
 
   {
 
-    label: "漫剧",
+    label: "AI Drama",
 
     items: [
 
-      { to: "/drama-projects", label: "漫剧项目", icon: Film, matchPrefix: true },
+      { to: "/drama-projects", label: "AI Drama Projects", icon: Film, matchPrefix: true },
 
-      { to: "/drama-assets", label: "资产库", icon: Image, matchPrefix: true },
+      { to: "/drama-assets", label: "Asset Library", icon: Image, matchPrefix: true },
 
-      { to: "/drama-episodes", label: "分集管理", icon: ListVideo, matchPrefix: true },
+      { to: "/drama-episodes", label: "Episode Management", icon: ListVideo, matchPrefix: true },
 
-      { to: "/drama-fragments", label: "分镜管理", icon: Layers, matchPrefix: true },
+      { to: "/drama-fragments", label: "Storyboard Management", icon: Layers, matchPrefix: true },
 
     ],
 
@@ -119,13 +119,13 @@ const navGroups: NavGroup[] = [
 
   {
 
-    label: "资源",
+    label: "Resources",
 
     items: [
 
-      { to: "/templates", label: "模板管理", icon: Shapes },
+      { to: "/templates", label: "Template Management", icon: Shapes },
 
-      { to: "/queues", label: "任务中心", icon: Layers },
+      { to: "/queues", label: "Task Center", icon: Layers },
 
     ],
 
@@ -133,9 +133,9 @@ const navGroups: NavGroup[] = [
 
   {
 
-    label: "系统",
+    label: "System",
 
-    items: [{ to: "/settings", label: "系统设置", icon: Settings }],
+    items: [{ to: "/settings", label: "System Settings", icon: Settings }],
 
   },
 
@@ -145,30 +145,30 @@ const navGroups: NavGroup[] = [
 
 const titles: Record<string, string> = {
 
-  "/": "仪表盘",
+  "/": "Dashboard",
 
-  "/users": "用户管理",
+  "/users": "User Management",
 
-  "/orders": "订单流水",
-  "/finance": "财务列表",
+  "/orders": "Order Transactions",
+  "/finance": "Finance List",
 
-  "/projects": "科普项目",
+  "/projects": "Short Video Projects",
 
-  "/drama-projects": "漫剧项目",
+  "/drama-projects": "AI Drama Projects",
 
-  "/drama-assets": "资产库",
+  "/drama-assets": "Asset Library",
 
-  "/drama-episodes": "分集管理",
+  "/drama-episodes": "Episode Management",
 
-  "/drama-fragments": "分镜管理",
+  "/drama-fragments": "Storyboard Management",
 
-  "/works": "作品审核",
+  "/works": "Work Review",
 
-  "/templates": "模板管理",
+  "/templates": "Template Management",
 
-  "/settings": "系统设置",
+  "/settings": "System Settings",
 
-  "/queues": "任务中心",
+  "/queues": "Task Center",
 
 };
 
@@ -176,15 +176,15 @@ const titles: Record<string, string> = {
 
 function resolveTitle(pathname: string): string {
 
-  if (pathname.startsWith("/drama-projects/")) return "漫剧项目详情";
+  if (pathname.startsWith("/drama-projects/")) return "AI Drama Project Details";
 
-  if (pathname.startsWith("/drama-assets/")) return "资产详情";
+  if (pathname.startsWith("/drama-assets/")) return "Asset Details";
 
-  if (pathname.startsWith("/drama-episodes/")) return "分集详情";
+  if (pathname.startsWith("/drama-episodes/")) return "Episode Details";
 
-  if (pathname.startsWith("/drama-fragments/")) return "分镜详情";
+  if (pathname.startsWith("/drama-fragments/")) return "Storyboard Details";
 
-  return titles[pathname] ?? "管理后台";
+  return titles[pathname] ?? "Admin Console";
 
 }
 
@@ -244,7 +244,7 @@ export function AdminLayout() {
 
               <div className="admin-brand-name">PRINTFILM</div>
 
-              <div className="admin-brand-sub">管理后台</div>
+              <div className="admin-brand-sub">{"Admin Console"}</div>
 
             </div>
 
@@ -312,13 +312,13 @@ export function AdminLayout() {
 
               <div className="truncate text-[13px] font-medium text-[#e8f0eb]">{user?.email}</div>
 
-              <div className="text-xs text-[rgba(240,245,242,0.45)]">超级管理员</div>
+              <div className="text-xs text-[rgba(240,245,242,0.45)]">{"Super Administrator"}</div>
 
             </div>
 
           )}
 
-          <button type="button" className="admin-icon-btn !text-[rgba(240,245,242,0.55)] hover:!text-[#e8f0eb]" onClick={handleLogout} title="退出登录">
+          <button type="button" className="admin-icon-btn !text-[rgba(240,245,242,0.55)] hover:!text-[#e8f0eb]" onClick={handleLogout} title={"Log Out"}>
 
             <LogOut className="h-4 w-4" />
 
@@ -344,7 +344,7 @@ export function AdminLayout() {
 
               onClick={() => setCollapsed((v) => !v)}
 
-              aria-label="折叠侧栏"
+              aria-label={"Collapse Sidebar"}
 
             >
 
@@ -356,7 +356,7 @@ export function AdminLayout() {
 
               <div className="admin-topbar-title">{title}</div>
 
-              <div className="admin-topbar-crumb">PRINTFILM · 运营管理</div>
+              <div className="admin-topbar-crumb">{"PRINTFILM · Operations Management"}</div>
 
             </div>
 
@@ -364,7 +364,7 @@ export function AdminLayout() {
 
           <div className="flex items-center gap-1">
 
-            <button type="button" className="admin-icon-btn" title="通知">
+            <button type="button" className="admin-icon-btn" title={"Notifications"}>
 
               <Bell className="h-4 w-4" />
 
@@ -376,7 +376,7 @@ export function AdminLayout() {
 
               className="admin-icon-btn"
 
-              title="全屏"
+              title={"Fullscreen"}
 
               onClick={() => {
 

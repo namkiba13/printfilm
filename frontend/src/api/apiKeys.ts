@@ -44,7 +44,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
         : Array.isArray(detail)
           ? detail.map((d: { msg?: string }) => d.msg || JSON.stringify(d)).join('; ')
           : res.statusText
-    throw new Error(message || '请求失败')
+    throw new Error(message || "Request Failed")
   }
   return res.json() as Promise<T>
 }

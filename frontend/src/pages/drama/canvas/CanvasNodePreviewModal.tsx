@@ -78,7 +78,7 @@ export function CanvasNodePreviewModal({ payload, onClose }: CanvasNodePreviewMo
         mode === 'video' ? 'mp4' : mode === 'audio' ? 'mp3' : 'png'
       await downloadCanvasMedia(url, canvasMediaFilename(payload.title, url, fallback))
     } catch (err) {
-      setError(err instanceof Error ? err.message : '下载失败')
+      setError(err instanceof Error ? err.message : "Download Failed")
     } finally {
       setBusy(false)
     }
@@ -89,7 +89,7 @@ export function CanvasNodePreviewModal({ payload, onClose }: CanvasNodePreviewMo
       className="fc-node-preview-backdrop"
       role="dialog"
       aria-modal="true"
-      aria-label={`${payload.title} 预览`}
+      aria-label={`${payload.title} Preview`}
       onClick={onClose}
     >
       <div className="fc-node-preview-bar" onClick={(event) => event.stopPropagation()}>
@@ -103,12 +103,11 @@ export function CanvasNodePreviewModal({ payload, onClose }: CanvasNodePreviewMo
             onClick={() => void handleDownload()}
           >
             <Download size={16} strokeWidth={2} />
-            {busy ? '下载中…' : '下载'}
+            {busy ? "Downloading…" : "Download"}
           </button>
-          <button type="button" className="fc-node-preview-btn is-ghost" onClick={onClose} aria-label="关闭">
+          <button type="button" className="fc-node-preview-btn is-ghost" onClick={onClose} aria-label={"Close"}>
             <X size={16} strokeWidth={2} />
-            关闭
-          </button>
+            {"Close"}</button>
         </div>
       </div>
       <div className="fc-node-preview-stage" onClick={(event) => event.stopPropagation()}>
@@ -122,14 +121,14 @@ export function CanvasNodePreviewModal({ payload, onClose }: CanvasNodePreviewMo
             <audio src={audioSrc} controls autoPlay />
           </div>
         ) : mode === 'text' ? (
-          <pre className="fc-node-preview-text">{text || '（空文本）'}</pre>
+          <pre className="fc-node-preview-text">{text || "(Empty Text)"}</pre>
         ) : mode === 'image' ? (
           <div className="fc-node-preview-still">
             <img className="fc-node-preview-media" src={media} alt={payload.title} />
             {audioSrc ? <audio src={audioSrc} controls /> : null}
           </div>
         ) : (
-          <p className="fc-node-preview-empty">暂无内容可预览</p>
+          <p className="fc-node-preview-empty">{"No content to preview"}</p>
         )}
       </div>
     </div>,

@@ -97,7 +97,7 @@ async def get_skill(
 ) -> AgentSkillOut:
     row = await get_visible_skill(db, user.id, skill_id)
     if row is None:
-        raise HTTPException(status_code=404, detail="Skill 不存在")
+        raise HTTPException(status_code=404, detail='Skill does not exist')
     return _out(row)
 
 
@@ -124,14 +124,14 @@ async def upload_skill_file(
     # 上传 .md 文件
     filename = (file.filename or "").lower()
     if filename and not filename.endswith((".md", ".markdown", ".txt")):
-        raise HTTPException(status_code=400, detail="请上传 .md 文件")
+        raise HTTPException(status_code=400, detail='Please upload an .md file')
     raw = await file.read()
     if len(raw) > 200 * 1024:
-        raise HTTPException(status_code=400, detail="文件不能超过 200KB")
+        raise HTTPException(status_code=400, detail='File cannot exceed 200KB')
     try:
         text = raw.decode("utf-8")
     except UnicodeDecodeError as exc:
-        raise HTTPException(status_code=400, detail="文件须为 UTF-8 文本") from exc
+        raise HTTPException(status_code=400, detail='File must be UTF-8 text') from exc
     try:
         row = await create_user_skill(db, user.id, text)
     except SkillParseError as exc:
@@ -148,9 +148,9 @@ async def patch_skill(
 ) -> AgentSkillOut:
     row = await get_visible_skill(db, user.id, skill_id)
     if row is None:
-        raise HTTPException(status_code=404, detail="Skill 不存在")
+        raise HTTPException(status_code=404, detail='Skill does not exist')
     if not row.is_builtin and row.user_id != user.id:
-        raise HTTPException(status_code=403, detail="不能修改他人 Skill")
+        raise HTTPException(status_code=403, detail="Cannot modify another user's Skill")
     try:
         row = await update_user_skill(db, row, markdown=body.markdown, is_active=body.is_active)
     except SkillParseError as exc:
@@ -166,11 +166,11 @@ async def remove_skill(
 ) -> dict:
     row = await get_visible_skill(db, user.id, skill_id)
     if row is None:
-        raise HTTPException(status_code=404, detail="Skill 不存在")
+        raise HTTPException(status_code=404, detail='Skill does not exist')
     if row.is_builtin:
-        raise HTTPException(status_code=400, detail="系统内置 Skill 不能删除，可停用")
+        raise HTTPException(status_code=400, detail='Built-in system Skills cannot be deleted, but can be disabled')
     if row.user_id != user.id:
-        raise HTTPException(status_code=403, detail="不能删除他人 Skill")
+        raise HTTPException(status_code=403, detail="Cannot delete another user's Skill")
     try:
         await delete_user_skill(db, row)
     except SkillParseError as exc:

@@ -621,7 +621,7 @@ async def plan_fragments_with_llm(
     elif isinstance(raw, list):
         items = raw
     if not isinstance(items, list) or not items:
-        raise RuntimeError("LLM 分镜结果为空")
+        raise RuntimeError('LLM storyboard result is empty')
 
     items = cap_llm_fragment_items(items)
 
@@ -644,7 +644,7 @@ async def plan_fragments_with_llm(
         include_character_intro=include_character_intro,
     )
     if not drafts:
-        raise RuntimeError("LLM 分镜规范化后为空")
+        raise RuntimeError('LLM storyboard result is empty after normalization')
     drafts = trim_episode_fragment_drafts(drafts)
     logger.info(
         "LLM 分镜完成 episode=%s ep_no=%s fragments=%s introduced_before=%s locked=%s",

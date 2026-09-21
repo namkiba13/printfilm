@@ -33,11 +33,11 @@ type Props = {
 
 /** 把合成进度转成按钮文案 */
 function composeProgressLabel(progress: EpisodeComposeProgress | null, busy: boolean) {
-  if (!busy) return '全片合成下载'
-  if (!progress) return '全片合成中…'
-  if (progress.phase === 'download') return `拉取分镜 ${progress.done}/${progress.total}`
-  if (progress.phase === 'server') return '服务端统一重编码拼接…'
-  return '正在拼接…'
+  if (!busy) return "Download full video"
+  if (!progress) return "Compositing full video…"
+  if (progress.phase === 'download') return `Fetch shots ${progress.done}/${progress.total}`
+  if (progress.phase === 'server') return "Server-side unified re-encoding and stitching…"
+  return "Stitching…"
 }
 
 // 渲染分集右侧预览与画布入口
@@ -47,7 +47,7 @@ export function EpisodeEditSidePane({
   onPlayingFragmentChange,
   aspectRatio,
   episodeId,
-  episodeName = '本集',
+  episodeName = "This Episode",
   subtitleMode,
   onOpenStoryboard,
   previewVideoUrl = null,
@@ -73,9 +73,9 @@ export function EpisodeEditSidePane({
     if (composeBusy || composeClips.length === 0) return
     if (missingCount > 0) {
       const ok = await dialog.confirm({
-        title: '部分分镜尚未生成',
-        message: `有 ${missingCount} 镜还没有视频，将只拼接已生成的 ${composeClips.length} 镜。是否继续？`,
-        confirmText: '继续合成',
+        title: "Some shots have not been generated",
+        message: `${missingCount} shots have no video yet. Only the ${composeClips.length} generated shots will be stitched. Continue?`,
+        confirmText: "Continue compositing",
       })
       if (!ok) return
     }
@@ -88,7 +88,7 @@ export function EpisodeEditSidePane({
       })
       triggerBlobDownload(blob, episodeComposeFilename(episodeName))
     } catch (err) {
-      setComposeError(err instanceof Error ? err.message : '全片合成失败')
+      setComposeError(err instanceof Error ? err.message : "Full video composition failed")
     } finally {
       setComposeBusy(false)
       setComposeProgress(null)
@@ -98,13 +98,11 @@ export function EpisodeEditSidePane({
   return (
     <aside className="drama-ep-preview">
       <div className="drama-ep-side-header">
-        <div className="drama-ep-side-tabs" role="tablist" aria-label="右侧面板">
+        <div className="drama-ep-side-tabs" role="tablist" aria-label={"Right panel"}>
           <button type="button" role="tab" aria-selected className="active">
-            预览
-          </button>
+            {"Preview"}</button>
           <button type="button" role="tab" onClick={onOpenStoryboard}>
-            画布
-          </button>
+            {"Canvas"}</button>
         </div>
         <button
           type="button"
@@ -112,8 +110,8 @@ export function EpisodeEditSidePane({
           disabled={composeBusy || composeClips.length === 0}
           title={
             composeClips.length === 0
-              ? '请先生成分镜视频'
-              : '在浏览器里把本集已生成镜头拼成一条成片并下载'
+              ? "Please generate storyboard videos first"
+              : "Stitch the generated shots from this episode into one video in the browser and download it"
           }
           onClick={() => void handleComposeDownload()}
         >
@@ -129,24 +127,22 @@ export function EpisodeEditSidePane({
 
       {previewVideoUrl ? (
         <div className="drama-ep-preview-banner">
-          <span>预览历史版本{previewLabel ? ` · ${previewLabel}` : ''}</span>
+          <span>{"Preview historical version"}{previewLabel ? ` · ${previewLabel}` : ''}</span>
           <div className="drama-ep-preview-banner-actions">
             {onActivatePreview ? (
               <button type="button" className="drama-ep-preview-banner-btn" onClick={onActivatePreview}>
-                设为当前
-              </button>
+                {"Set as current"}</button>
             ) : null}
             {onClearPreview ? (
               <button type="button" className="drama-ep-preview-banner-btn is-ghost" onClick={onClearPreview}>
-                退出预览
-              </button>
+                {"Exit preview"}</button>
             ) : null}
           </div>
         </div>
       ) : null}
 
       {!hasSelection || fragments.length === 0 ? (
-        <p className="drama-ep-empty">请选择底部分镜</p>
+        <p className="drama-ep-empty">{"Please select a shot from the bottom section"}</p>
       ) : (
         <>
           <div className="drama-ep-preview-inner">
@@ -160,8 +156,7 @@ export function EpisodeEditSidePane({
             />
             {!fragments.some((f) => f.video) && (
               <button type="button" className="drama-ep-open-canvas" onClick={onOpenStoryboard}>
-                打开分镜画布
-              </button>
+                {"Open storyboard canvas"}</button>
             )}
           </div>
           <DramaSubtitleBoard

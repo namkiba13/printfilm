@@ -94,7 +94,7 @@ async def _ensure_clip_local(url: str, cache_dir: Path, index: int) -> Path:
     dest = cache_dir / f"src_{index:03d}.mp4"
     await storage_svc.ensure_local_media(url, dest)
     if not dest.exists() or dest.stat().st_size <= 0:
-        raise RuntimeError(f"无法下载分镜视频：{url[:120]}")
+        raise RuntimeError(f'Unable to download shot video: {url[:120]}')
     return dest
 
 
@@ -112,7 +112,7 @@ async def compose_episode_video(
         frags = [f for f in frags if f.id in allow]
     clips = [(f.id, (f.video or "").strip()) for f in frags if (f.video or "").strip()]
     if not clips:
-        raise RuntimeError("本集还没有可拼接的分镜视频")
+        raise RuntimeError('This episode has no shot videos to stitch')
 
     ratio, resolution = resolve_episode_video_output(episode.params, project.params)
     width, height = target_pixel_size(ratio, resolution)

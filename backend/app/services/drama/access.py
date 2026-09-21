@@ -41,7 +41,7 @@ async def get_owned_drama_project(
     result = await db.execute(q)
     project = result.scalar_one_or_none()
     if not project:
-        raise HTTPException(status_code=404, detail="漫剧项目不存在")
+        raise HTTPException(status_code=404, detail='AI Drama project does not exist')
     return project
 
 
@@ -70,7 +70,7 @@ async def get_owned_episode(
     result = await db.execute(q)
     episode = result.scalar_one_or_none()
     if not episode:
-        raise HTTPException(status_code=404, detail="分集不存在")
+        raise HTTPException(status_code=404, detail='Episode does not exist')
     return episode
 
 

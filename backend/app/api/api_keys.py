@@ -40,6 +40,6 @@ async def revoke_key(
 ) -> dict:
     ok = await api_keys.revoke_api_key(db, user.id, key_id)
     if not ok:
-        raise HTTPException(status_code=404, detail="Key 不存在或已撤销")
+        raise HTTPException(status_code=404, detail='Key does not exist or has been revoked')
     await db.commit()
     return {"ok": True}

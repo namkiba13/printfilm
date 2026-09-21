@@ -60,7 +60,7 @@ export function useCanvasAutoSave({
         })
         onSaved()
       } catch (err) {
-        onError(err instanceof Error ? err.message : '自动保存失败')
+        onError(err instanceof Error ? err.message : "Auto-save failed")
       } finally {
         savingRef.current = false
       }

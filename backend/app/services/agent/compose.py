@@ -30,7 +30,7 @@ def render_skill_block(skills: list[AgentSkill], *, max_chars: int = MAX_SKILL_I
     chunks: list[str] = [SKILL_HEADER]
     used = len(SKILL_HEADER)
     for skill in skills:
-        title = (skill.name or skill.slug or "未命名").strip()
+        title = (skill.name or skill.slug or 'Untitled').strip()
         body = (skill.body or "").strip()
         piece = f"\n### {title}\n\n{body}\n"
         if used + len(piece) > max_chars:

@@ -47,12 +47,12 @@ export function DramaProjectOutputSettings({
       ? readEpisodeResolution(params, fallbackParams)
       : readProjectResolution(params)
   const outputLabel = formatProjectOutputLabel(aspectRatio, resolution)
-  const scopeHint = scope === 'episode' ? '本集' : '项目统一'
-  const panelTitle = scope === 'episode' ? '分集画幅' : '项目画幅'
+  const scopeHint = scope === 'episode' ? "This Episode" : "Project-wide"
+  const panelTitle = scope === 'episode' ? "Episode Aspect Ratio" : "Project Aspect Ratio"
   const panelNote =
     scope === 'episode'
-      ? '仅本集分镜使用；未单独设置时继承项目默认。修改后请重新生成各镜视频。'
-      : '全部分集共用同一规格，避免各镜比例/清晰度不一致导致无法拼接。'
+      ? "Used only for this episode's Storyboard; inherits the project default when not set. Please regenerate each shot's video after making changes."
+      : "All episodes share the same specifications to prevent stitching failures caused by inconsistent aspect ratios or resolutions between shots."
 
   useLayoutEffect(() => {
     if (!open || !rootRef.current) {
@@ -131,8 +131,8 @@ export function DramaProjectOutputSettings({
         disabled={disabled || saving}
         title={
           scope === 'episode'
-            ? '本集画幅与清晰度；各镜生成后可直接拼接'
-            : '全项目统一画幅与清晰度，各分镜生成后可直接拼接'
+            ? "Episode aspect ratio and resolution; shots can be stitched directly after generation"
+            : "Consistent aspect ratio and resolution across the project; all Storyboard shots can be stitched directly after generation"
         }
         onClick={() => setOpen((c) => !c)}
       >
@@ -148,7 +148,7 @@ export function DramaProjectOutputSettings({
               className="fc-gen-opt-panel drama-ep-opt-panel fc-gen-opt-panel--portal"
               style={panelStyle}
               role="dialog"
-              aria-label={scope === 'episode' ? '分集画幅与清晰度' : '项目画幅与清晰度'}
+              aria-label={scope === 'episode' ? "Episode aspect ratio and resolution" : "Project aspect ratio and resolution"}
             >
               <div className="fc-gen-opt-panel-title">{panelTitle}</div>
               <p className="drama-project-output-note">{panelNote}</p>
@@ -167,8 +167,7 @@ export function DramaProjectOutputSettings({
                 ))}
               </div>
               <div className="fc-gen-opt-panel-title" style={{ marginTop: 12 }}>
-                清晰度
-              </div>
+                {"Resolution"}</div>
               <div className="fc-gen-chip-row">
                 {DRAMA_RES_OPTIONS.map((r) => (
                   <button

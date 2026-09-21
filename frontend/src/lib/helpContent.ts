@@ -19,77 +19,77 @@ export type HelpGuideStep = {
 }
 
 export const HELP_CATS: HelpCatItem[] = [
-  { id: 'start', title: '快速开始', desc: '工作台选产品入口', href: '/' },
-  { id: 'drama', title: '漫剧创作', desc: '剧本 · 分集 · 成片', href: '/drama' },
-  { id: 'kepu', title: 'AI短视频', desc: '分镜流水线与成片', href: '/history' },
-  { id: 'tools', title: '创作工具', desc: '文生图 / 图生图 / 视频', href: '/tools' },
-  { id: 'settings', title: '个人中心', desc: '项目 · 记录 · 下载', href: '/settings?tab=tools' },
-  { id: 'billing', title: '充值说明', desc: '按量计费，余额永久有效', href: '/pricing' },
+  { id: 'start', title: "Quick Start", desc: "Workspace product selection entry", href: '/' },
+  { id: 'drama', title: "AI Drama Creation", desc: "Script · Episodes · Final Video", href: '/drama' },
+  { id: 'kepu', title: "AI Short Video", desc: "Storyboard pipeline and final video", href: '/history' },
+  { id: 'tools', title: "Creation Tools", desc: "Text-to-Image / Image-to-Image / Video", href: '/tools' },
+  { id: 'settings', title: "Profile", desc: "Projects · Records · Downloads", href: '/settings?tab=tools' },
+  { id: 'billing', title: "Top Up Information", desc: "Pay-as-you-go billing; balance never expires", href: '/pricing' },
 ]
 
 export const HELP_GUIDE_STEPS: HelpGuideStep[] = [
   {
     n: '01',
-    title: '选创作入口',
-    body: '工作台进入「AI 漫剧」或「AI短视频」；单点能力也可从顶栏「工具」进入文生图、图生图、文生视频等。',
+    title: "Choose a Creation Entry",
+    body: "From the Workspace, select \"AI Drama\" or \"AI Short Video\"; individual capabilities such as text-to-image, image-to-image, and text-to-video are also available under \"Tools\" in the top bar.",
   },
   {
     n: '02',
-    title: '配置并生成',
-    body: '漫剧：创意 → 大纲 → 资产 → 分集；AI短视频：主题 → 风格 → 分镜 → 成片；工具：填提示词或上传素材后点生成。',
+    title: "Configure and Generate",
+    body: "AI Drama: Idea → Outline → Assets → Episodes; AI Short Video: Topic → Style → Storyboard → Final Video; Tools: enter a prompt or upload media, then click Generate.",
   },
   {
     n: '03',
-    title: '审阅与迭代',
-    body: '漫剧 / AI短视频可单镜重绘、重生视频或重配音，不必整片重做。工具结果可在工作台预览后再次生成。',
+    title: "Review and Iterate",
+    body: "AI Drama / AI Short Video lets you redraw a single shot, regenerate a video, or re-record the voiceover without remaking the entire video. Tool results can be previewed in the Workspace and generated again.",
   },
   {
     n: '04',
-    title: '保存与下载',
-    body: '结果会写入云端存储。AI短视频在历史页下载；漫剧在项目工作台查看；工具创作在个人中心查看详情并下载。',
+    title: "Save and Download",
+    body: "Results are saved to cloud storage. Download AI Short Video results from the History page; view AI Drama projects in the project Workspace; view details and download Tool creations from your Profile.",
   },
 ]
 
 export const HELP_FAQ_ITEMS: HelpFaqItem[] = [
   {
-    q: '第一次使用从哪开始？',
-    a: '打开工作台，选择「AI 漫剧」或「AI短视频」。漫剧适合分集叙事与角色一致性；AI短视频定位获客，适合卖点讲解与分镜流水线。若只要单张图或短片段，可直接进入「工具」。',
+    q: "Where should I start the first time I use it?",
+    a: "Open the Workspace and select \"AI Drama\" or \"AI Short Video.\" AI Drama is suited to episodic storytelling and character consistency; AI Short Video is designed for customer acquisition, product highlights, and storyboard pipelines. If you only need a single image or short clip, go directly to \"Tools.\"",
   },
   {
-    q: '「AI 视频」和「静图成片」有什么区别？',
-    a: 'AI 视频镜头运动更强、成本更高；静图成片（图文视频）以画面 + 旁白为主，更快更稳，适合讲解类获客短片。新建 AI短视频项目时按需求选择即可。',
+    q: "What is the difference between \"AI Video\" and \"Still Image Video\"?",
+    a: "AI Video offers stronger camera movement at a higher cost; Still Image Video (image-and-text video) mainly uses visuals and voiceover, making it faster and more reliable for explainer-style customer acquisition clips. Choose according to your needs when creating a new AI Short Video project.",
   },
   {
-    q: '生成中可以离开页面吗？',
-    a: '可以。任务在服务端继续执行。AI短视频可回历史页看进度；漫剧回对应项目工作台；工具视频任务请尽量停留在当前页等待完成，或稍后在个人中心查看状态。',
+    q: "Can I leave the page while generation is in progress?",
+    a: "Yes. The task will continue running on the server. For AI Short Video, return to the History page to check progress; for AI Drama, return to the corresponding project workspace; for tool video tasks, please stay on the current page until completion if possible, or check the status later in the Personal Center.",
   },
   {
-    q: '工具中心能做什么？',
-    a: '已开放文生图、图生图、图生产品、文生视频、视频生视频与电商拼图。登录后进入「工具」选择对应能力，填写提示词或上传素材即可生成。',
+    q: "What can the Tool Center do?",
+    a: "Text-to-image, image-to-image, image-to-product, text-to-video, video-to-video, and e-commerce collage are available. After logging in, go to \"Tools\" and select the desired capability, then enter a prompt or upload materials to generate.",
   },
   {
-    q: '工具生成结果保存在哪里？',
-    a: '每次成功生成都会写入创作记录，媒体文件同步到云端对象存储（OSS）。可在头像 → 个人中心 →「工具创作」查看封面、状态与提示词。',
+    q: "Where are tool-generated results saved?",
+    a: "Each successful generation is added to your creation history, and media files are synchronized to cloud object storage (OSS). Go to Avatar → Personal Center → \"Tool Creations\" to view thumbnails, statuses, and prompts.",
   },
   {
-    q: '如何查看和下载工具结果？',
-    a: '打开个人中心「工具创作」，点击「查看」可预览大图或视频；点击「下载」将从云端地址保存到本地。生成页右侧成功后也会提示可前往个人中心回看。',
+    q: "How can I view and download tool results?",
+    a: "Open \"Tool Creations\" in the Personal Center and click \"View\" to preview an image or video; click \"Download\" to save it locally from the cloud URL. After a successful generation, the right side of the generation page will also prompt you to revisit it in the Personal Center.",
   },
   {
-    q: '成片或素材在哪里下载？',
-    a: 'AI短视频：顶栏「AI短视频」历史页，已完成项目可下载或打包。漫剧：进入对应项目工作台查看分镜与成片。全局资产：顶栏「资产」管理角色、场景、道具与音色。',
+    q: "Where can I download finished videos or materials?",
+    a: "AI Short Video: Go to the \"AI Short Video\" History page in the top bar. Completed projects can be downloaded or packaged. AI Drama: Enter the corresponding project workspace to view Storyboards and finished videos. Global Assets: Use \"Assets\" in the top bar to manage characters, scenes, props, and voice styles.",
   },
   {
-    q: '个人中心有哪些内容？',
-    a: '包含账号信息、漫剧项目、AI短视频历史、工具创作记录、资产管理入口，以及订阅与余额。团队、API、通知偏好等能力仍在建设中。',
+    q: "What is included in the Personal Center?",
+    a: "It includes account information, AI Drama projects, AI Short Video history, tool creation records, access to asset management, and subscriptions and balance. Team, API, notification preferences, and other features are still under development.",
   },
   {
-    q: '如何充值？余额怎么扣？',
-    a: '打开「定价」选择充值档位，支持支付宝与微信支付；未登录会先引导登录。按实际调用量扣费，余额永久有效，无强制订阅。用量可在定价页或个人中心「订阅与余额」查看。',
+    q: "How do I add funds? How is my balance charged?",
+    a: "Open \"Pricing\" and select a top-up tier. Alipay and WeChat Pay are supported; logged-out users will first be guided to log in. Charges are based on actual usage, the balance never expires, and there is no mandatory subscription. Usage can be viewed on the Pricing page or under \"Subscriptions & Balance\" in the Personal Center.",
   },
   {
-    q: '生成失败或画面不符合预期怎么办？',
-    a: '可调整提示词、反向提示词或参考图后重试；漫剧 / AI短视频支持单镜重生。若反复失败，请检查网络与余额，或稍后重试。敏感内容可能被模型安全策略拦截。',
+    q: "What should I do if generation fails or the result is not as expected?",
+    a: "Adjust the prompt, negative prompt, or reference image and try again; AI Drama / AI Short Video supports regenerating a single shot. If failures persist, check your network and balance, or try again later. Sensitive content may be blocked by the model's safety policies.",
   },
 ]
 

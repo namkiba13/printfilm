@@ -44,18 +44,18 @@ def test_build_single_episode_context_includes_titles_neighbors_and_cast():
     )
     joined = "\n\n".join(parts)
     assert "整剧：儿童看月亮" in joined
-    assert "第 1 集：开篇" in joined
-    assert "第 3 集：视差" in joined
+    assert 'Episode 1: 开篇' in joined
+    assert 'Episode 3: 视差' in joined
     assert "邻集正文" in joined
     assert "场1-1" in joined
-    assert "须优先使用这些定妆名：小明、老师" in joined
+    assert 'Prioritize using these established character names: 小明、老师' in joined
     assert "邻集创意/摘要补充" in joined
     assert "第二集" not in joined or "第 2 集" in joined  # 邻集不含本集正文块即可
 
 
 def test_format_character_asset_names_line_empty():
     line = format_character_asset_names_line([])
-    assert "暂无定妆角色资产" in line
+    assert 'No finalized character assets available' in line
 
 
 def test_collect_episode_seed_names_from_cast_and_summary():

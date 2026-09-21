@@ -71,4 +71,4 @@ def test_append_manual_episode_respects_max():
         append_manual_episode(existing)
         raise AssertionError("expected ValueError")
     except ValueError as exc:
-        assert "最多" in str(exc)
+        assert f"Up to {MAX_DRAMA_EPISODES} episodes" in str(exc)

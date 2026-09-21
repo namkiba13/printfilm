@@ -15,7 +15,7 @@ function errorMessage(data: ApiError, status: number): string {
   const detail = data?.detail;
   if (typeof detail === "string") return detail;
   if (Array.isArray(detail) && detail[0]?.msg) return detail[0].msg;
-  return `请求失败 (${status})`;
+  return `Request failed (${status})`;
 }
 
 // Authenticated JSON fetch against /api
@@ -36,7 +36,7 @@ export async function api<T>(
     if (!window.location.pathname.startsWith("/login")) {
       window.location.href = "/login";
     }
-    throw new Error("未登录或登录已失效");
+    throw new Error("Not logged in or login session expired");
   }
   const text = await res.text();
   const data = text ? (JSON.parse(text) as ApiError & T) : ({} as T);
@@ -56,7 +56,7 @@ export async function loginAsAdmin(email: string, password: string): Promise<Adm
   const me = await api<AdminUser>("/api/auth/me");
   if (me.role !== "admin") {
     clearAuth();
-    throw new Error("该账号没有管理员权限");
+    throw new Error("This account does not have administrator privileges");
   }
   setCachedUser(me);
   return me;

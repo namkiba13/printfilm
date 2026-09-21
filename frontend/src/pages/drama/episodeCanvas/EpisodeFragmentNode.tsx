@@ -35,14 +35,14 @@ function EpisodeFragmentNodeComponent({
           <button
             type="button"
             className="ep-frag-link-btn nodrag nopan"
-            title="关联出境资产"
-            aria-label="关联出境资产"
+            title={"Link Output Assets"}
+            aria-label={"Link Output Assets"}
             onClick={() => onRequestLinkAsset?.(data.fragmentId)}
           >
             <Plus size={14} strokeWidth={2} />
           </button>
         ) : (
-          <em className="ep-frag-link-count">{data.linkedCount || 0} 资产</em>
+          <em className="ep-frag-link-count">{data.linkedCount || 0} {"Assets"}</em>
         )}
       </div>
 
@@ -60,25 +60,25 @@ function EpisodeFragmentNodeComponent({
           <img src={media} alt="" draggable={false} />
         ) : (
           <div className="ep-frag-media-empty">
-            <span>暂无成片</span>
-            <small>生成后显示在此</small>
+            <span>{"No finished video yet"}</span>
+            <small>{"Displayed here after generation"}</small>
           </div>
         )}
       </div>
 
       <div className="ep-frag-prompt">
-        <label>提示词</label>
+        <label>{"Prompt"}</label>
         {selected ? (
           <textarea
             className="ep-frag-prompt-input nodrag nowheel"
             value={data.content}
             onChange={handlePromptChange}
-            placeholder="分镜脚本 / Seedance 提示词…"
+            placeholder={"Storyboard Script / Seedance Prompt…"}
             rows={5}
           />
         ) : (
           <p className="ep-frag-prompt-text">
-            {(data.content || '').trim() || '（空提示词）'}
+            {(data.content || '').trim() || "(Empty prompt)"}
           </p>
         )}
       </div>

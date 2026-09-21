@@ -26,8 +26,7 @@ def resolve_llm_api_key() -> str:
     key = (get_settings().openai_api_key or "").strip()
     if not key:
         raise LlmUnavailableError(
-            "未配置 OPENAI_API_KEY，无法调用文字模型。"
-            "请在管理后台「系统设置 → 模型」填写 TokenFree API Key 并选择文本模型。"
+            'OPENAI_API_KEY is not configured, so the text model cannot be called. Enter the TokenFree API Key and select a text model in the admin console under “System Settings → Models”.'
         )
     return key
 
@@ -85,7 +84,7 @@ async def chat_completions(
         base = resolve_llm_base_url()
     if not model:
         raise LlmUnavailableError(
-            "未解析到可用文字模型。请在管理后台填写 TokenFree API Key，拉取并选择文本模型。"
+            'No usable text model was found. Enter the TokenFree API Key in the admin console, then fetch and select a text model.'
         )
     # kimi 系列仅允许 temperature=0.6，其它值会 400
     effective_temperature = 0.6 if model.lower().startswith("kimi") else temperature
@@ -125,18 +124,16 @@ async def chat_completions(
             raise RuntimeError(f"LLM error {res.status_code}: {res.text[:800]}")
         body = (res.text or "").strip()
         if not body:
-            raise RuntimeError(f"LLM 返回空响应体 (HTTP {res.status_code})")
+            raise RuntimeError(f'LLM returned an empty response body (HTTP {res.status_code})')
         lowered = body[:256].lower()
         if lowered.startswith("<!doctype") or lowered.startswith("<html"):
             raise RuntimeError(
-                f"LLM 渠道 Base URL 配置错误（返回了网页 HTML 而非 API JSON）。"
-                f"当前 base={base}，请检查管理后台「模型渠道」的 Base URL 是否为 OpenAI 兼容 API 地址"
-                f"（如 https://api.deepseek.com 或 https://api.moonshot.cn/v1），而非网站首页。"
+                f'The LLM channel Base URL is misconfigured (it returned webpage HTML instead of API JSON). Current base={base}. Check that the Base URL under “Model Channels” in the admin console is an OpenAI-compatible API address (such as https://api.deepseek.com or https://api.moonshot.cn/v1), not a website homepage.'
             )
         try:
             data = res.json()
         except json.JSONDecodeError as exc:
-            raise RuntimeError(f"LLM 响应不是合法 JSON: {body[:200]}") from exc
+            raise RuntimeError(f'LLM response is not valid JSON: {body[:200]}') from exc
     content = _message_content(data)
     logger.info("文字 LLM 返回 content_len=%s", len(content))
     return content

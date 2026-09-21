@@ -23,8 +23,7 @@ export default function AppShell({ children, active, wide, flush, hideFooter }: 
       <SiteNav active={active} />
       {media && (!media.image_models.length || !media.video_models.length) && (
         <p role="status" style={{ margin: '0 auto', padding: '12px 20px', maxWidth: 1200, fontSize: 14 }}>
-          94API · Tạo ảnh/video: chưa cấu hình model. Bạn có thể tạo và chỉnh sửa kịch bản.
-          {' '}Image/video models are not configured yet.
+          94API · Image and video models are not configured yet. You can create and edit scripts.
         </p>
       )}
       <main className={['pf-shell-main', wide ? 'wide' : '', flush ? 'flush' : ''].filter(Boolean).join(' ')}>

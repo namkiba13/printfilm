@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 TOKEN_TTL_SECONDS = 30 * 60
 COOLDOWN_SECONDS = 60
 
-GENERIC_OK_MESSAGE = "若该邮箱已注册，将收到重置邮件"
+GENERIC_OK_MESSAGE = 'If this email address is registered, you will receive a password reset email.'
 
 
 class PasswordResetError(Exception):
@@ -66,7 +66,7 @@ def get_redis_client() -> Any:
         return client
     except Exception as exc:  # noqa: BLE001
         logger.warning("password reset redis unavailable: %s", exc)
-        raise RedisUnavailableError("服务暂时不可用，请稍后再试") from exc
+        raise RedisUnavailableError('Service temporarily unavailable. Please try again later.') from exc
 
 
 def create_reset_token(redis_client: Any, user_id: int) -> str:
@@ -88,17 +88,17 @@ def consume_reset_token(redis_client: Any, token: str) -> int:
     """校验并删除 token，返回 user_id；无效则抛 InvalidTokenError。"""
     raw = (token or "").strip()
     if not raw:
-        raise InvalidTokenError("重置链接无效或已过期")
+        raise InvalidTokenError('Reset link is invalid or has expired')
     th = _token_hash(raw)
     key = _token_key(th)
     # GETDEL 原子取删：并发的两次重置请求只有一次能拿到 user_id
     user_id_raw = redis_client.getdel(key)
     if not user_id_raw:
-        raise InvalidTokenError("重置链接无效或已过期")
+        raise InvalidTokenError('Reset link is invalid or has expired')
     try:
         user_id = int(user_id_raw)
     except (TypeError, ValueError) as exc:
-        raise InvalidTokenError("重置链接无效或已过期") from exc
+        raise InvalidTokenError('Reset link is invalid or has expired') from exc
 
     redis_client.delete(_user_key(user_id))
     return user_id
@@ -132,13 +132,11 @@ async def request_password_reset(db: AsyncSession, email: str) -> dict[str, Any]
     token = create_reset_token(redis_client, int(user.id))
     link = build_reset_link(token)
     body = (
-        "您正在重置 PRINTFILM 账号密码。\n\n"
-        f"请在 30 分钟内打开以下链接设置新密码：\n{link}\n\n"
-        "如非本人操作，请忽略本邮件。"
+        f'You are resetting your PRINTFILM account password.\n\nPlease open the following link within 30 minutes to set a new password:\n{link}\n\nIf you did not request this, please ignore this email.'
     )
     sent = await send_email(
         to_addrs=[email_norm],
-        subject="PRINTFILM 密码重置",
+        subject='PRINTFILM Password Reset',
         body=body,
     )
     if not sent:
@@ -161,6 +159,6 @@ async def apply_password_reset(
     user_id = consume_reset_token(redis_client, token)
     user = await get_user_by_id(db, user_id)
     if not user:
-        raise InvalidTokenError("重置链接无效或已过期")
+        raise InvalidTokenError('Reset link is invalid or has expired')
     user.hashed_password = hash_password(new_password)
     await db.commit()

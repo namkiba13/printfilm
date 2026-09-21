@@ -138,9 +138,9 @@ async def admin_tokenfree_account_quota(
     from app.services.tokenfree_usage import fetch_tokenfree_account, tokenfree_usage_configured
 
     if not tokenfree_usage_configured():
-        raise HTTPException(status_code=400, detail="未配置 TokenFree API Key（请先在「模型」填写）")
+        raise HTTPException(status_code=400, detail='TokenFree API Key is not configured (please fill it in under "Models" first)')
     try:
         return await fetch_tokenfree_account()
     except RuntimeError as exc:
         logger.warning("tokenfree quota query failed: %s", exc)
-        raise HTTPException(status_code=502, detail="TokenFree 额度查询失败") from exc
+        raise HTTPException(status_code=502, detail='Failed to query TokenFree quota') from exc

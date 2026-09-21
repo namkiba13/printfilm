@@ -53,7 +53,7 @@ export function readAssetVoiceBinding(asset: DramaAsset): VoiceBinding | null {
       return {
         sourceAssetId,
         url,
-        label: typeof data.label === 'string' ? data.label : '音色',
+        label: typeof data.label === 'string' ? data.label : "Voice",
         voicePrompt: typeof data.voicePrompt === 'string' ? data.voicePrompt : undefined,
       }
     }
@@ -66,7 +66,7 @@ export function readAssetVoiceBinding(asset: DramaAsset): VoiceBinding | null {
       const sourceAssetId = typeof data.sourceAssetId === 'number' ? data.sourceAssetId : null
       const url = typeof data.url === 'string' ? data.url : ''
       if (sourceAssetId && url) {
-        return { sourceAssetId, url, label: '音色' }
+        return { sourceAssetId, url, label: "Voice" }
       }
     }
   }
@@ -79,7 +79,7 @@ export function buildBoundParams(asset: DramaAsset, voice: DramaAsset): Record<s
   const binding: VoiceBinding = {
     sourceAssetId: voice.id,
     url,
-    label: voice.name || '音色',
+    label: voice.name || "Voice",
     voicePrompt: readVoicePrompt(voice) || undefined,
   }
   const prev = (asset.params || {}) as Record<string, unknown>
@@ -144,7 +144,7 @@ export function CharacterVoiceBindModal({
         setNewPrompt(result.voice_prompt || '')
         setSuggestedSpeaker(result.speaker || '')
       } catch (err) {
-        onError(err instanceof Error ? err.message : 'AI 生成音色描述失败')
+        onError(err instanceof Error ? err.message : "Failed to generate AI voice description")
       } finally {
         setPromptBusy(false)
       }
@@ -160,7 +160,7 @@ export function CharacterVoiceBindModal({
     setSelectedId(bound?.sourceAssetId ?? null)
     setNewPrompt('')
     setSuggestedSpeaker('')
-    setNewName(`${asset.name || '角色'}音色`)
+    setNewName(`${asset.name || "Character"} Voice`)
     setMode('pick')
     promptRequestedRef.current = false
 
@@ -176,7 +176,7 @@ export function CharacterVoiceBindModal({
           setMode('create')
         }
       })
-      .catch((err) => onError(err instanceof Error ? err.message : '加载音色资产失败'))
+      .catch((err) => onError(err instanceof Error ? err.message : "Failed to load voice assets"))
   }, [open, asset, projectId, bound?.sourceAssetId, onError])
 
   // 进入「新建并合成」时自动 AI 生成音色描述
@@ -202,12 +202,12 @@ export function CharacterVoiceBindModal({
         character_asset_id: asset.id,
       })
       const created = result.asset
-      if (!created) throw new Error('合成失败')
+      if (!created) throw new Error("Synthesis failed")
       setVoiceAssets((prev) => [...prev, created])
       setSelectedId(created.id)
       setMode('pick')
     } catch (err) {
-      onError(err instanceof Error ? err.message : '音色合成失败')
+      onError(err instanceof Error ? err.message : "Voice synthesis failed")
     } finally {
       setSynthBusy(false)
     }
@@ -230,7 +230,7 @@ export function CharacterVoiceBindModal({
         setVoiceAssets((prev) => prev.map((v) => (v.id === voice.id ? result.asset! : v)))
       }
     } catch (err) {
-      onError(err instanceof Error ? err.message : '重新合成失败')
+      onError(err instanceof Error ? err.message : "Failed to resynthesize")
     } finally {
       setSynthBusy(false)
     }
@@ -239,7 +239,7 @@ export function CharacterVoiceBindModal({
   // 确认绑定到角色
   async function handleConfirm() {
     if (!selectedVoice?.url || busy) {
-      onError('请选择已合成试听的音色资产')
+      onError("Please select a synthesized voice asset to preview")
       return
     }
     setBusy(true)
@@ -250,7 +250,7 @@ export function CharacterVoiceBindModal({
       onBound(updated)
       onClose()
     } catch (err) {
-      onError(err instanceof Error ? err.message : '绑定失败')
+      onError(err instanceof Error ? err.message : "Binding failed")
     } finally {
       setBusy(false)
     }
@@ -273,7 +273,7 @@ export function CharacterVoiceBindModal({
       onBound(updated)
       onClose()
     } catch (err) {
-      onError(err instanceof Error ? err.message : '解绑失败')
+      onError(err instanceof Error ? err.message : "Unbinding failed")
     } finally {
       setBusy(false)
     }
@@ -283,19 +283,17 @@ export function CharacterVoiceBindModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="绑定音色"
+      title={"Bind voice"}
       size="lg"
       dismissible={!busy}
       className="drama-voice-bind-modal"
       footer={
         <>
           <button type="button" className="pf-btn" onClick={onClose} disabled={busy}>
-            取消
-          </button>
+            {"Cancel"}</button>
           {bound ? (
             <button type="button" className="pf-btn" onClick={() => void handleUnbind()} disabled={busy}>
-              解除绑定
-            </button>
+              {"Unbind"}</button>
           ) : null}
           <button
             type="button"
@@ -303,14 +301,13 @@ export function CharacterVoiceBindModal({
             onClick={() => void handleConfirm()}
             disabled={!selectedVoice?.url || busy}
           >
-            {busy ? '绑定中…' : '确认绑定'}
+            {busy ? "Binding…" : "Confirm binding"}
           </button>
         </>
       }
     >
       <p className="drama-muted">
-        为「{asset.name || '角色'}」选择漫剧音色资产。音色将随分镜 Seedance 生成作为 reference_audio 提交。
-      </p>
+        {"Select an AI Drama voice asset for “"}{asset.name || "Character"}{"”. The voice will be submitted as reference_audio when generating the Storyboard with Seedance."}</p>
 
       <div className="drama-voice-mode-tabs">
         <button
@@ -318,8 +315,7 @@ export function CharacterVoiceBindModal({
           className={mode === 'pick' ? 'active' : ''}
           onClick={() => setMode('pick')}
         >
-          选择已有
-        </button>
+          {"Select existing"}</button>
         <button
           type="button"
           className={mode === 'create' ? 'active' : ''}
@@ -330,14 +326,13 @@ export function CharacterVoiceBindModal({
             }
           }}
         >
-          新建并合成
-        </button>
+          {"Create and synthesize"}</button>
       </div>
 
       {mode === 'pick' ? (
         <div className="drama-voice-list">
           {voiceAssets.length === 0 ? (
-            <p className="drama-muted">暂无音色资产，请切换到「新建并合成」</p>
+            <p className="drama-muted">{"No voice assets available. Switch to “Create and synthesize”"}</p>
           ) : (
             voiceAssets.map((voice) => {
               const hasAudio = Boolean(voice.url)
@@ -350,8 +345,8 @@ export function CharacterVoiceBindModal({
                     onChange={() => setSelectedId(voice.id)}
                   />
                   <span>
-                    {voice.name || `音色#${voice.id}`}
-                    <small>{hasAudio ? '已合成' : '未合成'}</small>
+                    {voice.name || `Voice #${voice.id}`}
+                    <small>{hasAudio ? "Synthesized" : "Not synthesized"}</small>
                   </span>
                   {hasAudio ? (
                     <button
@@ -363,8 +358,7 @@ export function CharacterVoiceBindModal({
                         void handleResynth(voice)
                       }}
                     >
-                      重合成
-                    </button>
+                      {"Resynthesize"}</button>
                   ) : null}
                 </label>
               )
@@ -374,38 +368,36 @@ export function CharacterVoiceBindModal({
       ) : (
         <div className="drama-voice-create-form">
           <label className="drama-field">
-            <span>音色名称</span>
+            <span>{"Voice name"}</span>
             <input
               type="text"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              placeholder="例如：大禹-沉稳男声"
+              placeholder={"Example: Dayu - Deep Male Voice"}
             />
           </label>
           <label className="drama-field">
             <span className="drama-voice-prompt-label">
-              音色描述（提示词）
-              <button
+              {"Voice Description (Prompt)"}<button
                 type="button"
                 className="pf-btn pf-btn-sm"
                 disabled={promptBusy || synthBusy}
                 onClick={() => void fetchVoicePrompt(true)}
               >
-                {promptBusy ? 'AI 生成中…' : 'AI 重新生成'}
+                {promptBusy ? "AI Generating…" : "AI Regenerate"}
               </button>
             </span>
             <textarea
               rows={4}
-              value={promptBusy && !newPrompt ? 'AI 正在根据角色设定生成音色描述…' : newPrompt}
+              value={promptBusy && !newPrompt ? "AI is generating a voice description based on the character settings…" : newPrompt}
               readOnly={promptBusy && !newPrompt}
               onChange={(e) => setNewPrompt(e.target.value)}
-              placeholder="将根据角色身份、性格、外形等自动生成，也可手动编辑"
+              placeholder={"Automatically generated based on the character's identity, personality, appearance, etc.; can also be edited manually"}
             />
           </label>
           {suggestedSpeaker ? (
             <p className="drama-muted" style={{ margin: 0, fontSize: 12 }}>
-              推荐声线：<code>{suggestedSpeaker}</code>（不同角色会自动匹配不同 TTS 发音人）
-            </p>
+              {"Recommended Voice:"}<code>{suggestedSpeaker}</code>{"(Different characters will be automatically matched with different TTS voices)"}</p>
           ) : null}
           <button
             type="button"
@@ -413,7 +405,7 @@ export function CharacterVoiceBindModal({
             disabled={!newPrompt.trim() || synthBusy || promptBusy}
             onClick={() => void handleCreateAndSynth()}
           >
-            {synthBusy ? '合成中…' : '按提示词合成试听'}
+            {synthBusy ? "Synthesizing…" : "Synthesize Preview from Prompt"}
           </button>
         </div>
       )}

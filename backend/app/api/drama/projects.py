@@ -107,7 +107,7 @@ async def create_project(
     # Create project + empty script draft from creative source
     source = (body.source or "").strip()
     if len(source) < 20:
-        raise HTTPException(status_code=400, detail="原始创意至少需要 20 个字")
+        raise HTTPException(status_code=400, detail='The original idea must contain at least 20 characters')
     title = (body.title or "").strip()
     if not title:
         title = source[:40] + ("…" if len(source) > 40 else "")
@@ -122,7 +122,7 @@ async def create_project(
     )
     project = DramaProject(
         user_id=user.id,
-        title=title or ("自由画布项目" if workflow == "canvas" else "未命名漫剧"),
+        title=title or ('Free Canvas Project' if workflow == "canvas" else 'Untitled AI Drama'),
         description=body.description,
         params=project_params,
     )

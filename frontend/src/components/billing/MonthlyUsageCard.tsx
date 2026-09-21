@@ -40,12 +40,12 @@ export default function MonthlyUsageCard({
   return (
     <div className={`pf-usage-card${variant === 'compact' ? ' is-compact' : ''}`}>
       <header className="pf-usage-card-head">
-        <h3>本月使用情况</h3>
-        <p>按上游 token 实际用量计费</p>
+        <h3>{"This Month's Usage"}</h3>
+        <p>{"Billed based on actual upstream token usage"}</p>
       </header>
 
       <div className="pf-usage-row">
-        <span>Token 用量</span>
+        <span>{"Token Usage"}</span>
         <span className="pf-usage-val">{formatTokens(usage?.tokens ?? 0)}</span>
       </div>
       <div className="pf-meter">
@@ -53,7 +53,7 @@ export default function MonthlyUsageCard({
       </div>
 
       <div className="pf-usage-row">
-        <span>本月费用</span>
+        <span>{"This Month's Cost"}</span>
         <span className="pf-usage-val">¥{(usage?.charge_yuan ?? 0).toFixed(2)}</span>
       </div>
       <div className="pf-meter">
@@ -61,22 +61,21 @@ export default function MonthlyUsageCard({
       </div>
 
       <div className="pf-usage-row">
-        <span>可用余额</span>
+        <span>{"Available Balance"}</span>
         <span className="pf-usage-val">¥{(usage?.balance_yuan ?? 0).toFixed(2)}</span>
       </div>
       {(usage?.frozen_fen ?? 0) > 0 ? (
         <div className="pf-usage-row">
-          <span>冻结中</span>
+          <span>{"Reserved"}</span>
           <span className="pf-muted">¥{(usage?.frozen_yuan ?? 0).toFixed(2)}</span>
         </div>
       ) : null}
 
       <div className="pf-usage-foot">
-        <span className="pf-muted">调用 {usage?.calls ?? 0} 次</span>
+        <span className="pf-muted">{"Calls"}{usage?.calls ?? 0} {"times"}</span>
         {showTopup ? (
           <Link to="/pricing" className="pf-btn pf-btn-lime pf-btn-sm">
-            去充值
-          </Link>
+            {"Top Up"}</Link>
         ) : null}
       </div>
     </div>

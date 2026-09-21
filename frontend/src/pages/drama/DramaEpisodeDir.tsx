@@ -31,21 +31,21 @@ export function buildEpisodeDirItems(episodes: DramaEpisode[]): DramaEpisodeDirI
     const fragCount = (ep.fragments || []).length
     return {
       id: ep.id,
-      label: epNo >= 1 ? `第 ${epNo} 集` : `未编号 · ${ep.id}`,
-      title: ep.name || `分集 ${ep.id}`,
-      meta: fragCount > 0 ? `${fragCount} 镜` : undefined,
+      label: epNo >= 1 ? `Episode ${epNo}` : `Unnumbered · ${ep.id}`,
+      title: ep.name || `Episode ${ep.id}`,
+      meta: fragCount > 0 ? `${fragCount} shots` : undefined,
     }
   })
 }
 
 // 左侧分集目录
 export function DramaEpisodeDir({
-  title = '分集目录',
+  title = "Episode Directory",
   items,
   activeId,
   onSelect,
   footer,
-  emptyText = '暂无分集',
+  emptyText = "No episodes available",
 }: DramaEpisodeDirProps) {
   return (
     <aside className="drama-episode-dir">

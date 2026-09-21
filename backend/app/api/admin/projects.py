@@ -95,7 +95,7 @@ async def get_project(
         )
     ).first()
     if not row:
-        raise HTTPException(status_code=404, detail="项目不存在")
+        raise HTTPException(status_code=404, detail='Project does not exist')
     project, email, scount = row
     base = AdminProjectOut.model_validate(project)
     payload = base.model_dump()

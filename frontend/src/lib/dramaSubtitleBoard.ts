@@ -92,13 +92,13 @@ export function buildDramaSubtitleBoard(fragments: DramaFragment[]): DramaSubtit
 // 导出字幕板纯文本（预览用）。
 export function exportDramaSubtitleBoardText(fragments: DramaFragment[]): string {
   const cues = buildDramaSubtitleBoard(fragments)
-  if (cues.length === 0) return '暂无可导出的字幕内容'
+  if (cues.length === 0) return "No subtitle content available for export"
   return cues
     .map(
       (cue) =>
-        `${formatSubtitleClock(cue.startSec)}-${formatSubtitleClock(cue.endSec)} 片段 ${String(
+        `${formatSubtitleClock(cue.startSec)}-${formatSubtitleClock(cue.endSec)} Segment ${String(
           cue.fragmentIndex + 1,
-        ).padStart(2, '0')} ${cue.speaker}：${cue.text}`,
+        ).padStart(2, '0')} ${cue.speaker}: ${cue.text}`,
     )
     .join('\n')
 }
@@ -162,20 +162,20 @@ function parseSubtitleLine(
   const stripped = normalized.replace(/^【[^】]+】/, '').trim()
   if (!stripped) return null
   if (stripped.startsWith('旁白（VO）：')) {
-    return { speaker: '旁白', text: stripped.slice('旁白（VO）：'.length).trim() }
+    return { speaker: "Narration", text: stripped.slice('旁白（VO）：'.length).trim() }
   }
   if (stripped.startsWith('旁白：')) {
-    return { speaker: '旁白', text: stripped.slice('旁白：'.length).trim() }
+    return { speaker: "Narration", text: stripped.slice('旁白：'.length).trim() }
   }
   if (stripped.startsWith('内心独白：')) {
-    return { speaker: '内心独白', text: stripped.slice('内心独白：'.length).trim() }
+    return { speaker: "Inner monologue", text: stripped.slice('内心独白：'.length).trim() }
   }
   const dialogue = stripped.match(/^([^：]{1,24})：(.+)$/)
   if (!dialogue) return null
   const speaker = dialogue[1].trim()
   const text = dialogue[2].trim()
   if (!speaker || !text) return null
-  if (['空镜', '远景', '近景', '特写', '全景', '中景'].includes(speaker)) return null
+  if (['空镜', '远景', '近景', '特写', '全景', '中景', "Long Shot", "Close Shot", "Close-up", "Wide Shot", "Medium Shot"].includes(speaker)) return null
   return { speaker, text }
 }
 

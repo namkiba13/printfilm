@@ -33,7 +33,7 @@ async def create_mock_delay_task(
 ) -> TaskRunOut:
     settings = get_settings()
     if not settings.ark_mock and str(user.role or "") != "admin":
-        raise HTTPException(status_code=404, detail="任务不存在")
+        raise HTTPException(status_code=404, detail='Task does not exist')
     try:
         async with _mock_delay_create_lock:
             active_count = await count_active_tasks_for_user(
@@ -43,7 +43,7 @@ async def create_mock_delay_task(
                 task_type="mock_delay",
             )
             if active_count >= 3:
-                raise HTTPException(status_code=429, detail="模拟延时任务最多同时运行 3 个")
+                raise HTTPException(status_code=429, detail='A maximum of 3 simulated delay tasks can run simultaneously')
             task = await create_task(
                 db,
                 user,
@@ -74,7 +74,7 @@ async def get_task_run(
     try:
         task = await get_task_for_user(db, user, task_id)
     except LookupError as exc:
-        raise HTTPException(status_code=404, detail="任务不存在") from exc
+        raise HTTPException(status_code=404, detail='Task does not exist') from exc
     return TaskRunOut.model_validate(task)
 
 
@@ -124,7 +124,7 @@ async def cancel_task_run(
     try:
         task = await cancel_task_for_user(db, user, task_id)
     except LookupError as exc:
-        raise HTTPException(status_code=404, detail="任务不存在") from exc
+        raise HTTPException(status_code=404, detail='Task does not exist') from exc
     except ValueError as exc:
         raise http_exception_for_value_error(exc) from exc
     return TaskRunOut.model_validate(task)

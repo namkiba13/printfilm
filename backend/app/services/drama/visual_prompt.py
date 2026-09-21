@@ -173,7 +173,7 @@ def fallback_character_visual_prompt(
     text = compose_character_visual_text(merged)
     if text:
         return normalize_visual_prompt_text(text)
-    name = asset.name or "角色"
+    name = asset.name or 'Role'
     return normalize_visual_prompt_text(
         f"{name}，青年，身形匀称，面容清晰，发型与服饰符合上古神话短剧设定，"
         f"白底全身站立，神态自然，影视定妆照。"
@@ -308,12 +308,12 @@ async def resolve_visual_prompt_for_asset(
             if len(prompt) >= min_len or len(prompt) >= 80:
                 return prompt
             if strict_llm:
-                raise RuntimeError(f"角色「{name}」AI 提示词过短（{len(prompt)} 字）")
+                raise RuntimeError(f'AI prompt for character “{name}” is too short ({len(prompt)} characters)')
         except LlmUnavailableError:
             raise
         except Exception as exc:
             if strict_llm:
-                raise RuntimeError(f"角色「{name}」AI 提示词生成失败") from exc
+                raise RuntimeError(f'Failed to generate AI prompt for character “{name}”') from exc
             logger.exception("角色视觉提示词 LLM 失败 asset_id=%s", asset.id)
         return rule_prompt
 
@@ -341,12 +341,12 @@ async def resolve_visual_prompt_for_asset(
             if len(prompt) >= min_len or len(prompt) >= 80:
                 return prompt
             if strict_llm:
-                raise RuntimeError(f"场景「{name}」AI 提示词过短（{len(prompt)} 字）")
+                raise RuntimeError(f'AI prompt for scene “{name}” is too short ({len(prompt)} characters)')
         except LlmUnavailableError:
             raise
         except Exception as exc:
             if strict_llm:
-                raise RuntimeError(f"场景「{name}」AI 提示词生成失败") from exc
+                raise RuntimeError(f'Failed to generate AI prompt for scene “{name}”') from exc
             logger.exception("场景视觉提示词 LLM 失败 asset_id=%s", asset.id)
         return rule_prompt
 
@@ -371,12 +371,12 @@ async def resolve_visual_prompt_for_asset(
             if len(prompt) >= 60:
                 return prompt
             if strict_llm:
-                raise RuntimeError(f"「{name}」AI 提示词过短（{len(prompt)} 字）")
+                raise RuntimeError(f'AI prompt for “{name}” is too short ({len(prompt)} characters)')
         except LlmUnavailableError:
             raise
         except Exception as exc:
             if strict_llm:
-                raise RuntimeError(f"「{name}」AI 提示词生成失败") from exc
+                raise RuntimeError(f'Failed to generate AI prompt for “{name}”') from exc
             logger.exception("%s 视觉提示词 LLM 失败 asset_id=%s", kind, asset.id)
         return rule_prompt
 

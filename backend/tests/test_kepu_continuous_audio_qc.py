@@ -25,7 +25,7 @@ async def test_synthesize_rejects_near_silent_tts(tmp_path, monkeypatch) -> None
         patch.object(pipeline, "is_near_silent_audio", return_value=True),
         patch.object(pipeline, "probe_duration", AsyncMock(side_effect=AssertionError("不应继续探测时长"))),
     ):
-        with pytest.raises(RuntimeError, match="近静音"):
+        with pytest.raises(RuntimeError, match='nearly silent'):
             await pipeline._synthesize_continuous_audio(
                 1,
                 voice="zh-F1",

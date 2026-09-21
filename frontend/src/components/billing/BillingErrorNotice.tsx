@@ -17,7 +17,7 @@ export default function BillingErrorNotice({
   message,
   className = 'pf-error',
   style,
-  linkText = '去充值 →',
+  linkText = "Top Up →",
   inline = false,
 }: Props) {
   const text = String(message || '').trim()

@@ -109,7 +109,7 @@ def motion_hint(level: str | None) -> str:
 def save_upload(user_id: int, data: bytes, filename: str) -> Path:
     ext = Path(filename or "bin").suffix.lower() or ".bin"
     if ext not in {".png", ".jpg", ".jpeg", ".webp", ".gif", ".mp4", ".mov", ".webm"}:
-        raise ValueError("仅支持 png / jpg / webp / gif / mp4 / mov / webm")
+        raise ValueError('Only png / jpg / webp / gif / mp4 / mov / webm are supported')
     dest = tools_dir(user_id) / f"{uuid.uuid4().hex[:12]}{ext}"
     dest.write_bytes(data)
     return dest
@@ -119,7 +119,7 @@ def save_upload(user_id: int, data: bytes, filename: str) -> Path:
 def collage_images(paths: list[Path], dest: Path, *, vertical: bool) -> None:
     ffmpeg = shutil.which(get_settings().ffmpeg_path) or shutil.which("ffmpeg")
     if not ffmpeg:
-        raise RuntimeError("未找到 ffmpeg，无法拼接图片")
+        raise RuntimeError('ffmpeg not found; unable to stitch images')
     if len(paths) < 2:
         shutil.copy2(paths[0], dest)
         return
@@ -134,7 +134,7 @@ def collage_images(paths: list[Path], dest: Path, *, vertical: bool) -> None:
     cmd = [ffmpeg, "-y", *inputs, "-filter_complex", filt, "-map", "[out]", str(dest)]
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0 or not dest.exists():
-        raise RuntimeError((proc.stderr or "拼接失败")[-800:])
+        raise RuntimeError((proc.stderr or 'Stitching failed')[-800:])
 
 
 # 文生图 / 图生图 / 图生产品 / 电商拼图：同步调用 Seedream 或 ffmpeg
@@ -158,10 +158,10 @@ async def run_image_tool(
 
     if tool_id == "t2i":
         if len(full_prompt) < 4:
-            raise ValueError("请填写提示词")
+            raise ValueError('Please enter a prompt')
     elif tool_id in {"i2i", "i2p"}:
         if not files:
-            raise ValueError("请上传参考图")
+            raise ValueError('Please upload a reference image')
         refs = [publish_public(files[0])]
         if tool_id == "i2i":
             full_prompt = f"{full_prompt or '保持主体，生成风格一致的变体'}。{strength_hint(strength)}"
@@ -176,18 +176,18 @@ async def run_image_tool(
         pack_name = pack or "主图拼接"
         if pack_name == "卖点海报":
             if not files:
-                raise ValueError("请上传商品图")
+                raise ValueError('Please upload a product image')
             refs = [publish_public(files[0])]
             full_prompt = f"{ECOM_POSTER}。{full_prompt}".strip("。")
         else:
             if len(files) < 2:
-                raise ValueError("拼接至少上传 2 张图片")
+                raise ValueError('Please upload at least 2 images to stitch')
             dest = tools_dir(user.id) / f"collage_{uuid.uuid4().hex[:8]}.jpg"
             collage_images(files, dest, vertical=pack_name == "详情排版")
             url = publish_public(dest)
             return {"kind": "image", "urls": [url], "status": "succeeded"}
     else:
-        raise ValueError("不支持的生图工具")
+        raise ValueError('Unsupported image generation tool')
 
     result = await ark.gen_image(
         full_prompt,
@@ -227,7 +227,7 @@ async def _ensure_image_tool_balance(db: AsyncSession, user: User, tool_id: str)
     need = await estimate_task_fen(db, synthetic)
     available = int(user.balance_fen or 0)
     if available < need:
-        raise ValueError(f"余额不足：需要 ¥{need/100:.2f}，当前 ¥{available/100:.2f}，请先充值")
+        raise ValueError(f'Insufficient balance: ¥{need / 100:.2f} required, current balance: ¥{available / 100:.2f}. Please top up first')
 
 
 # 提交生图任务：立即返回 task_id，实际生成在后台执行
@@ -269,7 +269,7 @@ async def enqueue_image_tool(
         "urls": [],
         "task_id": task_id,
         "status": "queued",
-        "message": "生图任务已提交，请稍候",
+        "message": 'Image generation task submitted. Please wait.',
         "run_id": row.id,
     }
 
@@ -288,7 +288,7 @@ async def execute_image_tool_run(run_id: int) -> dict:
         user = await db.get(User, row.user_id)
         if not user:
             row.status = "failed"
-            row.error = "用户不存在"
+            row.error = 'User does not exist'
             await db.commit()
             return {"ok": False, "error": row.error}
 
@@ -345,7 +345,7 @@ async def poll_image_tool_task(db: AsyncSession, user: User, task_id: str) -> di
     stmt = select(ToolRun).where(ToolRun.user_id == user.id, ToolRun.task_id == task_id)
     row = (await db.execute(stmt)).scalar_one_or_none()
     if not row:
-        return {"status": "failed", "kind": "image", "urls": [], "error": "任务不存在"}
+        return {"status": "failed", "kind": "image", "urls": [], "error": 'Task does not exist'}
 
     if row.status == "succeeded":
         row = await hydrate_tool_run_urls(db, row)
@@ -381,7 +381,7 @@ async def start_video_tool(
     if tool_id == "t2v":
         text = (prompt or "").strip()
         if len(text) < 4:
-            raise ValueError("请填写视频脚本")
+            raise ValueError('Please enter a video script')
         still = await ark.gen_image(
             f"{text}。电影感静帧，无文字",
             "文字，字幕，水印，logo",
@@ -406,22 +406,22 @@ async def start_video_tool(
         video_prompt = text
     elif tool_id == "v2v":
         if not files:
-            raise ValueError("请上传源视频或首帧图")
+            raise ValueError('Please upload a source video or first-frame image')
         src = files[0]
         if src.suffix.lower() in {".mp4", ".mov", ".webm"}:
             still_path = tools_dir(user.id) / f"frame_{uuid.uuid4().hex[:8]}.jpg"
             if not extract_video_poster_frame(src, still_path):
-                raise ValueError("无法从视频抽取首帧")
+                raise ValueError('Unable to extract the first frame from the video')
         else:
             still_path = src
         image_url = publish_public(still_path)
         preview_url = image_url
         video_prompt = f"{(prompt or '保持主体，变换画面风格').strip()}。{motion_hint(motion)}"
     else:
-        raise ValueError("不支持的视频工具")
+        raise ValueError('Unsupported video tool')
 
     if not image_url:
-        raise ValueError("缺少首帧图，无法生成视频")
+        raise ValueError('Missing first-frame image; unable to generate video')
 
     task_id = await ark.gen_video_i2v(
         image_url,
@@ -438,7 +438,7 @@ async def start_video_tool(
         "task_id": task_id,
         "status": "queued",
         "preview_url": preview_url,
-        "message": "视频生成中，请稍候",
+        "message": 'Video generation in progress. Please wait.',
     }
 
 

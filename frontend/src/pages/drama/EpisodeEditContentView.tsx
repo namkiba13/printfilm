@@ -39,7 +39,7 @@ export function EpisodeEditContentView({ content, assets, onOpenAsset }: Props) 
   const parts = useMemo(() => splitContentParts(content || ''), [content])
 
   if (!content.trim()) {
-    return <p className="drama-ep-content-empty">暂无脚本内容，点击「编辑」开始填写</p>
+    return <p className="drama-ep-content-empty">{"No script content yet. Click “Edit” to start writing."}</p>
   }
 
   return (
@@ -59,7 +59,7 @@ export function EpisodeEditContentView({ content, assets, onOpenAsset }: Props) 
         }
         const asset = byId.get(part.assetId)
         const preview = asset ? resolveDramaMediaUrl(asset.cover || asset.url) : ''
-        const label = asset?.name || `资产 ${part.assetId}`
+        const label = asset?.name || `Asset ${part.assetId}`
         return (
           <button
             key={`a-${idx}-${part.assetId}`}

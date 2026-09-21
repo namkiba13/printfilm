@@ -27,7 +27,7 @@ def test_require_confirmable_episode_body_missing():
         require_confirmable_episode_body({"episodes": [{"episodeNumber": 1, "body": "甲" * 600}]}, 2)
         raise AssertionError("expected ValueError")
     except ValueError as exc:
-        assert "找不到" in str(exc)
+        assert "not found" in str(exc)
 
 
 def test_require_confirmable_episode_body_too_short():
@@ -38,7 +38,7 @@ def test_require_confirmable_episode_body_too_short():
         )
         raise AssertionError("expected ValueError")
     except ValueError as exc:
-        assert "过短" in str(exc)
+        assert "too short" in str(exc)
 
 
 def test_protected_video_fragments_are_not_replaced():

@@ -27,7 +27,7 @@ export const DRAMA_NARRATION_PREFIX = '【旁白·慢速清晰·同步字幕】'
 
 // 空镜 / 景别冒号标签（与后端 VISUAL_SHOT_LABEL_RE 对齐）
 const VISUAL_SHOT_LABEL_RE =
-  /^(?:空镜|画面|远景|近景|中景|全景|特写|大特写|跟拍|俯拍|仰拍|航拍|推镜|拉镜|摇镜|环境|镜头|动作|转场|闪回|建立镜头|气氛镜头)\s*[：:]/
+  /^(?:空镜|画面|远景|近景|中景|全景|特写|大特写|跟拍|俯拍|仰拍|航拍|推镜|拉镜|摇镜|环境|镜头|动作|转场|闪回|建立镜头|气氛镜头|Establishing Shot|Long Shot|Wide Shot|Medium Shot|Close Shot|Close-up|Extreme Close-up|Atmospheric Shot|Push-in|Pull-out|Pan|Tracking Shot|Follow Shot|High-angle Shot|Low-angle Shot|Aerial Shot)\s*[：:]/i
 
 const VOICE_CUE_PREFIX_RE = /^【(?:对白|旁白|内心独白)[^】]*】\s*/
 
@@ -137,24 +137,24 @@ export function validateDramaFragmentScript(content: string): DramaScriptIssue[]
   if (badSegment != null) {
     issues.push({
       level: 'error',
-      message: `单个 @duration 需在 ${DRAMA_SEGMENT_DURATION_MIN}–${DRAMA_SEGMENT_DURATION_HARD_MAX} 秒之间`,
+      message: `A single @duration must be between ${DRAMA_SEGMENT_DURATION_MIN}–${DRAMA_SEGMENT_DURATION_HARD_MAX} seconds`,
     })
   } else if (durations.some((value) => value > DRAMA_SEGMENT_DURATION_MAX)) {
     issues.push({
       level: 'warn',
-      message: `部分 @duration 超过新分镜建议 ${DRAMA_SEGMENT_DURATION_MAX}s，旧稿可继续生成`,
+      message: `Some @duration values exceed the new Storyboard recommendation of ${DRAMA_SEGMENT_DURATION_MAX}s; legacy scripts can still be generated`,
     })
   }
 
   if (total > DRAMA_SHOT_DURATION_HARD_MAX) {
     issues.push({
       level: 'error',
-      message: `本镜 @duration 合计 ${total}s，超过 Seedance 上限 ${DRAMA_SHOT_DURATION_HARD_MAX}s`,
+      message: `This shot's @duration totals ${total}s, exceeding Seedance's ${DRAMA_SHOT_DURATION_HARD_MAX}s limit`,
     })
   } else if (total > FRAGMENT_CONTENT_DURATION_MAX) {
     issues.push({
       level: 'warn',
-      message: `本镜 @duration 合计 ${total}s，超过新分镜建议 ${FRAGMENT_CONTENT_DURATION_MAX}s（旧稿可继续生成）`,
+      message: `This shot's @duration totals ${total}s, exceeding the new Storyboard recommendation of ${FRAGMENT_CONTENT_DURATION_MAX}s (legacy scripts can still be generated)`,
     })
   }
 
@@ -168,7 +168,7 @@ export function validateDramaFragmentScript(content: string): DramaScriptIssue[]
       issues.push({
         level: 'error',
         message:
-          '检测到「空镜/景别」被标成对白或旁白（会口播并烧字幕）。请改为「【画面·无配音仅环境音】」或「空镜：…」纯画面行',
+          "Detected that an \"empty shot/shot size\" is labeled as dialogue or voiceover (it will be spoken aloud and subtitles will be burned in). Change it to \"[Visuals · ambient sound only, no voiceover]\" or a visuals-only line such as \"Empty shot: ...\"",
       })
       break
     }
@@ -211,14 +211,14 @@ export function validateDramaFragmentAssets(
   if (missingImage.length > 0) {
     issues.push({
       level: 'warn',
-      message: `以下资产缺少参考图，生成时可能自动补图或效果不稳定：${missingImage.slice(0, 5).join('、')}${missingImage.length > 5 ? '…' : ''}`,
+      message: `The following assets have no reference images and may be automatically supplemented during generation or produce unstable results: ${missingImage.slice(0, 5).join('、')}${missingImage.length > 5 ? '…' : ''}`,
     })
   }
 
   if (missingVoice.length > 0) {
     issues.push({
       level: 'warn',
-      message: `脚本含对白，但以下角色尚未绑定音色：${missingVoice.slice(0, 5).join('、')}${missingVoice.length > 5 ? '…' : ''}`,
+      message: `The script contains dialogue, but the following characters have no voice assigned: ${missingVoice.slice(0, 5).join('、')}${missingVoice.length > 5 ? '…' : ''}`,
     })
   }
 
@@ -247,10 +247,10 @@ export function formatDramaGateMessage(
 ): string {
   const parts = [baseMessage]
   if (blocking.length > 0) {
-    parts.push('', '【须先修复】', ...blocking.map((i) => `· ${i.message}`))
+    parts.push('', "[Must fix first]", ...blocking.map((i) => `· ${i.message}`))
   }
   if (warnings.length > 0) {
-    parts.push('', '【建议处理，仍可继续】', ...warnings.map((i) => `· ${i.message}`))
+    parts.push('', "[Recommended action; you can still continue]", ...warnings.map((i) => `· ${i.message}`))
   }
   return parts.join('\n')
 }

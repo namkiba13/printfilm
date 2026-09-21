@@ -523,7 +523,7 @@ def _build_readiness(
     logical_models: list[LogicalModel],
     defaults: DefaultModels,
 ) -> list[ModelCapabilityReadiness]:
-    labels = {"text": "文本", "image": "图像", "video": "视频", "audio": "语音"}
+    labels = {"text": 'Text', "image": 'Image', "video": 'Video', "audio": 'Voice'}
     items: list[ModelCapabilityReadiness] = []
     for capability, attr in {
         "text": "text_model",
@@ -540,7 +540,7 @@ def _build_readiness(
                 label=labels[capability],
                 model=model_id,
                 ready=bool(resolved),
-                message=f"路由至渠道 {resolved['channel'].name}" if resolved else f"需配置默认{labels[capability]}模型与渠道绑定",
+                message=f"Routed to channel {resolved['channel'].name}" if resolved else f'Configure a default {labels[capability]} model and channel binding',
             )
         )
     return items

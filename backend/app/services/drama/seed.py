@@ -384,7 +384,7 @@ async def refresh_asset_prompts_from_script(
         nonlocal updated
         async with sem:
             kind = (asset.type or "").lower()
-            name = asset.name or "未命名"
+            name = asset.name or 'Untitled'
             try:
                 prompt = await resolve_visual_prompt_for_asset(
                     asset,
@@ -418,7 +418,7 @@ async def seed_assets_from_script(
     # Create character/scene/prop/material assets from script if missing
     script = project.script
     if not script or not script.summary:
-        raise ValueError("请先生成剧本摘要")
+        raise ValueError('Please generate the script summary first')
 
     summary = script.summary if isinstance(script.summary, dict) else {}
     story_type = str(summary.get("storyType") or "").strip()
@@ -713,7 +713,7 @@ async def seed_assets_from_episode_body(
     """正文生成后增量 seed：只扫该集出场人物/场景 + 全剧 summary 人物；不抽道具。"""
     script = project.script
     if not script or not script.summary:
-        raise ValueError("请先生成剧本摘要")
+        raise ValueError('Please generate the script summary first')
 
     summary = script.summary if isinstance(script.summary, dict) else {}
     story_type = str(summary.get("storyType") or "").strip()
@@ -830,10 +830,10 @@ async def seed_episodes_from_script(
     # Create / 重切分镜：按 ### 场次拆分并生成视频向分镜文案
     script = project.script
     if not script:
-        raise ValueError("缺少剧本")
+        raise ValueError('Missing script')
     bodies = _normalize_episode_list(script.episode_content)
     if not bodies:
-        raise ValueError("请先生成分集剧本")
+        raise ValueError('Please generate the episode script first')
 
     assets = list(
         (
@@ -880,7 +880,7 @@ async def seed_episodes_from_script(
         series_introduced: set[str] = set()
         for item in bodies:
             ep_no = int(item.get("episodeNumber") or len(created) + 1)
-            title = str(item.get("title") or f"第{ep_no}集")
+            title = str(item.get("title") or f'Episode {ep_no}')
             body = str(item.get("body") or item.get("content") or "")
             episode = DramaEpisode(
                 project_id=project.id,
@@ -953,7 +953,7 @@ async def seed_episodes_from_script(
     for ep_no, item in sorted(body_by_number.items()):
         if ep_no in existing_numbers:
             continue
-        title = str(item.get("title") or f"第{ep_no}集")
+        title = str(item.get("title") or f'Episode {ep_no}')
         body = str(item.get("body") or item.get("content") or "")
         episode = DramaEpisode(
             project_id=project.id,
@@ -985,7 +985,7 @@ def require_confirmable_episode_body(
     """取出指定集正文；缺失或过短则报错。"""
     number = int(episode_number)
     if number < 1:
-        raise ValueError("集号无效")
+        raise ValueError('Invalid episode number')
     item = None
     for row in _normalize_episode_list(episode_content):
         try:
@@ -996,11 +996,11 @@ def require_confirmable_episode_body(
             item = row
             break
     if item is None:
-        raise ValueError(f"找不到第 {number} 集剧本")
+        raise ValueError(f'Script for Episode {number} not found')
     body = str(item.get("body") or item.get("content") or "")
     if _body_char_len(body) < MIN_EPISODE_CONTENT_CHARS:
         raise ValueError(
-            f"第 {number} 集正文过短，请先写完或让 AI 优化后再确认进入分镜"
+            f'The main text for Episode {number} is too short. Please finish writing it or have AI optimize it before confirming entry into Storyboard'
         )
     return item
 
@@ -1113,9 +1113,9 @@ async def seed_single_episode_from_script(
     """只为指定集建行/按规则切分镜，不 force 时保留已有视频与手改。"""
     script = project.script
     if not script:
-        raise ValueError("缺少剧本")
+        raise ValueError('Missing script')
     item = require_confirmable_episode_body(script.episode_content, episode_number)
-    title = str(item.get("title") or f"第{episode_number}集")
+    title = str(item.get("title") or f'Episode {episode_number}')
     body = str(item.get("body") or item.get("content") or "")
 
     assets = list(
@@ -1189,7 +1189,7 @@ async def seed_single_episode_from_script(
     await db.commit()
     reloaded = await _reload_episode(db, int(target.id))
     if reloaded is None:
-        raise ValueError("分集写入后未能重新加载")
+        raise ValueError('Failed to reload after saving the episode')
     logger.info(
         "单集切分镜完成 project_id=%s episode_number=%s episode_id=%s fragments=%s",
         project.id,
@@ -1453,7 +1453,7 @@ def _character_stub_from_cast(
     genre = (story_type or "").strip() or "短剧"
     stub_params = {
         "name": name,
-        "title": "出场人物",
+        "title": 'Featured character',
         "roleType": "配角",
         "visualImage": (
             f"{name}，{genre}人物定妆，可辨识面容与服饰，体态与气质贴合身份，"

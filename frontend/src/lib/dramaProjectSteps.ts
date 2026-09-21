@@ -18,13 +18,13 @@ export type WorkspaceLocationState = {
 export function buildProjectSteps(hasScript: boolean): ProjectStepItem[] {
   const steps: Array<{ key: ProjectStepKey; label: string }> = hasScript
     ? [
-        { key: 'outline', label: '剧情大纲' },
-        { key: 'storyboard', label: '分镜' },
-        { key: 'video', label: '生成视频' },
+        { key: 'outline', label: "Plot outline" },
+        { key: 'storyboard', label: "Storyboard" },
+        { key: 'video', label: "Generate video" },
       ]
     : [
-        { key: 'storyboard', label: '分镜' },
-        { key: 'video', label: '生成视频' },
+        { key: 'storyboard', label: "Storyboard" },
+        { key: 'video', label: "Generate video" },
       ]
   return steps.map((step, index) => ({ ...step, order: index + 1 }))
 }

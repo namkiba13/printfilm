@@ -27,21 +27,22 @@ def test_video_create_timeout_longer_than_old_60s():
 
 
 def test_reraise_read_timeout_says_waiting_not_unreachable():
-    with pytest.raises(RuntimeError, match="等待上游超时") as ei:
+    with pytest.raises(RuntimeError, match='ReadTimeout') as ei:
         reraise_upstream_timeout(httpx.ReadTimeout(""), kind="生图", read_sec=1200)
     text = str(ei.value)
-    assert "无法连接" not in text
+    assert "cannot connect" not in text
     assert "1200" in text
     wrapped = format_exception_message(ei.value)
-    assert "等待上游超时" in wrapped
+    assert "no result was returned" in wrapped
 
 
 def test_reraise_write_timeout_says_send_not_wait():
-    with pytest.raises(RuntimeError, match="发送请求超时") as ei:
+    with pytest.raises(RuntimeError, match='WriteTimeout') as ei:
         reraise_upstream_timeout(httpx.WriteTimeout(""), kind="生图", read_sec=1200)
-    assert "等待上游超时" not in str(ei.value)
+    assert "could not be sent" in str(ei.value)
+    assert "no result was returned" not in str(ei.value)
 
 
 def test_reraise_connect_timeout_says_unreachable():
-    with pytest.raises(RuntimeError, match="无法连接上游"):
+    with pytest.raises(RuntimeError, match='cannot connect to the upstream'):
         reraise_upstream_timeout(httpx.ConnectTimeout(""), kind="生视频", read_sec=180)

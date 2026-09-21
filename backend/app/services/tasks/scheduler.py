@@ -215,7 +215,7 @@ async def _tick() -> None:
                 event_type="task.leased",
                 status=next_status,
                 phase=getattr(task, "current_step_key", None),
-                message="任务已被调度器领取",
+                message='Task claimed by the scheduler',
             )
             claimed_ids.append(task_id)
             user_active_cache[user_id] += 1
@@ -284,7 +284,7 @@ async def recover_orphaned_tasks() -> int:
                 event_type="task.recovered",
                 status=task.status,
                 phase=task.current_step_key,
-                message="检测到任务执行中断或租约过期，已重新排队",
+                message='Task execution interruption or lease expiration detected; task requeued',
             )
             changed += 1
         if changed:

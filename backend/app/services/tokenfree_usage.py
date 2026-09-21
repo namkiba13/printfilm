@@ -201,7 +201,7 @@ async def _tokenfree_get(path: str, *, params: dict[str, Any] | None = None) -> 
     """GET TokenFree 站点路径；Bearer 使用模型页同一把 Key。"""
     key = resolve_tokenfree_api_key()
     if not key:
-        raise RuntimeError("未配置 TokenFree API Key，请先在「模型」填写")
+        raise RuntimeError('TokenFree API Key is not configured. Please enter it under “Models” first')
     origin = tokenfree_site_origin()
     url = path if path.startswith("http") else f"{origin}{path}"
     headers = {"Authorization": f"Bearer {key}"}
@@ -212,7 +212,7 @@ async def _tokenfree_get(path: str, *, params: dict[str, Any] | None = None) -> 
     try:
         return resp.json()
     except ValueError as exc:
-        raise RuntimeError("TokenFree 返回非 JSON") from exc
+        raise RuntimeError('TokenFree response is not JSON') from exc
 
 
 async def _try_tokenfree_get(path: str, *, params: dict[str, Any] | None = None) -> Any | None:
@@ -274,7 +274,7 @@ async def fetch_tokenfree_account(settings: Settings | None = None) -> dict[str,
         quota = int(round(max(0.0, hard_limit_usd - used_usd) * TOKENFREE_QUOTA_PER_USD))
 
     if quota is None and used_quota is None and hard_limit_usd is None and used_usd is None:
-        raise RuntimeError("TokenFree 额度查询失败")
+        raise RuntimeError('Failed to query TokenFree quota')
 
     remain_usd = None
     if quota is not None:

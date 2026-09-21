@@ -7,7 +7,7 @@ type Props = {
 }
 
 /** 内联「去充值」快速跳转 */
-export default function BillingTopupLink({ className = 'pf-link pf-billing-topup-link', children = '去充值 →' }: Props) {
+export default function BillingTopupLink({ className = 'pf-link pf-billing-topup-link', children = "Top Up →" }: Props) {
   return (
     <Link to={PRICING_PATH} className={className}>
       {children}

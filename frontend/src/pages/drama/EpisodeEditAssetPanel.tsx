@@ -37,9 +37,9 @@ type Props = {
 
 // 当前分类新建按钮文案
 function createLabel(tab: AssetTab | null): string {
-  if (tab === 'scene') return '新建场景'
-  if (tab === 'prop') return '新建道具'
-  return '新建角色'
+  if (tab === 'scene') return "Create Scene"
+  if (tab === 'prop') return "Create Prop"
+  return "Create Character"
 }
 
 // 渲染分集编辑左侧资产栏
@@ -71,20 +71,18 @@ export function EpisodeEditAssetPanel({
             className={scope === 'episode' ? 'active' : ''}
             onClick={() => onScopeChange('episode')}
           >
-            本集
-          </button>
+            {"This Episode"}</button>
           <button
             type="button"
             className={scope === 'series' ? 'active' : ''}
             onClick={() => onScopeChange('series')}
           >
-            全集
-          </button>
+            {"Entire Series"}</button>
         </div>
         <button
           type="button"
           className="drama-ep-icon-btn solid"
-          aria-label="打开分镜故事板画布"
+          aria-label={"Open Storyboard Canvas"}
           onClick={onOpenCanvas}
         >
           +
@@ -111,7 +109,7 @@ export function EpisodeEditAssetPanel({
               disabled={createBusy}
               onClick={onCreateAsset}
             >
-              {createBusy ? '创建中…' : createLabel(tab)}
+              {createBusy ? "Creating…" : createLabel(tab)}
             </button>
           ) : null}
           {onImportAsset ? (
@@ -121,8 +119,7 @@ export function EpisodeEditAssetPanel({
               disabled={createBusy}
               onClick={onImportAsset}
             >
-              导入
-            </button>
+              {"Import"}</button>
           ) : null}
         </div>
       ) : null}
@@ -130,8 +127,8 @@ export function EpisodeEditAssetPanel({
         {assets.length === 0 ? (
           <p className="drama-ep-empty">
             {scope === 'episode'
-              ? '本集暂无引用资产，可点上方「新建」加入，或切换「全集」查看项目资产'
-              : '暂无资产，可点上方「新建 / 导入」添加'}
+              ? "No referenced assets in this episode. Click “Create” above to add one, or switch to “Entire Series” to view project assets."
+              : "No assets yet. Click “Create / Import” above to add one."}
           </p>
         ) : (
           assets.map((asset) => {
@@ -150,7 +147,7 @@ export function EpisodeEditAssetPanel({
                     imageBusy ? ' is-gen' : ''
                   }`}
                   onClick={() => onOpenAsset(asset)}
-                  title="点击设置：编辑提示词、重新生成或上传形象"
+                  title={"Click to configure: edit the prompt, regenerate, or upload an image"}
                 >
                   <div className="drama-ep-asset-thumb">
                     {cover ? (
@@ -158,14 +155,14 @@ export function EpisodeEditAssetPanel({
                     ) : (
                       <span>{(asset.name || '?')[0]}</span>
                     )}
-                    {imageBusy ? <em className="drama-ep-asset-gen-badge">生成中</em> : null}
+                    {imageBusy ? <em className="drama-ep-asset-gen-badge">{"Generating"}</em> : null}
                   </div>
-                  <span className="drama-ep-asset-name">{asset.name || `资产 ${asset.id}`}</span>
-                  {isActive ? <span className="drama-ep-asset-linked">已关联</span> : null}
+                  <span className="drama-ep-asset-name">{asset.name || `Asset ${asset.id}`}</span>
+                  {isActive ? <span className="drama-ep-asset-linked">{"Linked"}</span> : null}
                   {DRAMA_VOICE_BINDING_ENABLED && voice ? (
-                    <span className="drama-ep-asset-voice">音色</span>
+                    <span className="drama-ep-asset-voice">{"Voice"}</span>
                   ) : null}
-                  <span className="drama-ep-asset-settings">设置</span>
+                  <span className="drama-ep-asset-settings">{"Settings"}</span>
                 </button>
                 <div className="drama-ep-asset-ops">
                   {isActive && onUnlinkAsset ? (
@@ -173,19 +170,17 @@ export function EpisodeEditAssetPanel({
                       type="button"
                       className="drama-ep-asset-op-btn"
                       onClick={() => onUnlinkAsset(asset.id)}
-                      title="仅取消当前分镜关联，不会删除资产"
+                      title={"Only unlink from the current shot; the asset will not be deleted"}
                     >
-                      取消关联
-                    </button>
+                      {"Unlink"}</button>
                   ) : (
                     <button
                       type="button"
                       className="drama-ep-asset-op-btn"
                       onClick={() => onMention(asset)}
-                      title="插入到当前分镜脚本"
+                      title={"Insert into the current shot script"}
                     >
-                      插入
-                    </button>
+                      {"Insert"}</button>
                   )}
                   {isCharacter && onGenerateVoice ? (
                     voice ? (
@@ -203,7 +198,7 @@ export function EpisodeEditAssetPanel({
                         disabled={voiceGenerating}
                         onClick={() => onGenerateVoice(asset)}
                       >
-                        {voiceGenerating ? '生成中…' : '生成音色'}
+                        {voiceGenerating ? "Generating…" : "Generate voice"}
                       </button>
                     )
                   ) : null}

@@ -18,12 +18,12 @@ export async function generateAndBindCharacterVoice(
   })
   const voicePrompt = (promptResult.voice_prompt || '').trim()
   if (!voicePrompt) {
-    throw new Error('音色描述为空')
+    throw new Error("Voice description is empty")
   }
 
   const voiceResult = await dramaApi.generateVoice({
     project_id: projectId,
-    name: `${asset.name || '角色'}音色`,
+    name: `${asset.name || "Character"} Voice`,
     voice_prompt: voicePrompt,
     speaker: promptResult.speaker || undefined,
     sample_text: promptResult.sample_text || undefined,
@@ -31,7 +31,7 @@ export async function generateAndBindCharacterVoice(
   })
   const voice = voiceResult.asset
   if (!voice?.url) {
-    throw new Error('音色合成失败')
+    throw new Error("Voice synthesis failed")
   }
 
   const character = await dramaApi.updateAsset(asset.id, {

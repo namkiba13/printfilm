@@ -117,10 +117,9 @@ async def process_user_milestone_alert(
     note = BillingAlertNotification(
         user_id=int(user.id),
         kind="user_milestone",
-        title="消费提醒",
+        title='Usage Alert',
         message=(
-            f"您已累计消费 {_fen_to_yuan(target)}。"
-            f"当前累计扣费 {_fen_to_yuan(total)}，请注意账户余额。"
+            f'You have spent a total of {_fen_to_yuan(target)}. Your current cumulative charges are {_fen_to_yuan(total)}. Please monitor your account balance.'
         ),
         milestone_fen=target,
     )
@@ -163,13 +162,9 @@ async def process_admin_cost_alert(
         logger.warning("admin cost alert skipped: no recipients cost_fen=%s", cost_fen)
         return False
 
-    subject = f"[{s.app_name}] 平台费用告警"
+    subject = f'[{s.app_name}] Platform Cost Alert'
     body = (
-        f"统计周期：{period_key}\n"
-        f"累计上游成本：{_fen_to_yuan(cost_fen)}\n"
-        f"告警阈值：每 {_fen_to_yuan(threshold)}\n"
-        f"当前档位：{target_level}\n\n"
-        f"请登录管理后台查看用量详情。"
+        f'Billing period: {period_key}\nAccumulated upstream cost: {_fen_to_yuan(cost_fen)}\nAlert threshold: Every {_fen_to_yuan(threshold)}\nCurrent tier: {target_level}\n\nPlease log in to the admin console to view usage details.'
     )
     sent = await send_email(to_addrs=recipients, subject=subject, body=body, settings=s)
     if not sent:

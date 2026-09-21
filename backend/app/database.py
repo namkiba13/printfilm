@@ -20,8 +20,7 @@ def _require_postgres(url: str) -> None:
     """拒绝非 Postgres 连接串，避免误连 SQLite。"""
     if not (url or "").startswith("postgresql"):
         raise RuntimeError(
-            "仅支持 PostgreSQL。请设置 DATABASE_URL=postgresql+asyncpg://..."
-            f"（当前：{(url or '')[:48]!r}）"
+            f"PostgreSQL only. Please set DATABASE_URL=postgresql+asyncpg://... (current: {(url or '')[:48]!r})"
         )
 
 

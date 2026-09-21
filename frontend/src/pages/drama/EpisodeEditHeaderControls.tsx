@@ -128,11 +128,11 @@ export function EpisodeEditHeaderControls({
   const stop = (e: MouseEvent) => {
     e.stopPropagation()
   }
-  const styleLabel = getImageStyleLabel(styleId) || '视频风格'
-  const modelLabel = catalogModelLabel(modelId, videoModels, '视频模型')
-  const subtitleLabel = subtitleMode === 'model' ? '模型字幕' : '后期字幕'
+  const styleLabel = getImageStyleLabel(styleId) || "Video Style"
+  const modelLabel = catalogModelLabel(modelId, videoModels, "Video model")
+  const subtitleLabel = subtitleMode === 'model' ? "Model Subtitles" : "Post-Production Subtitles"
   const subtitleUsesModel = subtitleModeUsesModelOutput(subtitleMode)
-  const introLabel = characterIntroMode === 'model' ? '人物介绍' : '无介绍叠字'
+  const introLabel = characterIntroMode === 'model' ? "Character Introduction" : "No Character Intro Overlay"
   const introEnabled = characterIntroModeEnabled(characterIntroMode)
   const globalLocked = disabled || globalSettingsReadOnly
   return (
@@ -159,7 +159,7 @@ export function EpisodeEditHeaderControls({
             if (globalSettingsReadOnly) return
             setOpen((c) => (c === 'style' ? null : 'style'))
           }}
-          title={globalSettingsReadOnly ? `${styleLabel}（项目设置，分镜只读）` : styleLabel}
+          title={globalSettingsReadOnly ? `${styleLabel} (Project Settings, Storyboard read-only)` : styleLabel}
         >
           <Smile size={14} strokeWidth={1.8} />
           <span className="fc-gen-opt-label">{styleLabel}</span>
@@ -173,7 +173,7 @@ export function EpisodeEditHeaderControls({
             if (globalSettingsReadOnly) return
             setOpen((c) => (c === 'subtitle' ? null : 'subtitle'))
           }}
-          title={globalSettingsReadOnly ? `${subtitleLabel}（项目设置，分镜只读）` : '字幕设置'}
+          title={globalSettingsReadOnly ? `${subtitleLabel} (Project Settings, Storyboard read-only)` : "Subtitle Settings"}
         >
           <Type size={14} strokeWidth={1.8} />
           <span className="fc-gen-opt-label">{subtitleLabel}</span>
@@ -187,7 +187,7 @@ export function EpisodeEditHeaderControls({
             if (globalSettingsReadOnly) return
             setOpen((c) => (c === 'intro' ? null : 'intro'))
           }}
-          title={globalSettingsReadOnly ? `${introLabel}（项目设置，分镜只读）` : '人物介绍叠字'}
+          title={globalSettingsReadOnly ? `${introLabel} (Project Settings, Storyboard read-only)` : "Character Intro Overlay"}
         >
           <Users size={14} strokeWidth={1.8} />
           <span className="fc-gen-opt-label">{introLabel}</span>
@@ -211,18 +211,18 @@ export function EpisodeEditHeaderControls({
             if (globalSettingsReadOnly) return
             setOpen((c) => (c === 'link' ? null : 'link'))
           }}
-          title={globalSettingsReadOnly ? `${linkLastFrame ? '尾帧衔接' : '并发生成'}（项目设置，分镜只读）` : '镜间尾帧衔接'}
+          title={globalSettingsReadOnly ? `${linkLastFrame ? "Last-Frame Transition" : "Generate Concurrently"} (Project Settings, Storyboard read-only)` : "Inter-Shot Last-Frame Continuity"}
         >
           <Link2 size={14} strokeWidth={1.8} />
-          <span className="fc-gen-opt-label">{linkLastFrame ? '尾帧衔接' : '并发生成'}</span>
+          <span className="fc-gen-opt-label">{linkLastFrame ? "Last-Frame Transition" : "Generate Concurrently"}</span>
           {!globalSettingsReadOnly ? <ChevronDown size={12} strokeWidth={2} /> : null}
         </button>
         <button
           type="button"
           className="fc-gen-opt-btn drama-seedance-help-btn"
           disabled={disabled}
-          title="Seedance 传值与使用规则"
-          aria-label="Seedance 传值与使用规则"
+          title={"Seedance Parameters and Usage Rules"}
+          aria-label={"Seedance Parameters and Usage Rules"}
           onClick={() => setRulesOpen(true)}
         >
           <CircleHelp size={14} strokeWidth={1.8} />
@@ -237,9 +237,9 @@ export function EpisodeEditHeaderControls({
                   className="fc-gen-opt-panel fc-gen-style-panel drama-ep-opt-panel fc-gen-opt-panel--portal"
                   style={panelStyle}
                   role="dialog"
-                  aria-label="视频风格"
+                  aria-label={"Video Style"}
                 >
-                  <div className="fc-gen-opt-panel-title">视频风格</div>
+                  <div className="fc-gen-opt-panel-title">{"Video Style"}</div>
                   <div className="fc-gen-style-grid">
                     {IMAGE_STYLE_OPTIONS.map((opt) => {
                       const selected = styleId === opt.id
@@ -267,12 +267,12 @@ export function EpisodeEditHeaderControls({
                   className="fc-gen-opt-panel drama-ep-opt-panel fc-gen-opt-panel--portal"
                   style={panelStyle}
                   role="dialog"
-                  aria-label="视频模型"
+                  aria-label={"Video model"}
                 >
-                  <div className="fc-gen-opt-panel-title">视频模型</div>
+                  <div className="fc-gen-opt-panel-title">{"Video model"}</div>
                   <div className="fc-gen-model-list">
                     {videoModels.length === 0 ? (
-                      <p className="fc-gen-model-empty">请先在管理后台「模型」勾选视频模型</p>
+                      <p className="fc-gen-model-empty">{"Please select a video model under “Models” in the admin console first"}</p>
                     ) : null}
                     {videoModels.map((opt) => (
                       <button
@@ -296,9 +296,9 @@ export function EpisodeEditHeaderControls({
                   className="fc-gen-opt-panel drama-ep-opt-panel fc-gen-opt-panel--portal"
                   style={panelStyle}
                   role="dialog"
-                  aria-label="镜间衔接"
+                  aria-label={"Shot Transitions"}
                 >
-                  <div className="fc-gen-opt-panel-title">镜间衔接</div>
+                  <div className="fc-gen-opt-panel-title">{"Shot Transitions"}</div>
                   <label className="drama-ep-link-last-frame">
                     <input
                       type="checkbox"
@@ -307,11 +307,8 @@ export function EpisodeEditHeaderControls({
                       onChange={(e) => onLinkLastFrameChange(e.target.checked)}
                     />
                     <span>
-                      用上一镜尾帧衔接
-                      <em>
-                        默认开启。按镜序生成，可提前提交下一镜并在队列中等待上一镜完成；关闭后默认并发生成。切换时会立刻重排未开始的任务。有角色/场景参考时以参考图附带尾帧（不可与
-                        first_frame 混用）
-                      </em>
+                      {"Connect with the previous shot's last frame"}<em>
+                        {"Enabled by default. Shots are generated in order: you can submit the next shot early and wait in the queue for the previous shot to finish. When disabled, shots are generated concurrently by default. Switching takes effect immediately and reorders tasks that have not started. When character or scene references are present, the last frame is attached to the reference image (cannot be used with first_frame)"}</em>
                     </span>
                   </label>
                 </div>
@@ -321,9 +318,9 @@ export function EpisodeEditHeaderControls({
                   className="fc-gen-opt-panel drama-ep-opt-panel fc-gen-opt-panel--portal"
                   style={panelStyle}
                   role="dialog"
-                  aria-label="字幕设置"
+                  aria-label={"Subtitle Settings"}
                 >
-                  <div className="fc-gen-opt-panel-title">字幕设置</div>
+                  <div className="fc-gen-opt-panel-title">{"Subtitle Settings"}</div>
                   <label className="drama-ep-link-last-frame">
                     <input
                       type="radio"
@@ -333,10 +330,8 @@ export function EpisodeEditHeaderControls({
                       onChange={() => onSubtitleModeChange('model')}
                     />
                     <span>
-                      模型自出字幕
-                      <em>
-                        切换后会立刻在当前分镜正文里补回「同步字幕 / 字幕 cue」提示词，生成时由模型直接出字幕。
-                      </em>
+                      {"Model-Generated Subtitles"}<em>
+                        {"After switching, the “sync subtitles / subtitle cue” prompt is immediately restored to the current shot body, and the model generates subtitles directly."}</em>
                     </span>
                   </label>
                   <label className="drama-ep-link-last-frame">
@@ -348,10 +343,8 @@ export function EpisodeEditHeaderControls({
                       onChange={() => onSubtitleModeChange('post')}
                     />
                     <span>
-                      后期拼接字幕
-                      <em>
-                        切换后会立刻去掉当前分镜里的字幕提示词；右侧字幕板仍可预览与导出，供后期叠字。
-                      </em>
+                      {"Post-Production Subtitles"}<em>
+                        {"After switching, the subtitle prompt is immediately removed from the current shot. The subtitle panel on the right can still be previewed and exported for adding text in post-production."}</em>
                     </span>
                   </label>
                 </div>
@@ -361,9 +354,9 @@ export function EpisodeEditHeaderControls({
                   className="fc-gen-opt-panel drama-ep-opt-panel fc-gen-opt-panel--portal"
                   style={panelStyle}
                   role="dialog"
-                  aria-label="人物介绍"
+                  aria-label={"Character Introduction"}
                 >
-                  <div className="fc-gen-opt-panel-title">人物介绍叠字</div>
+                  <div className="fc-gen-opt-panel-title">{"Character Intro Overlay"}</div>
                   <label className="drama-ep-link-last-frame">
                     <input
                       type="radio"
@@ -373,10 +366,8 @@ export function EpisodeEditHeaderControls({
                       onChange={() => onCharacterIntroModeChange('model')}
                     />
                     <span>
-                      模型叠字介绍
-                      <em>
-                        开启后，重新规划分镜时会为首次出场重要角色写入「人物介绍·画面叠字·角色身旁」；生成时由模型把介绍贴在角色身旁。
-                      </em>
+                      {"Model-Generated Character Introductions"}<em>
+                        {"When enabled, replanning shots adds “Character Introduction · On-Screen Text · Beside Character” for important characters appearing for the first time. During generation, the model places the introduction beside the character."}</em>
                     </span>
                   </label>
                   <label className="drama-ep-link-last-frame">
@@ -388,10 +379,8 @@ export function EpisodeEditHeaderControls({
                       onChange={() => onCharacterIntroModeChange('off')}
                     />
                     <span>
-                      关闭人物介绍
-                      <em>
-                        切换后会立刻去掉当前分镜里的人物介绍叠字行；生成时禁止画面内介绍字卡。已去掉的介绍需重新分镜才会回来。
-                      </em>
+                      {"Disable Character Introductions"}<em>
+                        {"After switching, the character-introduction on-screen text line is immediately removed from the current shot. Generation will prohibit character introduction cards in the frame. Removed introductions will return only after replanning the shots."}</em>
                     </span>
                   </label>
                 </div>

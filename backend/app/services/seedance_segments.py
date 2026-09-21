@@ -575,7 +575,7 @@ def format_segment_line(kind: str, text: str) -> str:
     if clean.startswith("【"):
         return clean
     k = (kind or "visual").strip().lower()
-    if k in {"narration", "vo", "旁白"}:
+    if k in {"narration", "vo", 'Narration'}:
         return f"{NARRATION_PREFIX}{clean}"
     return clean
 

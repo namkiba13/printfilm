@@ -71,7 +71,7 @@ export default function PaymentModal({ open, checkout, onClose, onPaid }: Props)
   function openCashier() {
     const url = (checkout?.payurl || '').trim()
     if (!url) {
-      setError('未获取到支付链接，请稍后重试')
+      setError("Payment link not received. Please try again later.")
       return
     }
     window.open(url, '_blank', 'noopener,noreferrer')
@@ -106,7 +106,7 @@ export default function PaymentModal({ open, checkout, onClose, onPaid }: Props)
       }
       if (!payload) {
         setQrDataUrl('')
-        setError('未获取到支付二维码，请稍后重试')
+        setError("Payment QR code not received. Please try again later.")
         return
       }
       // 若网关直接返回图片 URL，优先使用
@@ -123,7 +123,7 @@ export default function PaymentModal({ open, checkout, onClose, onPaid }: Props)
         })
         if (!cancelled) setQrDataUrl(url)
       } catch {
-        if (!cancelled) setError('二维码生成失败')
+        if (!cancelled) setError("Failed to generate QR code")
       }
     }
 
@@ -178,12 +178,12 @@ export default function PaymentModal({ open, checkout, onClose, onPaid }: Props)
       } else {
         setError(
           checkout.pay_mode === 'redirect'
-            ? '尚未检测到支付结果，请在支付页完成后再试'
-            : '尚未检测到支付结果，请稍后再试或继续扫码',
+            ? "Payment result not detected yet. Please complete payment on the payment page and try again"
+            : "Payment result not detected yet. Please try again later or continue scanning the QR code",
         )
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : '查询失败')
+      setError(e instanceof Error ? e.message : "Query failed")
     } finally {
       setChecking(false)
     }
@@ -195,16 +195,16 @@ export default function PaymentModal({ open, checkout, onClose, onPaid }: Props)
   const isRedirect = checkout.pay_mode === 'redirect' || (!checkout.qr_payload && !!checkout.payurl)
   const title = isRedirect
     ? isAlipay
-      ? '支付宝支付'
-      : '微信支付'
+      ? "Alipay"
+      : "WeChat Pay"
     : isAlipay
-      ? '支付宝扫码支付'
-      : '微信扫码支付'
+      ? "Alipay QR Code Payment"
+      : "WeChat QR Code Payment"
   const tip = isRedirect
-    ? '已打开易支付页面，请在新窗口完成支付；完成后返回本页等待到账'
+    ? "The EasyPay page has opened in a new window. Complete payment there, then return to this page and wait for the payment to arrive."
     : isAlipay
-      ? '请使用支付宝扫码完成支付'
-      : '请使用微信扫码完成支付'
+      ? "Please scan with Alipay to complete payment"
+      : "Please scan with WeChat to complete payment"
 
   return (
     <Modal
@@ -220,55 +220,54 @@ export default function PaymentModal({ open, checkout, onClose, onPaid }: Props)
             <PaymentBrandIcon brand={isAlipay ? 'alipay' : 'wxpay'} size="md" />
             <strong>{title}</strong>
           </div>
-          <button type="button" className="pf-pay-sheet-close" onClick={() => void handleCancel()} aria-label="关闭">
+          <button type="button" className="pf-pay-sheet-close" onClick={() => void handleCancel()} aria-label={"Close"}>
             ×
           </button>
         </header>
 
         <div className="pf-pay-sku-box">
           <strong>{checkout.sku_name}</strong>
-          <span>到账 ¥{yuan(checkout.credit_fen)}</span>
+          <span>{"Received ¥"}{yuan(checkout.credit_fen)}</span>
         </div>
 
         <div className="pf-pay-amount">
-          <span>支付金额</span>
+          <span>{"Payment Amount"}</span>
           <em>¥{yuan(checkout.amount_fen)}</em>
         </div>
 
         <div className="pf-pay-qr-wrap">
           {isRedirect ? (
             <div className="pf-pay-qr is-empty pf-pay-redirect-box">
-              <p>支付页已在新窗口打开</p>
+              <p>{"Payment page opened in a new window"}</p>
               <button type="button" className="pf-pay-btn primary" onClick={openCashier}>
-                重新打开支付页
-              </button>
+                {"Reopen Payment Page"}</button>
             </div>
           ) : qrDataUrl ? (
             <div className="pf-pay-qr">
-              <img src={qrDataUrl} alt="支付二维码" width={220} height={220} />
+              <img src={qrDataUrl} alt={"Payment QR Code"} width={220} height={220} />
               <span className={`pf-pay-qr-badge ${isAlipay ? 'alipay' : 'wxpay'}`} aria-hidden />
             </div>
           ) : (
-            <div className="pf-pay-qr is-empty">{error || '二维码加载中…'}</div>
+            <div className="pf-pay-qr is-empty">{error || "Loading QR Code…"}</div>
           )}
           <p className="pf-pay-tip">{tip}</p>
           <p className={`pf-pay-expire${status === 'expired' ? ' is-expired' : ''}`}>
             <span className="pf-pay-clock" aria-hidden />
             {status === 'expired'
               ? isRedirect
-                ? '订单已失效，请关闭后重新下单'
-                : '二维码已失效，请关闭后重新下单'
+                ? "Order expired. Please close this and place a new order."
+                : "QR code expired. Please close this and place a new order."
               : isRedirect
-                ? `请在 ${formatRemain(remain)} 内完成支付`
-                : `二维码将在 ${formatRemain(remain)} 后失效`}
+                ? `Please complete payment within ${formatRemain(remain)}`
+                : `The QR code will expire in ${formatRemain(remain)}`}
           </p>
           <p className={`pf-pay-wait${status === 'paid' ? ' is-paid' : ''}`}>
             <span className="pf-pay-dot" aria-hidden />
             {status === 'paid'
-              ? '支付成功，余额即将更新'
+              ? "Payment successful. Your balance will be updated shortly"
               : status === 'expired'
-                ? '订单已超时'
-                : '等待支付结果，请勿关闭页面'}
+                ? "The order has expired"
+                : "Waiting for payment confirmation. Please do not close the page"}
           </p>
         </div>
 
@@ -276,22 +275,20 @@ export default function PaymentModal({ open, checkout, onClose, onPaid }: Props)
 
         <div className="pf-pay-actions">
           <button type="button" className="pf-pay-btn ghost" onClick={() => void handleCancel()}>
-            取消支付
-          </button>
+            {"Cancel Payment"}</button>
           <button
             type="button"
             className="pf-pay-btn primary"
             disabled={checking || status === 'paid' || status === 'expired'}
             onClick={() => void confirmPaid()}
           >
-            {checking ? '确认中…' : status === 'paid' ? '已到账' : '我已完成支付'}
+            {checking ? "Confirming…" : status === 'paid' ? "Funds Received" : "I Have Completed Payment"}
           </button>
         </div>
 
         <p className="pf-pay-secure-line">
           <span className="pf-pay-shield" aria-hidden />
-          支付由易支付安全提供，到账以系统通知为准
-        </p>
+          {"Payment securely provided by Yipay Security. Account crediting is subject to system notification"}</p>
       </div>
     </Modal>
   )

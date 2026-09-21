@@ -43,7 +43,7 @@ export function DramaAssetsPage() {
       if (generationStatus.trim()) params.set("generation_status", generationStatus.trim());
       setData(await api<ListRes>(`/api/admin/drama-assets?${params}`));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "加载失败");
+      toast.error(err instanceof Error ? err.message : "Failed to Load");
     }
   }
 
@@ -54,13 +54,13 @@ export function DramaAssetsPage() {
 
   return (
     <div className="admin-list-page">
-      <PageHeader description="全站漫剧资产：角色、场景、道具等，可按项目与用户筛选" />
+      <PageHeader description={"All AI Drama assets across the site: characters, scenes, props, and more. Filter by project and user"} />
       <AdminFilterBar>
-        <Input placeholder="名称 / derive_id" value={q} onChange={(e) => setQ(e.target.value)} />
+        <Input placeholder={"Name / derive_id"} value={q} onChange={(e) => setQ(e.target.value)} />
         <AdminUserSearchSelect value={userId} onChange={setUserId} />
-        <Input placeholder="项目 ID" value={projectId} onChange={(e) => setProjectId(e.target.value)} />
+        <Input placeholder={"Project ID"} value={projectId} onChange={(e) => setProjectId(e.target.value)} />
         <select className="admin-native-select" value={type} onChange={(e) => setType(e.target.value)}>
-          <option value="">全部类型</option>
+          <option value="">{"All types"}</option>
           {ASSET_TYPES.map((t) => (
             <option key={t} value={t}>
               {dramaAssetTypeLabel(t)}
@@ -72,7 +72,7 @@ export function DramaAssetsPage() {
           value={generationStatus}
           onChange={(e) => setGenerationStatus(e.target.value)}
         >
-          <option value="">全部生成状态</option>
+          <option value="">{"All Generation Statuses"}</option>
           {DRAMA_GENERATION_STATUSES.map((s) => (
             <option key={s} value={s}>
               {formatDramaGenerationStatus(s)}
@@ -88,8 +88,7 @@ export function DramaAssetsPage() {
             void load(1);
           }}
         >
-          筛选
-        </Button>
+          {"Filter"}</Button>
       </AdminFilterBar>
 
       <div className="admin-table-wrap">
@@ -97,13 +96,13 @@ export function DramaAssetsPage() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>预览</th>
-              <th>名称</th>
-              <th>类型</th>
-              <th>项目</th>
-              <th>用户</th>
-              <th>生成</th>
-              <th>更新时间</th>
+              <th>{"Preview"}</th>
+              <th>{"Name"}</th>
+              <th>{"Type"}</th>
+              <th>{"Project"}</th>
+              <th>{"User"}</th>
+              <th>{"Generate"}</th>
+              <th>{"Updated At"}</th>
               <th></th>
             </tr>
           </thead>
@@ -142,7 +141,7 @@ export function DramaAssetsPage() {
                 </td>
                 <td>
                   <Button size="sm" variant="outline" asChild>
-                    <Link to={`/drama-assets/${row.id}`}>查看</Link>
+                    <Link to={`/drama-assets/${row.id}`}>{"View"}</Link>
                   </Button>
                 </td>
               </tr>
@@ -150,8 +149,7 @@ export function DramaAssetsPage() {
             {(data?.items.length ?? 0) === 0 ? (
               <tr>
                 <td colSpan={9} className="!text-center text-[var(--admin-muted)]">
-                  暂无资产
-                </td>
+                  {"No assets available"}</td>
               </tr>
             ) : null}
           </tbody>

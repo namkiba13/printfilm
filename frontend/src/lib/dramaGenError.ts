@@ -64,54 +64,54 @@ export function formatDramaGenError(raw: string | null | undefined): DramaGenErr
   const text = String(raw || '').trim()
   if (!text) {
     return {
-      title: '生成失败',
-      message: '任务未能完成，且未记录具体错误信息。',
-      suggestion: '请稍后重试；若反复失败，检查网络/代理是否能访问 TokenFree，以及后台模型渠道密钥。',
+      title: "Generation Failed",
+      message: "The task could not be completed, and no specific error information was recorded.",
+      suggestion: "Please try again later. If it repeatedly fails, check whether your network/proxy can access TokenFree and verify the model channel key in the admin backend.",
     }
   }
 
   if (/ReadTimeout|WriteTimeout|等待上游超时|响应超时/i.test(text)) {
     return {
-      title: '上游响应超时',
+      title: "Upstream Response Timed Out",
       message: text.length > 200 ? `${text.slice(0, 200)}…` : text,
       suggestion:
-        '已经连上 TokenFree，但出图/出视频等待超过上限。请稍后重试；若文本能生成、只有图/视频超时，多半是上游排队较慢，不是代理断网。',
+        "TokenFree was reached, but image/video generation exceeded the time limit. Please try again later. If text generation works but images/videos time out, the upstream queue is likely slow rather than the proxy being disconnected.",
     }
   }
 
   if (/网络错误|ConnectError|ConnectTimeout|无法连接上游|tokenfree\.com|api\.kie\.ai/i.test(text)) {
     return {
-      title: '无法连接图片/视频服务',
+      title: "Unable to Connect to Image/Video Service",
       message: text.length > 200 ? `${text.slice(0, 200)}…` : text,
       suggestion:
-        '本机当前连不上上游（常见于代理未放行或网络中断）。请检查网络/代理后重试，并确认后台 TokenFree 渠道密钥有效。',
+        "This device currently cannot connect to the upstream service (commonly caused by a proxy not allowing access or a network interruption). Check your network/proxy and try again, and verify that the TokenFree channel key in the admin backend is valid.",
     }
   }
 
   if (/^生图失败$/.test(text)) {
     return {
-      title: '生图失败',
-      message: '生图未成功，但旧任务未保存具体原因（多为上游连接失败且错误文案为空）。',
+      title: "Image Generation Failed",
+      message: "Image generation failed, but the legacy task did not save the specific reason (usually an upstream connection failure with no error message).",
       suggestion:
-        '请重新生成一次；新版本会写出明确错误。仍失败时检查 TokenFree 网络与密钥。',
+        "Please generate it again; the new version will record a specific error. If it still fails, check the TokenFree network connection and key.",
     }
   }
 
   if (isUpstreamAccountError(text) || (/Seedream error 403/i.test(text) && /AccountOverdue/i.test(text))) {
     return {
-      title: '平台上游账户欠费',
+      title: "Upstream Platform Account Balance Insufficient",
       message:
-        '上游 Seedream 模型账户余额不足，生图请求被拒绝。这是站点上游模型账户欠费，不是您个人钱包余额问题。',
-      suggestion: '请联系站点管理员在 TokenFree 控制台充值；充值完成后请重试生图。',
+        "The upstream Seedream model account has insufficient balance, so the image generation request was rejected. This concerns the site's upstream model account, not your personal wallet balance.",
+      suggestion: "Contact the site administrator to top up the TokenFree console account; retry image generation after the top-up is complete.",
       upstreamAccountBlocked: true,
     }
   }
 
   if (isBillingError(text)) {
     return {
-      title: '余额不足',
-      message: /余额不足|请先充值/.test(text) ? text : '当前余额不足，无法继续生成。',
-      suggestion: '请先充值后再重试该任务。',
+      title: "Insufficient Balance",
+      message: /余额不足|请先充值/.test(text) ? text : "Your current balance is insufficient to continue generating.",
+      suggestion: "Please top up before retrying this task.",
       billingBlocked: true,
     }
   }
@@ -125,61 +125,61 @@ export function formatDramaGenError(raw: string | null | undefined): DramaGenErr
     const named = text.match(/(角色|场景|道具|参考图)「([^」]+)」/)
     if (named) {
       return {
-        title: '参考图疑似真人',
-        message: `视频服务审核未通过：${named[1]}「${named[2]}」的参考图可能含真人肖像，已拒绝生成。`,
-        suggestion: `请在左侧资产中打开「${named[2]}」，重新生成或上传偏动漫/插画的形象后再生成该分镜。`,
+        title: "Reference Image May Contain a Real Person",
+        message: `Video service moderation failed: the reference image for ${named[1]} "${named[2]}" may contain a real person's likeness, so generation was rejected.`,
+        suggestion: `Open "${named[2]}" in the assets panel on the left, then regenerate or upload an anime-style/illustrated appearance before generating this Storyboard.`,
       }
     }
     const where =
       idx != null
-        ? `（提交内容第 ${idx + 1} 项 / content[${idx}]，多为角色或场景参考图）`
-        : '（某张参考图）'
+        ? `(Submission item ${idx + 1} / content[${idx}], usually a character or scene reference image)`
+        : "(A reference image)"
     return {
-      title: '参考图疑似真人',
-      message: `视频服务审核未通过：输入图片${where}可能含真人肖像，已拒绝生成。`,
+      title: "Reference Image May Contain a Real Person",
+      message: `Video service review failed: Input image ${where} may contain a real person's likeness, so generation was rejected.`,
       suggestion:
-        '打开左侧资产，为相关角色/场景重新用 AI 生成偏动漫或插画的形象（避免真人照片），或上传合规图后再重新生成该分镜。',
+        "Open the assets panel on the left and use AI to regenerate an anime-style or illustrated image for the relevant character/scene (avoid real-person photos), or upload a compliant image before regenerating this shot.",
     }
   }
 
   if (/重试超过上限|超过重试上限|内部自动重试超过上限/.test(text)) {
     return {
-      title: '多次生成仍失败',
+      title: "Still failing after multiple attempts",
       message: text,
       suggestion:
-        '这是同一次任务内的自动重试耗尽，不是禁止你再点生成。请根据真实原因（常见是参考图真人审核）改素材或文案后，再重新点生成。',
+        "Automatic retries for this task have been exhausted; this does not prevent you from clicking Generate again. Based on the actual cause (commonly real-person review of a reference image), modify the assets or script, then click Generate again.",
     }
   }
 
   if (/上一镜失败|无法衔接尾帧/.test(text)) {
     return {
-      title: '无法衔接上一镜',
-      message: '本镜依赖上一镜的尾帧衔接，但上一镜未成功，因此本镜未开始生成。',
-      suggestion: '先修复并重新生成失败的上一镜，再按镜序生成后续片段。',
+      title: "Unable to connect to the previous shot",
+      message: "This shot depends on the previous shot's end frame, but the previous shot was unsuccessful, so generation of this shot did not start.",
+      suggestion: "Fix and regenerate the failed previous shot first, then generate subsequent clips in shot order.",
     }
   }
 
   if (/分镜已变更|分镜上下文丢失|分镜不存在/.test(text)) {
     return {
-      title: '分镜已更新',
-      message: '分镜在生成过程中被保存或重切，旧任务已失效。',
-      suggestion: '请回到分集页，用当前分镜列表重新点生成；不要重试旧任务。',
+      title: "Shot updated",
+      message: "The shot was saved or recut during generation, so the old task is no longer valid.",
+      suggestion: "Return to the episode page and click Generate again using the current shot list; do not retry the old task.",
     }
   }
 
   if (/InputTextSensitive|text.*sensitive|敏感/i.test(text) && /Seedance|create error/i.test(text)) {
     return {
-      title: '文案未通过审核',
-      message: '分镜脚本或提示词触发了内容安全审核。',
-      suggestion: '请修改分镜中的敏感表述后重试。',
+      title: "Script failed review",
+      message: "The shot script or prompt triggered a content safety review.",
+      suggestion: "Revise sensitive wording in the shot and try again.",
     }
   }
 
   if (/resource download failed|audio_url/i.test(text) && !/audio duration/i.test(text)) {
     return {
-      title: '参考音频无法下载',
-      message: '音色参考文件地址无效或暂时无法访问。',
-      suggestion: '检查角色绑定的试听音频，重新生成或更换音色后再试。',
+      title: "Unable to download reference audio",
+      message: "The voice reference file URL is invalid or temporarily inaccessible.",
+      suggestion: "Check the preview audio bound to the character, then regenerate or change the voice and try again.",
     }
   }
 
@@ -189,41 +189,41 @@ export function formatDramaGenError(raw: string | null | undefined): DramaGenErr
     const named = extractNamedSlot(text)
     const where =
       named ||
-      (idx != null ? `提交内容第 ${idx + 1} 项 / content[${idx}]（参考音频，不是图片）` : '某条角色/旁白音色')
+      (idx != null ? `Submission item ${idx + 1} / content[${idx}] (reference audio, not an image)` : "A character/narration voice")
     return {
-      title: '参考音频过短',
-      message: `视频服务要求参考音频时长 ≥ 1.8 秒，当前过短：${where}。`,
+      title: "Reference audio too short",
+      message: `The video service requires reference audio to be ≥ 1.8 seconds; the current audio is too short: ${where}.`,
       suggestion:
-        '打开左侧对应角色或旁白资产，重新生成/上传更长的试听音频（建议 ≥ 2 秒）后再生成该分镜。这不是参考图问题。',
+        "Open the corresponding character or narration asset on the left, then regenerate/upload a longer preview audio clip (recommended: ≥ 2 seconds) before generating this shot. This is not a reference image issue.",
     }
   }
 
   if (/only support adaptive aspect ratio|adaptive aspect ratio/i.test(text)) {
     return {
-      title: '画幅参数不兼容',
-      message: '当前视频通道的图生视频若走单首帧，固定比例可能被拒绝。',
-      suggestion: '请重新生成该分镜；服务端会按参考图自适应画幅。',
+      title: "Incompatible aspect ratio parameters",
+      message: "For image-to-video generation on the current video channel, a fixed aspect ratio may be rejected when using a single start frame.",
+      suggestion: "Regenerate this shot; the server will adapt the aspect ratio to the reference image.",
     }
   }
 
   if (/Credits insufficient|积分不足|余额不足.*[Kk]ie|Kie.*积分/i.test(text)) {
     return {
-      title: '视频渠道积分不足',
-      message: '上游账户积分不足，无法创建视频生成任务（不是参考图或音频时长问题）。',
-      suggestion: '请联系管理员在 TokenFree 控制台充值后再重试；充值后重新生成该分镜即可。',
+      title: "Insufficient video channel Credits",
+      message: "The upstream account has insufficient Credits and cannot create a video generation task (this is not a reference image or audio duration issue).",
+      suggestion: "Contact an administrator to top up the TokenFree console, then try again; after topping up, regenerate this shot.",
       upstreamAccountBlocked: true,
     }
   }
 
   if (/File type not supported|参考图格式不支持|不支持 SVG/i.test(text)) {
     return {
-      title: '参考图格式不支持',
+      title: "Unsupported reference image format",
       message:
         text.includes('参考图格式不支持')
           ? text
-          : '上游拒绝了参考图：File type not supported（常见原因是 SVG 占位图或非位图）。',
+          : "The upstream service rejected the reference image: File type not supported (commonly caused by an SVG placeholder or a non-raster image).",
       suggestion:
-        '检查本镜引用的角色/场景/道具封面是否为 PNG/JPG/WEBP。若仍是 SVG 占位图，请对该资产重新生图或上传位图后再生成视频。',
+        "Check whether the cover images for the characters/scenes/props referenced by this shot are PNG/JPG/WEBP. If an SVG placeholder is still used, regenerate the asset or upload a raster image before generating the video again.",
     }
   }
 
@@ -232,52 +232,52 @@ export function formatDramaGenError(raw: string | null | undefined): DramaGenErr
     const named = extractNamedSlot(text)
     const where =
       named ||
-      (idx != null ? `（提交内容第 ${idx + 1} 项 / content[${idx}]）` : '')
+      (idx != null ? `(Submission item ${idx + 1} / content[${idx}])` : '')
     return {
-      title: '视频服务拒绝请求',
-      message: `上游返回参数或内容错误，未能创建生成任务${where}。`,
-      suggestion: '检查本镜参考图、参考音频时长（须 ≥ 1.8 秒）与脚本后重试；若持续失败请联系客服并提供任务号。',
+      title: "Video service rejected the request",
+      message: `The upstream service returned invalid parameters or content, so the generation task could not be created ${where}.`,
+      suggestion: "Check this shot's reference image, reference audio duration (must be ≥ 1.8 seconds), and script, then try again; if the issue persists, contact support and provide the task ID.",
     }
   }
 
   if (/Seedance|上游生成失败/i.test(text)) {
     return {
-      title: '视频生成失败',
+      title: "Video generation failed",
       message: text.length > 160 ? `${text.slice(0, 160)}…` : text,
-      suggestion: '可稍后重试该分镜；连续失败时请更换参考图或简化脚本。',
+      suggestion: "Try generating this shot again later; if it continues to fail, replace the reference image or simplify the script.",
     }
   }
 
   if (/跳过重复任务|分镜已生成完成/.test(text)) {
     return {
-      title: '旧任务已跳过',
-      message: '调度器发现该分镜已有成片，因此取消了这条重复入队的旧任务。',
+      title: "Old task skipped",
+      message: "The scheduler found that this shot already had a completed video, so it canceled this duplicate old task.",
       suggestion:
-        '若你是在「重新生成」，请看队列里是否还有进行中的新任务；没有的话再点一次重新生成。不要把这条旧取消当成当前失败。',
+        "If you selected \"Regenerate,\" check whether a new task is still in progress in the queue; if not, click Regenerate again. Do not treat this old cancellation as the current failure.",
     }
   }
 
   if (/已取消|任务已中断/.test(text)) {
     return {
-      title: text.includes('取消') ? '已取消' : '任务已中断',
+      title: text.includes('取消') ? "Canceled" : "Task interrupted",
       message: text,
-      suggestion: '需要成片时请重新入队生成。',
+      suggestion: "Re-queue the task for generation when you need the completed video.",
     }
   }
 
   // 已是较短中文：原样展示，补通用建议
   if (!/[{\\[\]"]/.test(text) && text.length <= 120 && /[\u4e00-\u9fff]/.test(text)) {
     return {
-      title: '生成失败',
+      title: "Generation Failed",
       message: text,
-      suggestion: '请按提示处理后重新生成该分镜。',
+      suggestion: "After following the instructions, regenerate this shot.",
     }
   }
 
   return {
-    title: '生成失败',
+    title: "Generation Failed",
     message: text.length > 200 ? `${text.slice(0, 200)}…` : text,
-    suggestion: '请检查本镜参考图与脚本后重试。',
+    suggestion: "Check this shot's reference image and script, then try again.",
   }
 }
 

@@ -455,7 +455,7 @@ def activate_fragment_video_version(
     params = dict(fragment.params or {}) if isinstance(fragment.params, dict) else {}
     versions_raw = params.get("video_versions")
     if not isinstance(versions_raw, list):
-        raise ValueError("没有可切换的历史版本")
+        raise ValueError('No previous version available to switch to')
     target: dict[str, Any] | None = None
     remaining: list[dict[str, Any]] = []
     for item in versions_raw:
@@ -466,7 +466,7 @@ def activate_fragment_video_version(
             continue
         remaining.append(dict(item))
     if not target or not str(target.get("video") or "").strip():
-        raise ValueError("指定版本不存在")
+        raise ValueError('Specified version does not exist')
 
     from datetime import datetime, timezone
 
@@ -598,7 +598,7 @@ def activate_asset_image_version(
     params = dict(asset.params or {}) if isinstance(asset.params, dict) else {}
     versions_raw = params.get("image_versions")
     if not isinstance(versions_raw, list):
-        raise ValueError("没有可切换的历史版本")
+        raise ValueError('No previous version available to switch to')
     target: dict[str, Any] | None = None
     remaining: list[dict[str, Any]] = []
     for item in versions_raw:
@@ -610,7 +610,7 @@ def activate_asset_image_version(
         remaining.append(dict(item))
     target_url = str((target or {}).get("url") or (target or {}).get("cover") or "").strip()
     if not target or not target_url:
-        raise ValueError("指定版本不存在")
+        raise ValueError('Specified version does not exist')
 
     from datetime import datetime, timezone
 
@@ -702,7 +702,7 @@ async def reconcile_orphaned_fragment_generations(
         params.pop("generation_attempts", None)
         params["generation"] = {
             "status": "idle",
-            "message": "任务已中断，请重新生成",
+            "message": 'Task interrupted. Please generate again.',
         }
         fragment.params = params
         changed += 1
@@ -811,7 +811,7 @@ def read_asset_visual_prompt(asset: DramaAsset) -> str:
     ).strip()
     if stored:
         return stored
-    name = (asset.name or "").strip() or f"资产{asset.id}"
+    name = (asset.name or "").strip() or f'Asset {asset.id}'
     kind = (asset.type or "character").strip()
     return f"{kind} {name}"
 
@@ -896,7 +896,7 @@ async def ensure_fragment_reference_images(
         {
             "status": "running",
             "phase": "assets",
-            "message": f"正在生成参考图 0/{len(missing)}",
+            "message": f'Generating reference image 0/{len(missing)}',
             "assets_total": len(missing),
             "assets_done": 0,
         },
@@ -926,7 +926,7 @@ async def ensure_fragment_reference_images(
             {
                 "status": "running",
                 "phase": "assets",
-                "message": f"正在生成参考图 {index + 1}/{len(missing)}：{asset.name or asset.id}",
+                "message": f'Generating reference image {index + 1}/{len(missing)}: {asset.name or asset.id}',
                 "assets_total": len(missing),
                 "assets_done": index,
                 "asset_id": asset.id,
@@ -956,7 +956,7 @@ async def ensure_fragment_reference_images(
         {
             "status": "running",
             "phase": "video",
-            "message": "参考图已就绪，开始生成视频",
+            "message": 'Reference images are ready; starting video generation',
             "assets_total": len(missing),
             "assets_done": len(missing),
         },
@@ -1332,7 +1332,7 @@ async def generate_asset_image(
                 project.id,
             )
     if not (url or "").strip():
-        raise RuntimeError("生图成功但未拿到可用图片 URL")
+        raise RuntimeError('Image generated successfully, but no usable image URL was obtained')
     logger.info("Seedream 返回 project_id=%s url=%s", project.id, url[:100])
 
     await record_seedream_image_usage(
@@ -1367,7 +1367,7 @@ async def generate_asset_image(
             project_id=project.id,
             type=kind,
             asset_type="image",
-            name=name or "未命名资产",
+            name=name or 'Untitled Asset',
             cover=url,
             url=url,
             params=gen_meta,
@@ -1446,7 +1446,7 @@ def build_fragment_ref_payloads(
                 "id": -1,
                 "type": "narration",
                 "assetType": "audio",
-                "name": "旁白",
+                "name": 'Narration',
                 "cover": "",
                 "url": "",
                 "params": {"voiceAudio": narrator_voice},
@@ -1640,7 +1640,7 @@ async def submit_prepared_fragment_video(
 ) -> str:
     ark = get_ark()
     if prepared.submit_mode == "kie":
-        raise RuntimeError("已改为 TokenFree 通道，请重新生成本镜视频")
+        raise RuntimeError('Switched to TokenFree channel. Please regenerate the video for this shot')
     if prepared.submit_mode == "seedance_body" and prepared.seedance_body:
         return await ark.gen_video_seedance_body(
             prepared.seedance_body,
@@ -1656,7 +1656,7 @@ async def submit_prepared_fragment_video(
             ratio=prepared.ratio,
             generate_audio=prepared.generate_audio,
         )
-    raise RuntimeError("分镜视频提交上下文不完整")
+    raise RuntimeError('Shot video submission context is incomplete')
 
 
 def serialize_fragment_video_prepared(prepared: FragmentVideoPrepared) -> dict[str, Any]:

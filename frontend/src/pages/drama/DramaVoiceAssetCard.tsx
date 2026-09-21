@@ -35,15 +35,15 @@ export function DramaVoiceAssetCard({
           <AudioLines size={18} strokeWidth={1.75} />
         </div>
         <div className="drama-voice-card-title">
-          <h3>{asset.name || '未命名音色'}</h3>
+          <h3>{asset.name || "Untitled Voice"}</h3>
           <span className={`drama-voice-card-status${hasAudio ? ' is-ready' : ' is-pending'}`}>
-            {hasAudio ? '已合成' : '待合成'}
+            {hasAudio ? "Synthesized" : "Pending Synthesis"}
           </span>
         </div>
         <button
           type="button"
           className="drama-voice-card-delete"
-          aria-label={`删除 ${asset.name || '音色'}`}
+          aria-label={`Delete ${asset.name || "Voice"}`}
           disabled={synthBusy}
           onClick={onDelete}
         >
@@ -53,14 +53,14 @@ export function DramaVoiceAssetCard({
 
       <div className="drama-voice-card-body">
         <label className="drama-voice-card-field">
-          <span>音色描述</span>
+          <span>{"Voice Description"}</span>
           <textarea
             rows={3}
             value={promptValue}
             disabled={synthBusy}
             onChange={(e) => onPromptChange(e.target.value)}
             onBlur={onPromptBlur}
-            placeholder="描述音色：年龄、性别、语气、语速…"
+            placeholder={"Describe the voice: age, gender, tone, speaking rate…"}
           />
         </label>
 
@@ -79,7 +79,7 @@ export function DramaVoiceAssetCard({
           ) : (
             <>
               <Volume2 size={16} strokeWidth={1.75} aria-hidden />
-              <span>填写描述后合成试听</span>
+              <span>{"Enter a description to synthesize a preview"}</span>
             </>
           )}
         </div>
@@ -92,7 +92,7 @@ export function DramaVoiceAssetCard({
           disabled={synthBusy || !promptValue.trim()}
           onClick={onSynth}
         >
-          {synthBusy ? '合成中…' : hasAudio ? '重新合成' : '按提示词合成'}
+          {synthBusy ? "Synthesizing…" : hasAudio ? "Re-synthesize" : "Synthesize from Prompt"}
         </button>
       </footer>
     </article>

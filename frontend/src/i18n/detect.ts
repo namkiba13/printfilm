@@ -2,7 +2,7 @@
 
 export type Locale = 'zh' | 'en'
 
-export const LOCALES: Locale[] = ['zh', 'en']
+export const LOCALES: Locale[] = ['en']
 
 export const LOCALE_STORAGE_KEY = 'printfilm.locale'
 
@@ -17,7 +17,7 @@ export const LOCALE_DATE: Record<Locale, string> = {
 }
 
 // 当前生效语言（供非 React 工具函数读取）
-let activeLocale: Locale = 'zh'
+let activeLocale: Locale = 'en'
 
 // 是否为已支持的语言代码
 export function isLocale(value: unknown): value is Locale {
@@ -25,9 +25,8 @@ export function isLocale(value: unknown): value is Locale {
 }
 
 // 从 Accept-Language / navigator 映射到 zh 或 en
-export function localeFromBrowser(lang?: string): Locale {
-  const raw = (lang || '').trim().toLowerCase()
-  return raw.startsWith('zh') ? 'zh' : 'en'
+export function localeFromBrowser(_lang?: string): Locale {
+  return 'en'
 }
 
 // 读取用户手动选择；无记录则返回 null（跟随浏览器）
@@ -42,11 +41,7 @@ export function readStoredLocale(): Locale | null {
 
 // 首次进入：有手动选择用手动，否则跟浏览器
 export function detectLocale(): Locale {
-  const stored = typeof window === 'undefined' ? null : readStoredLocale()
-  if (stored) return stored
-  if (typeof navigator === 'undefined') return 'zh'
-  const hint = navigator.language || navigator.languages?.[0] || 'zh'
-  return localeFromBrowser(hint)
+  return 'en'
 }
 
 export function getActiveLocale(): Locale {
@@ -55,6 +50,7 @@ export function getActiveLocale(): Locale {
 
 // 应用语言：写 html lang；persist 时才写入 localStorage
 export function applyLocale(locale: Locale, persist: boolean): void {
+  locale = 'en'
   activeLocale = locale
   if (persist) {
     try {

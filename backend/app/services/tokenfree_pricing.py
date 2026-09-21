@@ -54,77 +54,77 @@ RECOMMENDED_MODELS: tuple[dict[str, Any], ...] = (
         "id": "kimi-k2.6",
         "capability": "text",
         "label": "Kimi K2.6",
-        "note": "默认剧本/分镜，中文长上下文",
+        "note": 'Default screenplay/Storyboard, long Chinese context',
         "recommended": True,
     },
     {
         "id": "deepseek-v3.2",
         "capability": "text",
         "label": "DeepSeek V3.2",
-        "note": "便宜备选，扩写与闲聊",
+        "note": 'An inexpensive alternative for expansion and casual chat',
         "recommended": False,
     },
     {
         "id": "qwen3.5-plus",
         "capability": "text",
         "label": "Qwen 3.5 Plus",
-        "note": "便宜中文日常对话",
+        "note": 'Affordable everyday Chinese conversation',
         "recommended": False,
     },
     {
         "id": "gpt-image-2-5",
         "capability": "image",
         "label": "GPT Image 2.5",
-        "note": "TokenFree 实测可通；计费按 Kie 2K 约 $0.05/张。Seedream 会改走此模型",
+        "note": 'Verified working with TokenFree; billed at approximately $0.05/image for Kie 2K. Seedream will use this model instead',
         "recommended": True,
     },
     {
         "id": "nano-banana-2",
         "capability": "image",
         "label": "Nano Banana 2",
-        "note": "极便宜闪图，草稿/批量",
+        "note": 'Extremely cheap quick images for drafts/batch generation',
         "recommended": False,
     },
     {
         "id": "seedance-2-5",
         "capability": "video",
         "label": "Seedance 2.5",
-        "note": "默认成片，最长约 30 秒",
+        "note": 'Default finished video, up to approximately 30 seconds',
         "recommended": True,
     },
     {
         "id": "seedance-2-0",
         "capability": "video",
         "label": "Seedance 2.0",
-        "note": "标准 2.0，与 Mini 不同价档",
+        "note": 'Standard 2.0, with a different price tier from Mini',
         "recommended": False,
     },
     {
         "id": "seedance-2-0-mini",
         "capability": "video",
         "label": "Seedance 2.0 Mini",
-        "note": "更快更便宜的备选",
+        "note": 'A faster, cheaper alternative',
         "recommended": False,
     },
     {
         "id": "qwen-tts-2025-05-22",
         "capability": "audio",
         "label": "Qwen TTS",
-        "note": "默认配音逻辑名；Ali /audio/speech 未实现，实际走 qwen3-omni-flash 流式 chat",
+        "note": 'Default voiceover logical name; Ali /audio/speech is not implemented, so qwen3-omni-flash streaming chat is used instead',
         "recommended": True,
     },
     {
         "id": "gemini-3.1-flash-tts",
         "capability": "audio",
         "label": "Gemini 3.1 Flash TTS",
-        "note": "TokenFree 目录备选配音",
+        "note": 'Alternative voiceover from the TokenFree catalog',
         "recommended": True,
     },
     {
         "id": "elevenlabs-tts",
         "capability": "audio",
         "label": "ElevenLabs TTS",
-        "note": "TokenFree 目录备选配音",
+        "note": 'Alternative voiceover from the TokenFree catalog',
         "recommended": False,
     },
 )
@@ -447,7 +447,7 @@ def build_official_rate_rows(
     provider = "TokenFree" if native else "94API"
     specs = RECOMMENDED_MODELS if native else tuple(
         {"id": mid, "label": mid, "capability": infer_model_capability(mid),
-         "recommended": mid == s.model_llm, "note": "上游当前价目 / Current gateway pricing"}
+         "recommended": mid == s.model_llm, "note": 'Current gateway pricing / Current gateway pricing'}
         for mid in rates
     )
     for spec in specs:
@@ -516,15 +516,15 @@ async def fetch_tokenfree_pricing() -> dict[str, Any]:
         async with httpx.AsyncClient(timeout=8.0) as client:
             resp = await client.get(url)
     except httpx.HTTPError as exc:
-        raise RuntimeError(f"TokenFree pricing 网络失败: {exc}") from exc
+        raise RuntimeError(f'TokenFree pricing network request failed: {exc}') from exc
     if resp.status_code >= 400:
         raise RuntimeError(f"TokenFree pricing HTTP {resp.status_code}: {resp.text[:300]}")
     try:
         payload = resp.json()
     except ValueError as exc:
-        raise RuntimeError("TokenFree 价目返回非 JSON") from exc
+        raise RuntimeError('TokenFree pricing response is not JSON') from exc
     if not isinstance(payload, dict):
-        raise RuntimeError("TokenFree 价目格式异常")
+        raise RuntimeError('TokenFree pricing format is invalid')
     return payload
 
 

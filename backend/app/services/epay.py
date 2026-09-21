@@ -56,7 +56,7 @@ def build_submit_fields(
     if pay_type not in {"alipay", "wxpay"}:
         raise ValueError("pay_type must be alipay or wxpay")
     if not s.epay_pid or not s.epay_key:
-        raise ValueError("易支付未配置 EPAY_PID / EPAY_KEY")
+        raise ValueError('Epay EPAY_PID / EPAY_KEY not configured')
     notify = (notify_url or s.epay_notify_url or "").strip()
     ret = (return_url or s.epay_return_url or "").strip()
     # Avoid "/api/" in notify_url — pay.gitcc.com WAF blocks those payloads.
@@ -146,9 +146,9 @@ async def create_mapi_payment(
         logger.error("epay mapi non-json status=%s body=%s", resp.status_code, snippet)
         if resp.status_code == 403 or "防火墙" in (resp.text or ""):
             raise ValueError(
-                "易支付防火墙拦截（请确认 notify_url 不含 /api/ 路径）"
+                'Epay firewall blocked the request (please confirm that notify_url does not contain the /api/ path)'
             ) from exc
-        raise ValueError(f"易支付返回异常(HTTP {resp.status_code})") from exc
+        raise ValueError(f'Epay returned an error (HTTP {resp.status_code})') from exc
     if int(data.get("code") or 0) != 1:
         msg = str(data.get("msg") or data.get("message") or "下单失败")
         raise ValueError(msg)
@@ -183,7 +183,7 @@ async def create_mapi_payment(
             data.get("trade_no"),
             sorted(data.keys()) if isinstance(data, dict) else [],
         )
-        raise ValueError(f"易支付未返回可用支付链接（{pay_type}）")
+        raise ValueError(f'Epay did not return a usable payment link ({pay_type})')
 
     return {
         "trade_no": str(data.get("trade_no") or ""),

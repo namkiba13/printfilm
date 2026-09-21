@@ -20,7 +20,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }))
     const detail = err.detail
-    throw new Error(typeof detail === 'string' ? detail : '请求失败')
+    throw new Error(typeof detail === 'string' ? detail : "Request Failed")
   }
   return res.json()
 }
@@ -64,7 +64,7 @@ export async function uploadAgentSkillFile(file: File) {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }))
-    throw new Error(typeof err.detail === 'string' ? err.detail : '上传失败')
+    throw new Error(typeof err.detail === 'string' ? err.detail : "Upload Failed")
   }
   return res.json() as Promise<AgentSkill>
 }

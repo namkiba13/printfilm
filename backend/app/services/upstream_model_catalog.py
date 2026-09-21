@@ -63,21 +63,21 @@ async def _list_openai_compatible_models(
 ) -> list[dict[str, str]]:
     """GET {base}/models，按 OpenAI 兼容响应解析。"""
     if not base_url:
-        raise RuntimeError("请先填写 Base URL")
+        raise RuntimeError('Please enter the Base URL first')
     if not api_key:
-        raise RuntimeError("请先填写 API Key，或使用已保存密钥的渠道")
+        raise RuntimeError('Please enter the API Key first, or use a channel with a saved key')
 
     headers = {"Authorization": f"Bearer {api_key}"}
     url = f"{base_url.rstrip('/')}/models"
     async with httpx.AsyncClient(timeout=60.0) as client:
         resp = await client.get(url, headers=headers)
         if resp.status_code >= 400:
-            raise RuntimeError(f"拉取模型目录失败 HTTP {resp.status_code}: {resp.text[:300]}")
+            raise RuntimeError(f'Failed to fetch model catalog HTTP {resp.status_code}: {resp.text[:300]}')
         payload = resp.json()
 
     data = payload.get("data") if isinstance(payload, dict) else None
     if not isinstance(data, list):
-        raise RuntimeError("上游返回格式异常：缺少 data 列表")
+        raise RuntimeError('Invalid upstream response format: missing data list')
 
     cap_filter = (capability or "all").strip().lower()
     out: list[dict[str, str]] = []
@@ -120,7 +120,7 @@ async def list_upstream_models(
     )
 
     if proto == "volc_tts":
-        raise RuntimeError("豆包 TTS 暂不支持从上游拉取模型目录，请手动填写 speaker / 音色 ID")
+        raise RuntimeError('Doubao TTS does not currently support fetching the model catalog from upstream. Please enter the speaker / voice ID manually')
 
     if proto == "kie" or proto == "ark" or "volces.com" in base.lower() or "kie.ai" in base.lower():
         from app.services.tokenfree_gateway import TOKENFREE_BASE_URL, resolve_tokenfree_api_key

@@ -10,8 +10,7 @@ logger = logging.getLogger(__name__)
 
 # 画风板只借鉴气质，禁止抄参考图里的人物与构图
 STYLE_BOARD_PROMPT_HINT = (
-    "另附画风参考图：只借鉴其色调、笔触、光影与整体气质，"
-    "禁止复制该图的人物、场景主体与构图。"
+    'Additional style reference image: draw inspiration only from its color palette, brushwork, lighting, and overall mood; do not copy the people, main subjects, or composition.'
 )
 
 _STYLE_BOARD_EXTS = (".png", ".jpg", ".jpeg", ".webp")
@@ -47,95 +46,87 @@ IMAGE_STYLE_IDS = (
 # IMAGE_STYLE_PROMPTS 风格 → 提示词片段
 IMAGE_STYLE_PROMPTS: dict[str, str] = {
     "retro-sci-fi-atompunk": (
-        "复古科幻原子朋克风格，1950年代未来主义美学，流线型金属与原子能符号，"
-        "霓虹高光，金属质感，高对比色彩，轻微胶片颗粒"
+        'Retro sci-fi atompunk style, 1950s futuristic aesthetic, streamlined metal and atomic energy symbols, neon highlights, metallic texture, high-contrast colors, subtle film grain'
     ),
     "palace-intrigue-cold": (
-        "中国宫廷权谋题材冷峻风格，低饱和暗调，克制光影，庄重构图，"
-        "华贵但压抑的宫廷氛围，硬朗轮廓，戏剧化侧光"
+        'Austere style for Chinese palace intrigue, low-saturation dark tones, restrained lighting, solemn composition, luxurious yet oppressive palace atmosphere, defined contours, dramatic side lighting'
     ),
     "domestic-suspense-cold": (
-        "国产悬疑影视冷调风格，偏青灰色调，低调光，阴影浓重，写实摄影质感，紧张压抑氛围，细节丰富"
+        'Cool-toned style for domestic suspense film and television, blue-gray palette, low-key lighting, heavy shadows, realistic photographic texture, tense and oppressive atmosphere, rich detail'
     ),
     "ancient-romance-soft": (
-        "中国古代偶像剧唯美柔光风格，梦幻柔焦，暖色薄纱光晕，精致古装妆造，背景虚化，浪漫飘逸氛围"
+        'Aesthetic soft-light style for ancient Chinese idol dramas, dreamy soft focus, warm gauzy light halos, refined ancient-costume makeup and styling, blurred background, romantic and ethereal atmosphere'
     ),
     "ancient-chinese-mythology": (
-        "中国古代神话史诗风格，上古洪荒气质，苍茫山河与云雾神光，青铜礼器与粗纻麻衣质感，"
-        "水墨青绿与矿物颜料色调，庄严神圣，史诗大场面，电影级光影，忌现代偶像剧柔光与甜宠滤镜"
+        'Style of ancient Chinese mythological epics, primordial wilderness atmosphere, vast mountains and rivers with divine light through mist, bronze ritual vessels and coarse linen textures, ink-wash blue-green and mineral-pigment palette, solemn and sacred, epic large-scale scenes, cinematic lighting; avoid modern idol-drama soft lighting and sugary romance filters'
     ),
     "japanese-youth-film": (
-        "日式青春题材胶片摄影风格，柯达胶片色调，自然阳光，浅景深，细腻颗粒，青涩真挚的日常氛围"
+        'Japanese youth-film style with analog photography, Kodak film tones, natural sunlight, shallow depth of field, fine grain, youthful and sincere everyday atmosphere'
     ),
     "japanese-daily-natural": (
-        "日式生活纪录片自然光影风格，柔和自然光，低对比，真实日常场景，安静治愈，轻微胶片质感"
+        'Natural-light style of Japanese slice-of-life documentaries, soft natural light, low contrast, authentic everyday scenes, quiet and soothing, subtle film texture'
     ),
-    "korean-urban-soft": "韩剧都市题材柔光风格，暖色滤镜，通透肤质，都市背景虚化，浪漫温柔灯光氛围",
+    "korean-urban-soft": 'Soft-light style for Korean urban dramas, warm filter, luminous skin, blurred urban background, romantic and gentle lighting atmosphere',
     "chinese-urban-realistic": (
-        "国产都市现实题材写实摄影风格，自然光，真实生活场景，中性色调，细节锐利，无过度美化"
+        'Realistic photographic style for domestic urban realism, natural light, authentic life scenes, neutral tones, sharp details, no excessive beautification'
     ),
     "wuxia-realistic-photo": (
-        "中国武侠江湖题材写实摄影风格，自然光影，真实地形与服饰质感，动态构图，江湖氛围，电影级景深"
+        'Realistic photographic style for Chinese wuxia and jianghu stories, natural lighting, authentic terrain and costume textures, dynamic composition, jianghu atmosphere, cinematic depth of field'
     ),
     "90s-realistic-film": (
-        "1990年代写实电影风格，胶片质感，自然肤色，时代感服装与环境，柔和对比，怀旧色调"
+        '1990s realistic film style, film texture, natural skin tones, period-appropriate clothing and environments, soft contrast, nostalgic color palette'
     ),
     "retro-narrative-film": (
-        "复古叙事电影风格，经典电影构图，胶片色彩分级，富有故事感的场景调度，电影级布光"
+        'Retro narrative film style, classic cinematic composition, film color grading, story-rich scene blocking, cinematic lighting'
     ),
     "american-retro-hollywood": (
-        "美式复古好莱坞黄金年代风格，高对比布光，暖调彩色或经典黑白，明星质感，华丽景深"
+        'American retro Hollywood Golden Age style, high-contrast lighting, warm color or classic black-and-white, star-quality glamour, sumptuous depth of field'
     ),
     "neon-cyberpunk-film": (
-        "霓虹赛博朋克电影风格，蓝紫霓虹灯光，雨夜反射，高对比，未来都市，烟雾与全息感光效"
+        'Neon cyberpunk film style, blue-violet neon lighting, rainy-night reflections, high contrast, futuristic cityscape, smoky atmosphere and holographic light effects'
     ),
     "90s-rural-china-film": (
-        "1990年代中国农村题材电影风格，自然光，土黄与绿色调，粗糙真实质感，乡土生活氛围"
+        '1990s Chinese rural film style, natural light, earth-yellow and green tones, rough and authentic texture, rural life atmosphere'
     ),
     "cgi-3d-animation": (
-        "电影级三维 CGI 动画风格，皮克斯/梦工厂气质，圆润造型与清晰轮廓，"
-        "柔和体积光与次表面散射，干净材质与饱和配色，浅景深，"
-        "非写实摄影、非日系赛璐璐平面、非剪纸扁平"
+        'Film-grade 3D CGI animation style, with a Pixar/DreamWorks feel, rounded forms and clean silhouettes, soft volumetric lighting and subsurface scattering, clean materials and saturated colors, shallow depth of field, non-photorealistic, not Japanese cel-shaded flat style, not flat paper-cut style'
     ),
     "ghibli-handdrawn-anime": (
-        "手绘二维动画电影气质，水彩与水粉背景，柔和自然光与金色黄昏，"
-        "写实人体比例与朴素五官（非大眼睛赛璐璐美少女），生活化服饰，"
-        "茂盛草木、风吹草地与流动云层，温暖土黄与青绿，空气透视与电影构图，"
-        "非写实摄影、非3D CGI、非像素风、非剪纸扁平"
+        'Hand-drawn 2D animated film aesthetic, watercolor and gouache backgrounds, soft natural light and golden-hour glow, realistic human proportions and understated facial features (not big-eyed cel-shaded anime girls), everyday clothing, lush vegetation, windblown grass and drifting clouds, warm ochre and blue-green tones, atmospheric perspective and cinematic composition, non-photorealistic, not 3D CGI, not pixel art, not flat paper-cut style'
     ),
-    "tezuka-era-cartoon": "手冢治虫时代经典日式卡通画风，简洁线条，复古动画平涂着色，怀旧动画质感",
+    "tezuka-era-cartoon": 'Classic Japanese cartoon style from the era of Osamu Tezuka, simple lines, retro animation flat coloring, nostalgic animated-film texture',
     "shanghai-animation": (
-        "上海美术电影制片厂经典动画画风，中国民族绘画韵味，水彩与工笔结合，诗意唯美，传统色彩"
+        'Classic animation style of the Shanghai Animation Film Studio, with the charm of traditional Chinese painting, a combination of watercolor and meticulous gongbi painting, poetic and beautiful, traditional colors'
     ),
-    "pixel-art": "像素艺术风格，清晰像素块，复古游戏美学，有限色板，8-bit 或 16-bit 质感",
+    "pixel-art": 'Pixel art style, crisp pixel blocks, retro game aesthetic, limited color palette, 8-bit or 16-bit texture',
     "shadow-puppet-illustration": (
-        "中国皮影戏插画画风，剪影轮廓，镂空纹理，暖色背光，民间艺术装饰性，层叠投影效果"
+        'Chinese shadow-puppet illustration style, silhouette contours, pierced textures, warm backlighting, decorative folk-art elements, layered projection effects'
     ),
 }
 
 # IMAGE_STYLE_LABELS 风格展示名
 IMAGE_STYLE_LABELS: dict[str, str] = {
-    "retro-sci-fi-atompunk": "复古科幻原子朋克",
-    "palace-intrigue-cold": "宫斗权谋冷峻",
-    "domestic-suspense-cold": "国产悬疑冷调",
-    "ancient-romance-soft": "古偶唯美柔光",
-    "ancient-chinese-mythology": "中国古代神话史诗",
-    "japanese-youth-film": "日式青春胶片",
-    "japanese-daily-natural": "日式生活自然",
-    "korean-urban-soft": "韩剧都市柔光",
-    "chinese-urban-realistic": "国产都市写实",
-    "wuxia-realistic-photo": "武侠江湖写实摄影",
-    "90s-realistic-film": "90年代写实电影",
-    "retro-narrative-film": "复古叙事电影",
-    "american-retro-hollywood": "美式复古好莱坞",
-    "neon-cyberpunk-film": "霓虹赛博电影",
-    "90s-rural-china-film": "90年代中国农村电影",
-    "cgi-3d-animation": "3D 动画",
-    "ghibli-handdrawn-anime": "宫崎骏气质手绘",
-    "tezuka-era-cartoon": "手冢治虫时代卡通画风",
-    "shanghai-animation": "上美画风",
-    "pixel-art": "像素风",
-    "shadow-puppet-illustration": "皮影戏插画",
+    "retro-sci-fi-atompunk": 'Retro sci-fi atomic punk',
+    "palace-intrigue-cold": 'Palace intrigue, cold and austere',
+    "domestic-suspense-cold": 'Chinese suspense, cool tones',
+    "ancient-romance-soft": 'Chinese historical romance, soft light',
+    "ancient-chinese-mythology": 'Epic ancient Chinese mythology',
+    "japanese-youth-film": 'Japanese youth film',
+    "japanese-daily-natural": 'Japanese slice-of-life, natural',
+    "korean-urban-soft": 'K-drama urban soft light',
+    "chinese-urban-realistic": 'Chinese urban realism',
+    "wuxia-realistic-photo": 'Wuxia jianghu realistic cinematography',
+    "90s-realistic-film": '1990s realist cinema',
+    "retro-narrative-film": 'Retro narrative cinema',
+    "american-retro-hollywood": 'American retro Hollywood',
+    "neon-cyberpunk-film": 'Neon cyberpunk cinema',
+    "90s-rural-china-film": '1990s Chinese rural cinema',
+    "cgi-3d-animation": '3D animation',
+    "ghibli-handdrawn-anime": 'Hand-drawn in the style of Hayao Miyazaki',
+    "tezuka-era-cartoon": 'Cartoon style of the Osamu Tezuka era',
+    "shanghai-animation": 'Shanghai Animation Film Studio style',
+    "pixel-art": 'Pixel art',
+    "shadow-puppet-illustration": 'Shadow puppetry illustration',
 }
 
 

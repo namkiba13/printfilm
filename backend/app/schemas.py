@@ -11,7 +11,7 @@ from app.schemas_tasks import TaskRunBriefOut
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=6, max_length=64)
-    nickname: str = Field(default="创作者", max_length=64)
+    nickname: str = Field(default='Creator', max_length=64)
 
 
 class LoginRequest(BaseModel):
@@ -132,7 +132,7 @@ class ShotUpdate(BaseModel):
 
 class ProjectCreate(BaseModel):
     template_id: str
-    title: str = "未命名作品"
+    title: str = 'Untitled Work'
     source_type: str = Field(default="theme", pattern="^(theme|script)$")
     source_text: str = Field(min_length=2, max_length=20000)
     resolution_mode: str = Field(default="preview", pattern="^(preview|hd)$")

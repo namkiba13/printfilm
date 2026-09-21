@@ -35,10 +35,10 @@ def _send_email_sync(
 ) -> None:
     s = settings or get_settings()
     if not _smtp_configured(s):
-        raise RuntimeError("SMTP 未配置或未启用")
+        raise RuntimeError('SMTP is not configured or enabled')
     recipients = [addr.strip() for addr in to_addrs if addr and addr.strip()]
     if not recipients:
-        raise RuntimeError("无有效收件人")
+        raise RuntimeError('No valid recipients')
 
     msg = EmailMessage()
     msg["Subject"] = subject

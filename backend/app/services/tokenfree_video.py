@@ -246,9 +246,9 @@ def format_video_task_error(err: Any) -> str:
                 nested = format_video_task_error(value)
                 if nested:
                     return nested
-        return "视频生成失败"
+        return 'Video generation failed'
     text = str(err or "").strip()
-    return text or "视频生成失败"
+    return text or 'Video generation failed'
 
 
 def extract_video_result_url(data: dict[str, Any]) -> str | None:

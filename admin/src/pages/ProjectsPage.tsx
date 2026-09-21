@@ -60,7 +60,7 @@ export function ProjectsPage() {
       if (userId) params.set("user_id", String(userId));
       setData(await api<ListRes>(`/api/admin/projects?${params}`));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "加载失败");
+      toast.error(err instanceof Error ? err.message : "Failed to Load");
     }
   }
 
@@ -75,7 +75,7 @@ export function ProjectsPage() {
     try {
       setDetail(await api<AdminProject>(`/api/admin/projects/${id}`));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "加载详情失败");
+      toast.error(err instanceof Error ? err.message : "Failed to load details");
       projectDetail.close();
     } finally {
       setDetailLoading(false);
@@ -96,7 +96,7 @@ export function ProjectsPage() {
 
   return (
     <div className="admin-list-page">
-      <PageHeader description="科普管线项目：状态、镜头、关联任务与费用" />
+      <PageHeader description={"Short Video pipeline project: status, shots, linked tasks, and costs"} />
       <AdminFilterBar>
         <Select value={status} onChange={(e) => setStatus(e.target.value)}>
           {PROJECT_STATUS_OPTIONS.map((opt) => (
@@ -105,7 +105,7 @@ export function ProjectsPage() {
             </option>
           ))}
         </Select>
-        <Input placeholder="标题 / 错误信息" value={q} onChange={(e) => setQ(e.target.value)} />
+        <Input placeholder={"Title / error message"} value={q} onChange={(e) => setQ(e.target.value)} />
         <AdminUserSearchSelect value={userId} onChange={(id) => setUserId(id)} />
         <Button
           size="sm"
@@ -116,24 +116,23 @@ export function ProjectsPage() {
             void load(1);
           }}
         >
-          筛选
-        </Button>
+          {"Filter"}</Button>
       </AdminFilterBar>
       <div className="rounded-lg border bg-background">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>
-              <TableHead>标题</TableHead>
-              <TableHead>用户</TableHead>
-              <TableHead>模板</TableHead>
-              <TableHead>管线</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>进度</TableHead>
-              <TableHead>镜头</TableHead>
-              <TableHead>费用</TableHead>
-              <TableHead>创建</TableHead>
-              <TableHead>更新</TableHead>
+              <TableHead>{"Title"}</TableHead>
+              <TableHead>{"User"}</TableHead>
+              <TableHead>{"Template"}</TableHead>
+              <TableHead>{"Pipeline"}</TableHead>
+              <TableHead>{"Status"}</TableHead>
+              <TableHead>{"Progress"}</TableHead>
+              <TableHead>{"Shot"}</TableHead>
+              <TableHead>{"Cost"}</TableHead>
+              <TableHead>{"Create"}</TableHead>
+              <TableHead>{"Updated"}</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
@@ -161,8 +160,7 @@ export function ProjectsPage() {
                 </TableCell>
                 <TableCell>
                   <Button size="sm" variant="outline" onClick={() => void openDetail(p.id)}>
-                    详情
-                  </Button>
+                    {"Details"}</Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -187,20 +185,20 @@ export function ProjectsPage() {
           }
         }}
         size="full"
-        title={detail ? `科普项目 #${detail.id} · ${detail.title}` : "科普项目详情"}
-        subtitle={detail ? projectStatusLabel(detail.status) : detailLoading ? "加载中…" : undefined}
+        title={detail ? `Short Video project #${detail.id} · ${detail.title}` : "Short Video project details"}
+        subtitle={detail ? projectStatusLabel(detail.status) : detailLoading ? "Loading…" : undefined}
         bodyClassName="space-y-3"
       >
         {detailLoading && !detail ? (
-          <div className="py-10 text-center text-sm text-[var(--admin-muted)]">加载中…</div>
+          <div className="py-10 text-center text-sm text-[var(--admin-muted)]">{"Loading…"}</div>
         ) : null}
         {detail ? (
           <>
-            <AdminDetailSection title="基本信息">
+            <AdminDetailSection title={"Basic Information"}>
               <AdminDetailMeta
                 items={[
                   {
-                    label: "用户",
+                    label: "User",
                     value: (
                       <AdminEntityLink
                         kind="user"
@@ -210,29 +208,29 @@ export function ProjectsPage() {
                     ),
                   },
                   {
-                    label: "状态 / 进度",
-                    value: `${projectStatusLabel(detail.status)} · ${detail.progress}% · 镜头 ${detail.shot_count}`,
+                    label: "Status / progress",
+                    value: `${projectStatusLabel(detail.status)} · ${detail.progress}% · Shots ${detail.shot_count}`,
                   },
-                  { label: "模板", value: detail.template_id },
-                  { label: "管线", value: detail.pipeline_mode },
-                  { label: "来源", value: detail.source_type || "—" },
+                  { label: "Template", value: detail.template_id },
+                  { label: "Pipeline", value: detail.pipeline_mode },
+                  { label: "Source", value: detail.source_type || "—" },
                   {
-                    label: "分辨率 / 比例",
+                    label: "Resolution / aspect ratio",
                     value: `${detail.resolution_mode || "—"} · ${detail.output_ratio || "—"}`,
                   },
-                  { label: "配音", value: detail.voice_id || "—", full: true },
+                  { label: "Voiceover", value: detail.voice_id || "—", full: true },
                 ]}
               />
               <AdminDetailNote empty={!detail.error_msg} className="mt-3">
-                {detail.error_msg || "无错误信息"}
+                {detail.error_msg || "No Error Information"}
               </AdminDetailNote>
             </AdminDetailSection>
 
             {(detail.cover_url || detail.final_video_url) ? (
-              <AdminDetailSection title="媒体预览">
+              <AdminDetailSection title={"Media Preview"}>
                 <div className="admin-detail-media">
                   {detail.cover_url ? (
-                    <img src={mediaSrc(detail.cover_url)} alt="封面" />
+                    <img src={mediaSrc(detail.cover_url)} alt={"Cover"} />
                   ) : null}
                   {detail.final_video_url ? (
                     <video src={mediaSrc(detail.final_video_url)} controls className="max-w-full" />
@@ -241,39 +239,38 @@ export function ProjectsPage() {
               </AdminDetailSection>
             ) : null}
 
-            <AdminDetailSection title="费用汇总">
+            <AdminDetailSection title={"Cost Summary"}>
               <AdminDetailStatGrid
                 items={[
-                  { label: "扣费", value: `¥${fenToYuan(usage?.charge_fen ?? detail.charge_fen ?? 0)}` },
-                  { label: "成本", value: `¥${fenToYuan(usage?.cost_fen ?? 0)}` },
+                  { label: "Charge", value: `¥${fenToYuan(usage?.charge_fen ?? detail.charge_fen ?? 0)}` },
+                  { label: "Cost", value: `¥${fenToYuan(usage?.cost_fen ?? 0)}` },
                   { label: "Tokens", value: usage?.tokens ?? 0 },
                   {
-                    label: "图/视/LLM/TTS",
+                    label: "Image/Video/LLM/TTS",
                     value: `${usage?.image_gens ?? 0}/${usage?.video_gens ?? 0}/${usage?.llm_calls ?? 0}/${usage?.tts_gens ?? 0}`,
                   },
                 ]}
               />
             </AdminDetailSection>
 
-            <AdminDetailSection title={`镜头（${(detail.shots ?? []).length}）`}>
+            <AdminDetailSection title={`Shots (${(detail.shots ?? []).length})`}>
               <AdminDetailTableWrap>
                 <table>
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>状态</th>
-                      <th>时长</th>
-                      <th>图</th>
-                      <th>视频</th>
-                      <th>音频</th>
+                      <th>{"Status"}</th>
+                      <th>{"Duration"}</th>
+                      <th>{"Image"}</th>
+                      <th>{"Video"}</th>
+                      <th>{"Audio"}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {(detail.shots ?? []).length === 0 ? (
                       <tr>
                         <td colSpan={6} className="!text-center text-[var(--admin-muted)]">
-                          暂无镜头
-                        </td>
+                          {"No shots available"}</td>
                       </tr>
                     ) : (
                       (detail.shots ?? []).map((s) => (
@@ -281,9 +278,9 @@ export function ProjectsPage() {
                           <td>{s.shot_no}</td>
                           <td>{s.status}</td>
                           <td>{s.duration}s</td>
-                          <td>{s.has_image ? "有" : "—"}</td>
-                          <td>{s.has_video ? "有" : "—"}</td>
-                          <td>{s.has_audio ? "有" : "—"}</td>
+                          <td>{s.has_image ? "Yes" : "—"}</td>
+                          <td>{s.has_video ? "Yes" : "—"}</td>
+                          <td>{s.has_audio ? "Yes" : "—"}</td>
                         </tr>
                       ))
                     )}
@@ -292,23 +289,22 @@ export function ProjectsPage() {
               </AdminDetailTableWrap>
             </AdminDetailSection>
 
-            <AdminDetailSection title={`关联任务（最近 ${(detail.recent_tasks ?? []).length}）`}>
+            <AdminDetailSection title={`Related Tasks (Recent ${(detail.recent_tasks ?? []).length})`}>
               <AdminDetailTableWrap className="max-h-[200px]">
                 <table>
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>类型</th>
-                      <th>状态</th>
-                      <th>已扣 / 预估</th>
+                      <th>{"Type"}</th>
+                      <th>{"Status"}</th>
+                      <th>{"Charged / Estimated"}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {(detail.recent_tasks ?? []).length === 0 ? (
                       <tr>
                         <td colSpan={4} className="!text-center text-[var(--admin-muted)]">
-                          暂无任务
-                        </td>
+                          {"No tasks available"}</td>
                       </tr>
                     ) : (
                       (detail.recent_tasks ?? []).map((t) => (
@@ -330,7 +326,7 @@ export function ProjectsPage() {
             </AdminDetailSection>
 
             {detail.source_text ? (
-              <AdminDetailSection title="源文本">
+              <AdminDetailSection title={"Source Text"}>
                 <AdminDetailNote>{detail.source_text}</AdminDetailNote>
               </AdminDetailSection>
             ) : null}

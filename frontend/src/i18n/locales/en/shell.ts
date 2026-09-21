@@ -64,7 +64,7 @@ export const enShell = {
     closeMenu: 'Close menu',
     mobileNav: 'Mobile navigation',
     language: 'Language',
-    langZh: '中',
+    langZh: 'Chinese',
     langEn: 'EN',
   },
   footer: {

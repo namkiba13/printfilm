@@ -200,7 +200,7 @@ async function waitForAssetImage(
   while (Date.now() - started < POLL_TIMEOUT_MS) {
     const list = await dramaApi.listAssets(projectId)
     const latest = list.find((a) => a.id === assetId)
-    if (!latest) throw new Error('资产不存在')
+    if (!latest) throw new Error("Asset does not exist")
 
     const status = readGenerationStatus(latest)
     const currentUrl = assetMediaUrl(latest)
@@ -219,7 +219,7 @@ async function waitForAssetImage(
     if (status === 'failed' || status === 'cancelled') {
       const gen = (latest.params || {}).generation as { error?: string } | undefined
       const raw = String(gen?.error || '').trim()
-      throw new Error(raw || (status === 'cancelled' ? '生图已取消' : '生图失败'))
+      throw new Error(raw || (status === 'cancelled' ? "Image generation cancelled" : "Image Generation Failed"))
     }
 
     const urlChanged = Boolean(currentUrl) && currentUrl !== baselineUrl
@@ -236,7 +236,7 @@ async function waitForAssetImage(
     // 仍是旧图且未进入过 in-flight：继续等（POST 后状态可能尚未可见）
     await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS))
   }
-  throw new Error('生图超时，请刷新后重试')
+  throw new Error("Image generation timed out, please refresh and try again")
 }
 
 const waitingPoll: InternalJob[] = []
@@ -266,7 +266,7 @@ async function pollJob(job: InternalJob) {
     emit()
     job.resolve(asset)
   } catch (err) {
-    const message = err instanceof Error ? err.message : '生图失败'
+    const message = err instanceof Error ? err.message : "Image Generation Failed"
     job.status = 'failed'
     job.error = message
     job.finishedAt = Date.now()
@@ -322,7 +322,7 @@ async function submitJob(job: InternalJob) {
     waitingPoll.push(job)
     pumpPoll()
   } catch (err) {
-    const message = err instanceof Error ? err.message : '生图失败'
+    const message = err instanceof Error ? err.message : "Image Generation Failed"
     job.status = 'failed'
     job.error = message
     job.finishedAt = Date.now()
@@ -370,7 +370,7 @@ export function enqueueDramaImageGen(input: EnqueueInput): Promise<DramaAsset> {
       id: makeJobId(),
       projectId: input.projectId,
       assetId: input.assetId,
-      assetName: (input.assetName || '').trim() || `资产 ${input.assetId}`,
+      assetName: (input.assetName || '').trim() || `Asset ${input.assetId}`,
       assetType: input.assetType || 'character',
       prompt: input.prompt,
       options: input.options || {},

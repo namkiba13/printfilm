@@ -64,7 +64,7 @@ async def run_tool(
             if not raw:
                 continue
             if len(raw) > 40 * 1024 * 1024:
-                raise ValueError("单个文件不能超过 40MB")
+                raise ValueError('A single file cannot exceed 40MB')
             saved.append(save_upload(user.id, raw, item.filename or "upload.bin"))
         if tid in IMAGE_TOOLS:
             try:
@@ -118,7 +118,7 @@ async def run_tool(
                 data=data,
             )
         else:
-            raise ValueError("未知工具")
+            raise ValueError('Unknown tool')
         await db.commit()
     except HTTPException:
         raise
@@ -137,7 +137,7 @@ async def get_tool_task(
     user: User = Depends(get_current_user),
 ) -> ToolTaskOut:
     if not task_id.strip():
-        raise HTTPException(status_code=400, detail="缺少任务")
+        raise HTTPException(status_code=400, detail='Missing task')
     tid = task_id.strip()
     row = (
         await db.execute(
@@ -148,7 +148,7 @@ async def get_tool_task(
     # 本地无归属记录即拒绝：上游 task_id 可被持有者之外的人猜测传递，
     # 不能在没有归属凭据时代理查上游（视频 URL 会被拖走）。
     if not row:
-        raise HTTPException(status_code=404, detail="任务不存在")
+        raise HTTPException(status_code=404, detail='Task does not exist')
     if isinstance(row.params, dict):
         raw_bid = row.params.get("billing_task_id")
         if raw_bid is not None:
@@ -221,6 +221,6 @@ async def get_run(
 ) -> ToolRunRecordOut:
     row = await get_tool_run(db, user.id, run_id)
     if not row:
-        raise HTTPException(status_code=404, detail="记录不存在")
+        raise HTTPException(status_code=404, detail='Record does not exist')
     await db.commit()
     return _record_out(row)

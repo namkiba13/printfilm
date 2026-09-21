@@ -9,61 +9,61 @@ from typing import Any
 VOICE_PRESETS: list[dict[str, Any]] = [
     {
         "id": "zh_female_cancan_uranus_bigtts",
-        "label": "灿灿 · 女声旁白",
+        "label": 'Cancan · Female Narrator',
         "gender": "female",
         "speaker": "zh_female_cancan_uranus_bigtts",
     },
     {
         "id": "zh_female_tianmeixiaoyuan_uranus_bigtts",
-        "label": "甜美女声 · 故事",
+        "label": 'Sweet Female Voice · Stories',
         "gender": "female",
         "speaker": "zh_female_tianmeixiaoyuan_uranus_bigtts",
     },
     {
         "id": "zh_female_shuangkuaisisi_uranus_bigtts",
-        "label": "爽快女声 · 都市",
+        "label": 'Bright Female Voice · Urban',
         "gender": "female",
         "speaker": "zh_female_shuangkuaisisi_uranus_bigtts",
     },
     {
         "id": "zh_female_vv_uranus_bigtts",
-        "label": "Vivi · 国风女声",
+        "label": 'Vivi · Traditional Chinese Female Voice',
         "gender": "female",
         "speaker": "zh_female_vv_uranus_bigtts",
     },
     {
         "id": "zh_female_xiaohe_uranus_bigtts",
-        "label": "小何 · 通用女声",
+        "label": 'Xiao He · General Female Voice',
         "gender": "female",
         "speaker": "zh_female_xiaohe_uranus_bigtts",
     },
     {
         "id": "zh_male_shaonianzixin_uranus_bigtts",
-        "label": "少年梓辛 · 男声",
+        "label": 'Shaonian Zixin · Male Voice',
         "gender": "male",
         "speaker": "zh_male_shaonianzixin_uranus_bigtts",
     },
     {
         "id": "zh_male_m191_uranus_bigtts",
-        "label": "云舟 · 稳重男声",
+        "label": 'Yunzhou · Steady Male Voice',
         "gender": "male",
         "speaker": "zh_male_m191_uranus_bigtts",
     },
     {
         "id": "zh_male_taocheng_uranus_bigtts",
-        "label": "小天 · 年轻男声",
+        "label": 'Xiaotian · Young Male Voice',
         "gender": "male",
         "speaker": "zh_male_taocheng_uranus_bigtts",
     },
     {
         "id": "zh_male_ruyayichen_uranus_bigtts",
-        "label": "儒雅逸辰 · 男声",
+        "label": 'Ruyayi Chen · Male Voice',
         "gender": "male",
         "speaker": "zh_male_ruyayichen_uranus_bigtts",
     },
     {
         "id": "zh_male_baqiqingshu_uranus_bigtts",
-        "label": "霸气青叔 · 男声",
+        "label": 'Dominant Mature Male · Male Voice',
         "gender": "male",
         "speaker": "zh_male_baqiqingshu_uranus_bigtts",
     },
@@ -257,7 +257,7 @@ def infer_speaker_from_voice_prompt(voice_prompt: str, *, character_name: str = 
     return infer_drama_speaker_from_prompt(voice_prompt, character_name=character_name, asset_id=asset_id)
 
 
-PREVIEW_TEXT = "大家好，这是当前音色的试听效果，适合科普短视频旁白讲解。"
+PREVIEW_TEXT = 'Hello everyone, this is a preview of the current voice. It is suitable for Short Video narration and explanations.'
 # 试听缓存文件名后缀：TTS 路由/edge 性别修复后递增，避免继续播放旧错误样例
 PREVIEW_CACHE_TAG = "v3"
 

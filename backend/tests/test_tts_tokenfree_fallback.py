@@ -127,7 +127,7 @@ async def test_tts_raises_when_all_providers_fail(tmp_path: Path, monkeypatch: p
     silence = AsyncMock()
     monkeypatch.setattr(gw, "_write_silence_mp3", silence)
 
-    with pytest.raises(RuntimeError, match="配音失败"):
+    with pytest.raises(RuntimeError, match='Voiceover failed'):
         await gw.tts("你好。", "narrator_calm", project_id=1, shot_no=0)
     silence.assert_not_called()
 

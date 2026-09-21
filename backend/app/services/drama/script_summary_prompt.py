@@ -68,24 +68,24 @@ def build_script_summary_user_message(
     image_style_id: str | None = None,
 ) -> str:
     trimmed = (creative or "").strip()
-    sections = [f"原始创意：\n{trimmed}"]
+    sections = [f'Original concept:\n{trimmed}']
     production_params: list[str] = []
 
     if episode_count is not None:
         production_params.append(
-            f"- 目标集数：{episode_count} 集（输出中的 episodeCount 必须与该值完全一致，不得自行修改）"
+            f'- Target episode count: {episode_count} episodes (episodeCount in the output must exactly match this value and must not be changed)'
         )
 
     resolved_style = _resolve_image_style_id(image_style_id)
     if resolved_style:
         label = get_image_style_label(resolved_style)
         style_prompt = resolve_image_style_prompt(resolved_style)
-        production_params.append(f"- 画面风格：{label}（{resolved_style}）")
+        production_params.append(f'- Visual style: {label} ({resolved_style})')
         if style_prompt:
-            production_params.append(f"  风格说明：{style_prompt}")
-        production_params.append("  人物 visualImage、故事类型标签与整体美学须符合该画面风格")
+            production_params.append(f'  Style description: {style_prompt}')
+        production_params.append('  Character visualImage, story genre tags, and overall aesthetic must conform to this visual style')
 
     if production_params:
-        sections.append("\n".join(["制作参数：", *production_params]))
+        sections.append("\n".join(['Production parameters:', *production_params]))
 
     return "\n\n".join(sections)

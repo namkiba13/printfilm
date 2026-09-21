@@ -22,7 +22,7 @@ export const SUBTITLE_CUE = '【字幕：后期叠旁白字幕，简体中文逐
 export const NARRATION_PREFIX = '【旁白·自然语速·同步字幕】'
 
 /** 脚本编辑区 placeholder */
-export const SEGMENT_SCRIPT_PLACEHOLDER = `${SUBTITLE_CUE}\n【BGM：后期混音 · 轻快专业，音量低于人声】\n@duration:4\n过肩工位操作画面…\n@duration:8\n${NARRATION_PREFIX}口播内容…`
+export const SEGMENT_SCRIPT_PLACEHOLDER = '@duration:4\nDescribe the visuals for this segment…\n@duration:8\nAdd the next segment of your script…'
 
 const DURATION_TOKEN_PATTERN = /@duration:(\d+)/g
 
@@ -85,7 +85,7 @@ export function validateSegmentScriptDuration(content: string): {
       valid: false,
       total,
       durations,
-      message: `单个 @duration 需在 ${SEGMENT_DURATION_MIN}–${SEGMENT_DURATION_MAX} 秒之间`,
+      message: `A single @duration must be between ${SEGMENT_DURATION_MIN}–${SEGMENT_DURATION_MAX} seconds`,
     }
   }
 
@@ -94,7 +94,7 @@ export function validateSegmentScriptDuration(content: string): {
       valid: false,
       total,
       durations,
-      message: `镜头时长合计不能超过 ${SHOT_DURATION_MAX} 秒（当前 ${total}s）`,
+      message: `Total shot duration cannot exceed ${SHOT_DURATION_MAX} seconds (currently ${total}s)`,
     }
   }
 

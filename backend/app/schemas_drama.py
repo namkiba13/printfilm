@@ -11,9 +11,9 @@ from app.schemas_tasks import TaskRunBriefOut
 
 
 class DramaProjectCreate(BaseModel):
-    title: str = Field(default="未命名漫剧", max_length=200)
+    title: str = Field(default='Untitled AI Drama', max_length=200)
     description: str | None = None
-    source: str = Field(default="", description="原始创意文案")
+    source: str = Field(default="", description='Original creative copy')
     episode_count: int = Field(default=12, ge=1, le=120)
     image_style_id: str = Field(default="")
     # script=大纲分集流程；canvas=自由画布
@@ -246,12 +246,12 @@ class DramaVoiceGenerateRequest(BaseModel):
     project_id: int
     asset_id: int | None = None
     name: str | None = None
-    voice_prompt: str = Field(description="音色描述，用于 TTS 试听与 Seedance reference_audio")
-    sample_text: str | None = Field(default=None, description="试听台词，缺省自动生成")
-    speaker: str | None = Field(default=None, description="可选 TTS speaker 覆盖")
+    voice_prompt: str = Field(description='Voice description for TTS preview and Seedance reference_audio')
+    sample_text: str | None = Field(default=None, description='Preview dialogue; generated automatically if omitted')
+    speaker: str | None = Field(default=None, description='Optional TTS speaker override')
     character_asset_id: int | None = Field(
         default=None,
-        description="关联角色资产 ID，用于 voice_design image_prompt",
+        description='Associated character asset ID for voice_design image_prompt',
     )
 
 

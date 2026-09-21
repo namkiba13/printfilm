@@ -29,10 +29,10 @@ async def get_current_user(
     db: AsyncSession = Depends(get_db),
 ) -> User:
     if not creds:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="未登录")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Not logged in')
     user = await _user_from_bearer(db, creds.credentials)
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="登录已失效")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Login has expired')
     return user
 
 
@@ -46,15 +46,15 @@ async def get_api_user(
     if not token and creds:
         token = creds.credentials
     if not token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="缺少 API Key")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Missing API Key')
     user = await _user_from_bearer(db, token)
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="API Key 无效或已撤销")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='API Key is invalid or has been revoked')
     return user
 
 
 async def get_current_admin(user: User = Depends(get_current_user)) -> User:
     # Require role=admin for /api/admin routes
     if (user.role or "user") != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="需要管理员权限")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Administrator privileges required')
     return user

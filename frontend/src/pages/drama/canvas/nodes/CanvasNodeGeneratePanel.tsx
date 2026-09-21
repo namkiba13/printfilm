@@ -37,29 +37,29 @@ type CanvasNodeGeneratePanelProps = {
 function panelCopy(kind: CanvasNodeKind, hasMedia: boolean) {
   if (kind === 'video') {
     return {
-      title: hasMedia ? '编辑并重生视频' : 'AI 生成视频',
-      placeholder: '描述视频画面、镜头运动与氛围；键入 @ 引用角色/场景…',
-      hint: 'Enter 生成视频 · @ 引用 · Shift+Enter 换行',
+      title: hasMedia ? "Edit and Regenerate Video" : "AI Generate Video",
+      placeholder: "Describe the video scene, camera movement, and atmosphere; type @ to reference characters/scenes…",
+      hint: "Press Enter to generate · @ to reference · Shift+Enter for a new line",
     }
   }
   if (kind === 'character') {
     return {
-      title: hasMedia ? '编辑并重生角色' : 'AI 生角色',
-      placeholder: '描述角色外貌、服饰与气质…',
-      hint: 'Enter 生成 · Shift+Enter 换行',
+      title: hasMedia ? "Edit and Regenerate Character" : "AI Generate Character",
+      placeholder: "Describe the character's appearance, clothing, and demeanor…",
+      hint: "Press Enter to generate · Shift+Enter for a new line",
     }
   }
   if (kind === 'scene') {
     return {
-      title: hasMedia ? '编辑并重生场景' : 'AI 生场景',
-      placeholder: '描述场景环境、光线与氛围…',
-      hint: 'Enter 生成 · Shift+Enter 换行',
+      title: hasMedia ? "Edit and Regenerate Scene" : "AI Generate Scene",
+      placeholder: "Describe the scene environment, lighting, and atmosphere…",
+      hint: "Press Enter to generate · Shift+Enter for a new line",
     }
   }
   return {
-    title: hasMedia ? '编辑并重生图片' : 'AI 生图',
-    placeholder: '描述画面内容；键入 @ 引用角色/场景…',
-    hint: 'Enter 生成 · @ 引用 · Shift+Enter 换行',
+    title: hasMedia ? "Edit and Regenerate Image" : "AI Generate Image",
+    placeholder: "Describe the image content; type @ to reference characters/scenes…",
+    hint: "Press Enter to generate · @ to reference · Shift+Enter for a new line",
   }
 }
 
@@ -186,7 +186,7 @@ export function CanvasNodeGeneratePanel({
         await generateNodeImage(nodeId, prompt, imageOptions)
       }
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : '生成失败')
+      setErrorMessage(err instanceof Error ? err.message : "Generation Failed")
     } finally {
       setBusy(false)
     }
@@ -213,7 +213,7 @@ export function CanvasNodeGeneratePanel({
         updateNodePrompt(nodeId, next)
       }
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : 'Skill 优化失败')
+      setErrorMessage(err instanceof Error ? err.message : "Skill optimization failed")
     } finally {
       setOptimizing(false)
     }
@@ -235,13 +235,13 @@ export function CanvasNodeGeneratePanel({
       <div className="fc-generate-head">
         <Sparkles size={14} strokeWidth={1.8} />
         <span>{copy.title}</span>
-        {hasMedia ? <em className="fc-generate-tag">可再次生成</em> : null}
+        {hasMedia ? <em className="fc-generate-tag">{"Can generate again"}</em> : null}
         {isVideo ? (
           <button
             type="button"
             className="fc-generate-help"
-            title="Seedance 传值与使用规则"
-            aria-label="Seedance 传值与使用规则"
+            title={"Seedance Parameters and Usage Rules"}
+            aria-label={"Seedance Parameters and Usage Rules"}
             disabled={isBusy}
             onClick={() => setRulesOpen(true)}
           >
@@ -290,13 +290,12 @@ export function CanvasNodeGeneratePanel({
             type="button"
             className="fc-generate-optimize"
             disabled={!canOptimize}
-            title={selectedIds.length ? '按所选 Skill 改写提示词' : '请先选择 Skill'}
+            title={selectedIds.length ? "Rewrite prompt with selected Skill" : "Please select a Skill first"}
             onClick={() => void optimizePrompt()}
           >
             {optimizing ? <Loader2 size={14} className="fc-spin" /> : <Wand2 size={14} strokeWidth={1.8} />}
-            Skill 优化
-          </button>
-          <button type="submit" className="fc-generate-submit" disabled={!canSubmit} aria-label="生成">
+            {"Skill Optimization"}</button>
+          <button type="submit" className="fc-generate-submit" disabled={!canSubmit} aria-label={"Generate"}>
             {isBusy && !optimizing ? (
               <Loader2 size={16} className="fc-spin" />
             ) : (

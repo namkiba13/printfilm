@@ -17,9 +17,9 @@ type UsageTrendChartProps = {
 };
 
 function metricLabel(metric: DashboardMetric): string {
-  if (metric === "cost") return "上游成本";
-  if (metric === "calls") return "调用次数";
-  return "扣费金额";
+  if (metric === "cost") return "Upstream cost";
+  if (metric === "calls") return "Call Count";
+  return "Charged Amount";
 }
 
 function readMetric(row: AdminDailyUsage, metric: DashboardMetric): number {
@@ -47,7 +47,7 @@ export function UsageTrendChart({ data, metric }: UsageTrendChartProps) {
   }));
 
   if (chartData.length === 0) {
-    return <div className="admin-chart-empty">暂无趋势数据</div>;
+    return <div className="admin-chart-empty">{"No Trend Data"}</div>;
   }
 
   return (

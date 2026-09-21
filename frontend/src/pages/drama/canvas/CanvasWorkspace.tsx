@@ -75,8 +75,7 @@ function CanvasWorkspaceContent({
       ) : null}
       {loading ? (
         <p className="fc-error-toast" style={{ background: '#fff', color: '#64748b' }}>
-          加载画布…
-        </p>
+          {"Loading canvas…"}</p>
       ) : null}
     </div>
   )

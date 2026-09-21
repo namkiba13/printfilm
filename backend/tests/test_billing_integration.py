@@ -75,7 +75,7 @@ async def test_ensure_balance_rejects_insufficient_funds(db_session: AsyncSessio
     task = await make_task(db_session, user, domain="api", task_type="v1_image")
     await db_session.commit()
 
-    with pytest.raises(ValueError, match="余额不足"):
+    with pytest.raises(ValueError, match='Insufficient balance'):
         await ensure_balance_for_task(db_session, user, task)
 
 
@@ -85,7 +85,7 @@ async def test_create_task_rejects_insufficient_balance(db_session: AsyncSession
     user = await make_user(db_session, balance_fen=0)
     await db_session.commit()
 
-    with pytest.raises(ValueError, match="余额不足"):
+    with pytest.raises(ValueError, match='Insufficient balance'):
         await create_task(
             db_session,
             user,
@@ -121,7 +121,7 @@ async def test_ensure_balance_counts_pending_unfrozen_tasks(db_session: AsyncSes
         status="pending",
         billing_status="none",
     )
-    with pytest.raises(ValueError, match="余额不足"):
+    with pytest.raises(ValueError, match='Insufficient balance'):
         await ensure_balance_for_task(db_session, user, task2)
 
 
@@ -160,7 +160,7 @@ async def test_ensure_balance_for_task_batch_rejects_insufficient(db_session: As
 
     await ensure_balance_for_task_batch(db_session, user, probe, 2)
 
-    with pytest.raises(ValueError, match="批量生成"):
+    with pytest.raises(ValueError, match='in batch'):
         await ensure_balance_for_task_batch(db_session, user, probe, 3)
 
 

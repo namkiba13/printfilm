@@ -26,9 +26,9 @@ export default function BillingAlertHost() {
       if (!items.length) return
       for (const item of items) {
         await dialog.alert({
-          title: item.title || '消费提醒',
+          title: item.title || "Usage Alert",
           message: item.message,
-          confirmText: '知道了',
+          confirmText: "Got it",
         })
         try {
           await api.billingAlertAck(item.id)

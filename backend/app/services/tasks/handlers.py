@@ -75,7 +75,7 @@ async def _run_drama_fragment_video(task: TaskRun) -> dict[str, Any] | None:
     payload = task.payload or {}
     fragment_ids = payload.get("fragment_ids") or []
     if fragment_ids and not isinstance(fragment_ids, list):
-        raise ValueError("fragment_ids 必须为数组")
+        raise ValueError('fragment_ids must be an array')
     return await submit_fragment_video_task(task)
 
 
@@ -105,7 +105,7 @@ async def _run_drama_asset_video(task: TaskRun) -> dict[str, Any] | None:
     payload = task.payload or {}
     reference_asset_ids = payload.get("reference_asset_ids") or []
     if not isinstance(reference_asset_ids, list):
-        raise ValueError("reference_asset_ids 必须为数组")
+        raise ValueError('reference_asset_ids must be an array')
     return await run_asset_video_job(
         _require_int(task.drama_project_id, "drama_project_id"),
         int(task.requested_by),
@@ -229,11 +229,11 @@ async def _run_tools_mock_delay(task: TaskRun) -> dict[str, Any] | None:
     payload = task.payload or {}
     delay_seconds = int(payload.get("delay_seconds") or 10)
     if delay_seconds < 1 or delay_seconds > 600:
-        raise ValueError("delay_seconds 必须在 1-600 秒之间")
+        raise ValueError('delay_seconds must be between 1-600 seconds')
     await asyncio.sleep(delay_seconds)
     succeed = payload.get("succeed", True)
     if not isinstance(succeed, bool):
-        raise ValueError("succeed 必须为布尔值")
+        raise ValueError('succeed must be a boolean')
     if not succeed:
         raise RuntimeError(str(payload.get("error_message") or "mock delayed task failed"))
     result_payload = payload.get("result_payload")
@@ -257,7 +257,7 @@ async def _noop_ephemeral(task: TaskRun) -> dict[str, Any] | None:
 def _require_int(value: int | None, field_name: str) -> int:
     if isinstance(value, int) and value > 0:
         return value
-    raise ValueError(f"任务缺少 {field_name}")
+    raise ValueError(f'Task is missing {field_name}')
 
 
 TASK_HANDLERS: dict[tuple[str, str], TaskHandler] = {

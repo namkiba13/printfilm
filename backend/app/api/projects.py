@@ -101,7 +101,7 @@ async def preview_voice(
     try:
         url = await ensure_voice_preview(body.voice_id)
     except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=502, detail=f"试听生成失败：{exc}") from exc
+        raise HTTPException(status_code=502, detail=f'Preview generation failed: {exc}') from exc
     return VoicePreviewOut(url=url, voice_id=body.voice_id)
 
 
@@ -114,13 +114,13 @@ async def expand_content(
     """AI-expand a short topic into a project title + theme brief or full script."""
     topic = (body.topic or "").strip()
     if not topic:
-        raise HTTPException(status_code=400, detail="请输入选题")
+        raise HTTPException(status_code=400, detail='Please enter a topic')
 
     async def _do_expand() -> dict[str, str]:
         try:
             result = await get_ark().expand_content(topic, body.mode)
         except Exception as exc:  # noqa: BLE001
-            raise HTTPException(status_code=502, detail=f"AI 生成失败：{exc}") from exc
+            raise HTTPException(status_code=502, detail=f'AI generation failed: {exc}') from exc
         await record_llm_chat_line(
             db,
             user_id=user.id,
@@ -155,7 +155,7 @@ async def _get_owned_project(db: AsyncSession, project_id: int, user: User) -> P
     )
     project = result.scalar_one_or_none()
     if not project:
-        raise HTTPException(status_code=404, detail="项目不存在")
+        raise HTTPException(status_code=404, detail='Project does not exist')
     project.active_tasks = await list_active_tasks_for_owner(db, user.id, project_id=project.id)
     runtime_status, runtime_progress, runtime_error = _project_runtime_view(project)
     project.status = runtime_status
@@ -192,14 +192,14 @@ def _ensure_side_task_allowed(project: Project) -> None:
         if str(getattr(task, "status", "") or "") not in ACTIVE_TASK_STATUSES:
             continue
         if str(getattr(task, "task_type", "") or "") in _PROJECT_WIDE_TASK_TYPES:
-            raise HTTPException(status_code=409, detail="整片生成进行中，请稍后")
+            raise HTTPException(status_code=409, detail='The full video is being generated. Please try again later')
 
 
 # COMPOSING 且无进行中任务时视为拼接已失败卡住，允许重新发起
 async def _ensure_compose_allowed(db: AsyncSession, user: User, project: Project) -> None:
     active = await list_active_tasks_for_owner(db, user.id, project_id=project.id)
     if active:
-        raise HTTPException(status_code=409, detail="生成进行中，请稍后")
+        raise HTTPException(status_code=409, detail='Generation in progress, please wait')
     running = {
         ProjectStatus.SCRIPTING,
         ProjectStatus.IMAGING,
@@ -208,7 +208,7 @@ async def _ensure_compose_allowed(db: AsyncSession, user: User, project: Project
         ProjectStatus.AUDITING,
     }
     if project.status in running:
-        raise HTTPException(status_code=409, detail="生成进行中，请稍后")
+        raise HTTPException(status_code=409, detail='Generation in progress, please wait')
     # COMPOSING / FAILED / VIDEO_READY / DONE 等均可重试拼接（无 active task）
 
 
@@ -301,7 +301,7 @@ async def create_project(
 
     tpl = await db.get(Template, body.template_id)
     if not tpl or not tpl.is_active:
-        raise HTTPException(status_code=400, detail="无效模板")
+        raise HTTPException(status_code=400, detail='Invalid template')
     project = Project(
         user_id=user.id,
         template_id=body.template_id,
@@ -351,7 +351,7 @@ async def list_projects(
     q: str | None = Query(None, description="title search"),
     pipeline_mode: str | None = Query(
         None,
-        description="full|image_text；空=全部类型",
+        description='full|image_text; empty = all types',
     ),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -476,9 +476,9 @@ async def list_projects(
 
 
 def _safe_zip_name(title: str, project_id: int) -> str:
-    raw = (title or "未命名作品").strip() or "未命名作品"
+    raw = (title or 'Untitled Work').strip() or 'Untitled Work'
     cleaned = re.sub(r'[<>:"/\\|?*\x00-\x1f]+', "_", raw)
-    cleaned = cleaned.strip(" .")[:60] or "未命名作品"
+    cleaned = cleaned.strip(" .")[:60] or 'Untitled Work'
     return f"p{project_id}_{cleaned}.mp4"
 
 
@@ -491,9 +491,9 @@ async def download_projects_zip(
     """Zip final videos for selected owned projects (DONE with final_video_url)."""
     ids = list(dict.fromkeys(int(i) for i in body.ids if int(i) > 0))
     if not ids:
-        raise HTTPException(status_code=400, detail="请选择要下载的作品")
+        raise HTTPException(status_code=400, detail='Please select works to download')
     if len(ids) > 50:
-        raise HTTPException(status_code=400, detail="一次最多打包 50 个")
+        raise HTTPException(status_code=400, detail='You can package up to 50 items at a time')
 
     result = await db.execute(
         select(Project).where(Project.user_id == user.id, Project.id.in_(ids))
@@ -502,7 +502,7 @@ async def download_projects_zip(
     by_id = {p.id: p for p in projects}
     missing = [i for i in ids if i not in by_id]
     if missing:
-        raise HTTPException(status_code=404, detail=f"项目不存在: {missing[:5]}")
+        raise HTTPException(status_code=404, detail=f'Project does not exist: {missing[:5]}')
 
     entries: list[tuple[str, bytes]] = []
     skipped: list[str] = []
@@ -526,7 +526,7 @@ async def download_projects_zip(
     if not entries:
         raise HTTPException(
             status_code=400,
-            detail="所选作品暂无成片可下载（需状态为已完成）",
+            detail='The selected works have no completed videos available for download (status must be Completed)',
         )
 
     buf = io.BytesIO()
@@ -544,7 +544,7 @@ async def download_projects_zip(
         if skipped:
             zf.writestr(
                 "skipped.txt",
-                "以下项目未打包（未完成或缺少成片文件）：\n" + "\n".join(skipped),
+                'The following projects were not packaged (incomplete or missing final video files):\n' + "\n".join(skipped),
             )
     buf.seek(0)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -578,7 +578,7 @@ async def update_project(
         ProjectStatus.COMPOSING,
         ProjectStatus.AUDITING,
     }:
-        raise HTTPException(status_code=409, detail="生成进行中，无法修改")
+        raise HTTPException(status_code=409, detail='Generation in progress, unable to modify')
 
     data = body.model_dump(exclude_unset=True)
     if "template_id" in data:
@@ -586,7 +586,7 @@ async def update_project(
 
         tpl = await db.get(Template, data["template_id"])
         if not tpl or not tpl.is_active:
-            raise HTTPException(status_code=400, detail="无效模板")
+            raise HTTPException(status_code=400, detail='Invalid template')
         # 换模板后清空项目覆盖，后续生成跟随后台模板；请求显式带提示词则保留
         if "style_prompt" not in data:
             data["style_prompt"] = ""
@@ -597,7 +597,7 @@ async def update_project(
     if "cover_url" in data and data["cover_url"]:
         url = str(data["cover_url"]).strip()
         if not (url.startswith("/static/") or url.startswith("http://") or url.startswith("https://")):
-            raise HTTPException(status_code=400, detail="无效封面地址")
+            raise HTTPException(status_code=400, detail='Invalid cover URL')
     for key in ("style_prompt", "character_prompt", "extra_prompt", "image_model", "video_model"):
         if key in data:
             data[key] = str(data[key] or "").strip()
@@ -605,12 +605,12 @@ async def update_project(
         from app.services.media_catalog import is_valid_project_media_model
 
         if not is_valid_project_media_model(data["image_model"], "image"):
-            raise HTTPException(status_code=400, detail="无效图片模型")
+            raise HTTPException(status_code=400, detail='Invalid image model')
     if "video_model" in data and data["video_model"]:
         from app.services.media_catalog import is_valid_project_media_model
 
         if not is_valid_project_media_model(data["video_model"], "video"):
-            raise HTTPException(status_code=400, detail="无效视频模型")
+            raise HTTPException(status_code=400, detail='Invalid video model')
     if "bgm_lock" in data:
         data["bgm_lock"] = str(data["bgm_lock"] or "").strip()
     if "subtitle_preset" in data:
@@ -640,7 +640,7 @@ async def upload_project_cover(
         ProjectStatus.COMPOSING,
         ProjectStatus.AUDITING,
     }:
-        raise HTTPException(status_code=409, detail="生成进行中，无法更换封面")
+        raise HTTPException(status_code=409, detail='Generation in progress; the cover cannot be changed')
 
     content_type = (file.content_type or "").lower()
     allowed = {
@@ -657,13 +657,13 @@ async def upload_project_cover(
         if suffix in {".jpg", ".jpeg", ".png", ".webp", ".gif"}:
             ext = ".jpg" if suffix == ".jpeg" else suffix
         else:
-            raise HTTPException(status_code=400, detail="仅支持 JPG / PNG / WebP / GIF")
+            raise HTTPException(status_code=400, detail='Only JPG / PNG / WebP / GIF are supported')
 
     raw = await file.read()
     if not raw:
-        raise HTTPException(status_code=400, detail="空文件")
+        raise HTTPException(status_code=400, detail='Empty file')
     if len(raw) > 8 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="封面不能超过 8MB")
+        raise HTTPException(status_code=400, detail='The cover cannot exceed 8MB')
 
     dest = storage.project_dir(project_id) / f"cover{ext}"
     dest.write_bytes(raw)
@@ -696,7 +696,7 @@ async def generate_project(
         ProjectStatus.COMPOSING,
         ProjectStatus.AUDITING,
     }:
-        raise HTTPException(status_code=409, detail="生成进行中，请稍后")
+        raise HTTPException(status_code=409, detail='Generation in progress, please wait')
 
     if restart:
         for shot in list(project.shots):
@@ -712,7 +712,7 @@ async def generate_project(
     phase = "script" if (restart or not shots) else resolve_kepu_billing_phase(project)
     if phase == "compose":
         # 成片走专用 compose 任务，避免 project_pipeline 重复预扣整片视频
-        raise HTTPException(status_code=409, detail="素材已齐，请点击合成成片")
+        raise HTTPException(status_code=409, detail='All materials are ready. Click to compose the final video')
     if restart or not shots:
         # First run / restart — actually splitting storyboard
         project.status = ProjectStatus.SCRIPTING
@@ -765,12 +765,12 @@ async def cancel_project(
         ProjectStatus.AUDITING,
     }
     if project.status not in running:
-        raise HTTPException(status_code=400, detail="当前状态不可取消")
+        raise HTTPException(status_code=400, detail='The current status cannot be canceled')
 
     await cancel_tasks_for_scope(db, user.id, project_id=project_id)
     pipeline.cancel_pipeline(project_id)
     project.status = ProjectStatus.CANCELLED
-    project.error_msg = "用户取消"
+    project.error_msg = 'User canceled'
     await db.commit()
     return await _get_owned_project(db, project_id, user)
 
@@ -856,7 +856,7 @@ async def create_shot(
     from app.services.seedance_segments import SegmentBeat, build_segment_script
 
     bgm = clip_shot_bgm(getattr(project, "bgm_lock", None))
-    visual = "画面轻微动态，保持主体稳定"
+    visual = 'Slight motion in the frame while keeping the subject stable'
     script = build_segment_script(
         [SegmentBeat(duration=4, kind="visual", text=visual)],
         bgm_mood=bgm,
@@ -866,7 +866,7 @@ async def create_shot(
         shot_no=next_no,
         duration=4,
         narration="",
-        overlay_title=f"场景 {next_no:02d}",
+        overlay_title=f'Scene {next_no:02d}',
         overlay_subtitle="",
         img_prompt=visual,
         video_prompt=script,
@@ -896,7 +896,7 @@ async def reorder_shots(
     _ensure_side_task_allowed(project)
     existing = {s.id: s for s in project.shots}
     if set(body.shot_ids) != set(existing.keys()):
-        raise HTTPException(status_code=400, detail="镜头列表不完整")
+        raise HTTPException(status_code=400, detail='The shot list is incomplete')
     for i, sid in enumerate(body.shot_ids, start=1):
         existing[sid].shot_no = i
     _demote_after_edit(project)
@@ -917,7 +917,7 @@ async def upload_shot_image(
     _ensure_side_task_allowed(project)
     shot = next((s for s in project.shots if s.id == shot_id), None)
     if not shot:
-        raise HTTPException(status_code=404, detail="分镜不存在")
+        raise HTTPException(status_code=404, detail='Shot does not exist')
     content_type = (file.content_type or "").lower()
     allowed = {
         "image/jpeg": ".jpg",
@@ -931,15 +931,15 @@ async def upload_shot_image(
         suffix = Path(file.filename or "").suffix.lower()
         ext = ".jpg" if suffix == ".jpeg" else suffix if suffix in {".jpg", ".png", ".webp", ".gif"} else ""
     if not ext:
-        raise HTTPException(status_code=400, detail="仅支持 JPG / PNG / WebP / GIF")
+        raise HTTPException(status_code=400, detail='Only JPG / PNG / WebP / GIF are supported')
     raw = await file.read(8 * 1024 * 1024 + 1)
     if not raw:
-        raise HTTPException(status_code=400, detail="空文件")
+        raise HTTPException(status_code=400, detail='Empty file')
     if len(raw) > 8 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="画面不能超过 8MB")
+        raise HTTPException(status_code=400, detail='The image cannot exceed 8MB')
     sniffed = _image_ext_from_magic(raw)
     if not sniffed:
-        raise HTTPException(status_code=400, detail="文件不是有效图片")
+        raise HTTPException(status_code=400, detail='The file is not a valid image')
     ext = sniffed
     dest = storage.project_dir(project_id) / f"shot_{shot.id}_upload{ext}"
     dest.write_bytes(raw)
@@ -968,7 +968,7 @@ async def update_shot(
     project = await _get_owned_project(db, project_id, user)
     shot = next((s for s in project.shots if s.id == shot_id), None)
     if not shot:
-        raise HTTPException(status_code=404, detail="分镜不存在")
+        raise HTTPException(status_code=404, detail='Shot does not exist')
     data = body.model_dump(exclude_unset=True)
     if "segment_script" in data and data["segment_script"] is not None:
         from app.services.seedance_segments import (
@@ -1051,7 +1051,7 @@ async def regen_image(
     _ensure_side_task_allowed(project)
     shot = next((s for s in project.shots if s.id == shot_id), None)
     if not shot:
-        raise HTTPException(status_code=404, detail="分镜不存在")
+        raise HTTPException(status_code=404, detail='Shot does not exist')
     project.status = ProjectStatus.IMAGING
     project.error_msg = None
     await db.commit()
@@ -1075,10 +1075,10 @@ async def regen_video(
     project = await _get_owned_project(db, project_id, user)
     _ensure_side_task_allowed(project)
     if (project.pipeline_mode or "full") == "image_text":
-        raise HTTPException(status_code=400, detail="图文模式无需生成 AI 视频，请直接重新合成成片")
+        raise HTTPException(status_code=400, detail='AI video generation is not required in image-text mode. Please directly recompose the final video')
     shot = next((s for s in project.shots if s.id == shot_id), None)
     if not shot or not (shot.image_url or shot.image_ark_url):
-        raise HTTPException(status_code=400, detail="请先生成该镜画面")
+        raise HTTPException(status_code=400, detail='Please generate the visual for this shot first')
     project.status = ProjectStatus.VIDEOING
     project.error_msg = None
     await db.commit()
@@ -1103,7 +1103,7 @@ async def regen_audio(
     _ensure_side_task_allowed(project)
     shot = next((s for s in project.shots if s.id == shot_id), None)
     if not shot:
-        raise HTTPException(status_code=404, detail="分镜不存在")
+        raise HTTPException(status_code=404, detail='Shot does not exist')
     project.status = ProjectStatus.AUDIOING
     project.error_msg = None
     await db.commit()
@@ -1133,9 +1133,9 @@ async def regen_all_audio(
         ProjectStatus.COMPOSING,
         ProjectStatus.AUDITING,
     }:
-        raise HTTPException(status_code=409, detail="生成进行中，请稍后")
+        raise HTTPException(status_code=409, detail='Generation in progress, please wait')
     if not project.shots:
-        raise HTTPException(status_code=400, detail="暂无分镜，请先生成")
+        raise HTTPException(status_code=400, detail='No storyboard yet. Please generate one first')
     project.status = ProjectStatus.AUDIOING
     project.progress = 80
     project.error_msg = None
@@ -1162,7 +1162,7 @@ async def compose_only(
     if not project.shots or not (
         any(s.image_url for s in project.shots) or any(s.video_url for s in project.shots)
     ):
-        raise HTTPException(status_code=400, detail="缺少分镜图或镜头视频，无法合成")
+        raise HTTPException(status_code=400, detail='Missing storyboard images or shot videos; unable to compose')
     project.status = ProjectStatus.COMPOSING
     project.progress = 90
     project.error_msg = None
@@ -1184,7 +1184,7 @@ async def publish_work(
 ) -> Work:
     project = await _get_owned_project(db, project_id, user)
     if project.status != ProjectStatus.DONE or not project.final_video_url:
-        raise HTTPException(status_code=400, detail="成片未完成，无法发布")
+        raise HTTPException(status_code=400, detail='The final video is not complete and cannot be published')
     existing = await db.execute(select(Work).where(Work.project_id == project.id))
     work = existing.scalar_one_or_none()
     if work:

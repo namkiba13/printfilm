@@ -67,7 +67,7 @@ export function DramaSkillOptionsBar({
         </button>
       </div>
       {open ? (
-        <div className="fc-gen-opt-panel" role="dialog" aria-label="选择 Skill">
+        <div className="fc-gen-opt-panel" role="dialog" aria-label={"Select Skill"}>
           <div className="fc-gen-opt-panel-title">Skill</div>
           <AgentSkillPicker
             compact

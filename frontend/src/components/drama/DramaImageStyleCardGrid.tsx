@@ -16,7 +16,7 @@ export function DramaImageStyleCardGrid({
   value,
   onChange,
   allowNone = true,
-  noneLabel = '无风格',
+  noneLabel = "No style",
   className,
 }: Props) {
   return (

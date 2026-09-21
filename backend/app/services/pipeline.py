@@ -294,7 +294,7 @@ async def _synthesize_continuous_audio(
     narrations = [(getattr(s, "narration", None) or "") for s in shot_rows]
     full_text = join_shot_narrations(narrations)
     if not full_text.strip():
-        raise ValueError("全部镜头旁白为空，无法配音")
+        raise ValueError('All shot narrations are empty; unable to generate voiceover')
 
     ark = get_ark()
     regenerated = force or not _continuous_audio_ok(project_id)
@@ -316,16 +316,16 @@ async def _synthesize_continuous_audio(
         )
         src = storage.local_path_from_url(audio_url or "")
         if not src or not src.exists():
-            raise RuntimeError("整片配音生成失败")
+            raise RuntimeError('Failed to generate full-film voiceover')
         if src.resolve() != dest.resolve():
             dest.write_bytes(src.read_bytes())
         # 新合成必须复查近静音：TTS 偶发返回极低音量音频，静默合成会产出无声成片
         if is_near_silent_audio(dest):
-            raise RuntimeError("整片配音近静音（音量异常），请重新配音")
+            raise RuntimeError('Full-film voiceover is nearly silent (abnormal volume). Please regenerate the voiceover.')
 
     dur = await asyncio.to_thread(probe_duration, dest)
     if not dur or dur < 0.8:
-        raise RuntimeError("整片配音时长异常")
+        raise RuntimeError('Abnormal full-film voiceover duration')
 
     allocated = allocate_durations_by_narration(narrations, dur)
     async with _db_write_lock():
@@ -396,7 +396,7 @@ async def run_pipeline(project_id: int, *, phase: str | None = None) -> None:
         if not skip_script:
             if requested and requested not in {"script", "produce"}:
                 raise RuntimeError(
-                    f"分镜尚未就绪，无法执行阶段 {requested}；请先生成分镜脚本"
+                    f'Storyboard is not ready, so stage {requested} cannot be executed; please generate the storyboard script first'
                 )
             await _script_stage(project_id)
             await _ensure_not_cancelled(project_id)
@@ -406,7 +406,7 @@ async def run_pipeline(project_id: int, *, phase: str | None = None) -> None:
                     "event": "paused",
                     "stage": "SCRIPT_READY",
                     "percent": 15,
-                    "message": "分镜已生成，请确认修改后手动继续",
+                    "message": 'Storyboard generated. Please review and edit it, then continue manually',
                 },
             )
             return
@@ -425,7 +425,7 @@ async def run_pipeline(project_id: int, *, phase: str | None = None) -> None:
                 "event": "progress",
                 "stage": "RESUME",
                 "percent": 70 if skip_assets else 18,
-                "message": "沿用已有分镜，继续后续阶段",
+                "message": 'Using the existing storyboard and continuing to the next stages',
             },
         )
 
@@ -460,7 +460,7 @@ async def run_pipeline(project_id: int, *, phase: str | None = None) -> None:
                         "event": "paused",
                         "stage": "ASSETS_READY",
                         "percent": 50,
-                        "message": "分镜图与配音已补齐，请再次点击继续生成镜头视频",
+                        "message": 'Storyboard images and voiceover are ready. Click Continue again to generate shot videos',
                     },
                 )
                 return
@@ -471,7 +471,7 @@ async def run_pipeline(project_id: int, *, phase: str | None = None) -> None:
                         "event": "paused",
                         "stage": "VIDEO_READY",
                         "percent": 88,
-                        "message": "镜头视频已就绪，请确认后合成成片",
+                        "message": 'Shot videos are ready. Please confirm to compose the final film',
                     },
                 )
                 return
@@ -483,7 +483,7 @@ async def run_pipeline(project_id: int, *, phase: str | None = None) -> None:
                     "event": "paused",
                     "stage": "VIDEO_READY",
                     "percent": 88,
-                    "message": "镜头视频已完成，请确认后合成成片",
+                    "message": 'Shot videos are complete. Please confirm to compose the final film',
                 },
             )
             return
@@ -535,7 +535,7 @@ async def run_pipeline(project_id: int, *, phase: str | None = None) -> None:
                     "event": "paused",
                     "stage": "VIDEO_READY",
                     "percent": 88,
-                    "message": "镜头视频已完成，请确认后合成成片",
+                    "message": 'Shot videos are complete. Please confirm to compose the final film',
                 },
             )
             return
@@ -573,7 +573,7 @@ async def run_pipeline(project_id: int, *, phase: str | None = None) -> None:
             {
                 "event": "failed",
                 "stage": "CANCELLED",
-                "message": "用户取消",
+                "message": 'User canceled',
                 "retryable": True,
                 "code": "CANCELLED",
             },
@@ -593,7 +593,7 @@ async def run_pipeline(project_id: int, *, phase: str | None = None) -> None:
                 {
                     "event": "failed",
                     "stage": "CANCELLED",
-                    "message": "用户取消",
+                    "message": 'User canceled',
                     "retryable": True,
                     "code": "CANCELLED",
                 },
@@ -1012,7 +1012,7 @@ async def _parallel_image_and_audio(project_id: int) -> None:
                 "event": "progress",
                 "stage": "PARALLEL_ASSETS",
                 "percent": 30,
-                "message": "整片连贯配音中…",
+                "message": 'Generating continuous full-film voiceover…',
             },
         )
         await _synthesize_continuous_audio(
@@ -1033,7 +1033,7 @@ async def _parallel_image_and_audio(project_id: int) -> None:
                 "event": "progress",
                 "stage": "PARALLEL_ASSETS",
                 "percent": 48,
-                "message": "整片配音完成",
+                "message": 'Full-film voiceover complete',
             },
         )
 
@@ -1070,7 +1070,7 @@ async def _parallel_image_and_audio(project_id: int) -> None:
             "stage": "ASSETS_READY",
             "percent": 70 if image_text else 50,
             "message": (
-                "分镜图与整片配音已完成"
+                'Storyboard images and full-film voiceover are complete'
             ),
         },
     )
@@ -1151,7 +1151,7 @@ async def _parallel_videos(project_id: int) -> None:
                         "shot": meta["shot_no"],
                         "total": total,
                         "percent": pct,
-                        "message": f"镜头 {meta['shot_no']} 含真人已跳过 AI 视频，将用静图合成",
+                        "message": f"Shot {meta['shot_no']} contains a real person, so AI video was skipped and a still image will be used for composition",
                     },
                 )
                 return proxy
@@ -1174,7 +1174,7 @@ async def _parallel_videos(project_id: int) -> None:
                     "stage": "VIDEOING",
                     "shot": meta["shot_no"],
                     "percent": pct,
-                    "message": f"沿用已有视频 {done}/{total}",
+                    "message": f'Using existing videos {done}/{total}',
                 },
             )
             return proxy
@@ -1320,7 +1320,7 @@ async def _parallel_videos(project_id: int) -> None:
                 await db.commit()
     await publish_progress(
         project_id,
-        {"event": "progress", "stage": "VIDEO_READY", "percent": 88, "message": "全部镜头视频完成"},
+        {"event": "progress", "stage": "VIDEO_READY", "percent": 88, "message": 'All shot videos are complete'},
     )
 
 
@@ -1457,7 +1457,7 @@ async def _run_ffmpeg_compose_with_retry(project_id: int, work) -> None:
                     "event": "progress",
                     "stage": "COMPOSING",
                     "percent": 93,
-                    "message": f"合成被中断，正在自动重试（{attempt}/{_COMPOSE_SIGTERM_MAX_ATTEMPTS}）…",
+                    "message": f'Composition was interrupted. Retrying automatically ({attempt}/{_COMPOSE_SIGTERM_MAX_ATTEMPTS})…',
                 },
             )
             await asyncio.sleep(float(attempt) * 2.0)
@@ -1477,13 +1477,13 @@ async def _run_ffmpeg_compose_with_retry(project_id: int, work) -> None:
                         "event": "progress",
                         "stage": "COMPOSING",
                         "percent": 93,
-                        "message": f"合成被中断，正在自动重试（{attempt}/{_COMPOSE_SIGTERM_MAX_ATTEMPTS}）…",
+                        "message": f'Composition was interrupted. Retrying automatically ({attempt}/{_COMPOSE_SIGTERM_MAX_ATTEMPTS})…',
                     },
                 )
                 await asyncio.sleep(float(attempt) * 2.0)
                 continue
             raise
-    raise last_exc or RuntimeError("FFmpeg 合成失败")
+    raise last_exc or RuntimeError('FFmpeg composition failed')
 
 
 @storage.without_intermediate_oss
@@ -1561,7 +1561,7 @@ async def regen_shot_video(project_id: int, shot_id: int) -> None:
         )
         project = result.scalar_one()
         if _is_image_text(project):
-            raise ValueError("图文模式无需生成 AI 视频，请直接重新合成成片")
+            raise ValueError('AI video generation is not required in image-text mode. Please directly recompose the final video')
         shot = next((s for s in project.shots if s.id == shot_id), None)
         if not shot or not (shot.image_url or shot.image_ark_url):
             raise ValueError("shot image required")
@@ -1657,7 +1657,7 @@ async def regen_shot_audio(project_id: int, shot_id: int) -> None:
         if not (shot.narration or "").strip() and not any(
             (s.narration or "").strip() for s in project.shots
         ):
-            raise ValueError("旁白为空，无法配音")
+            raise ValueError('Narration is empty; unable to generate voiceover')
         voice = _project_voice(project)
         shots = sorted(project.shots, key=lambda s: s.shot_no)
     await _synthesize_continuous_audio(
@@ -1712,7 +1712,7 @@ async def regen_project_audio_and_compose(project_id: int) -> None:
             "event": "progress",
             "stage": "AUDIOING",
             "percent": 82,
-            "message": "整片连贯配音中…",
+            "message": 'Generating continuous full-film voiceover…',
         },
     )
     await _synthesize_continuous_audio(
@@ -1724,7 +1724,7 @@ async def regen_project_audio_and_compose(project_id: int) -> None:
             "event": "progress",
             "stage": "AUDIOING",
             "percent": 90,
-            "message": "整片配音完成，开始合成",
+            "message": 'Full-film voiceover complete; starting composition',
         },
     )
 

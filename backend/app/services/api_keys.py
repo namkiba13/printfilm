@@ -31,7 +31,7 @@ async def create_api_key(db: AsyncSession, user: User, name: str) -> tuple[UserA
     raw, prefix, key_hash = generate_api_key()
     row = UserApiKey(
         user_id=user.id,
-        name=(name or "默认 Key").strip()[:64] or "默认 Key",
+        name=(name or 'Default Key').strip()[:64] or 'Default Key',
         key_prefix=prefix,
         key_hash=key_hash,
     )

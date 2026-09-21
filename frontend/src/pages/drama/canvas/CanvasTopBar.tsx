@@ -23,8 +23,8 @@ export function CanvasTopBar({ variant = 'fullscreen' }: Props) {
             <button
               type="button"
               className="fc-icon-btn"
-              aria-label="返回"
-              title="返回"
+              aria-label={"Back"}
+              title={"Back"}
               onClick={() => {
                 if (freeCanvasMode) {
                   navigate('/drama')
@@ -38,13 +38,12 @@ export function CanvasTopBar({ variant = 'fullscreen' }: Props) {
             </button>
           )}
           <span className="fc-topbar-title">
-            {embedded ? '资产画布' : freeCanvasMode ? '自由画布' : '资产库编排'}
+            {embedded ? "Asset Canvas" : freeCanvasMode ? "Free Canvas" : "Asset Library Arrangement"}
           </span>
           {saveStatusVisible ? (
             <span className="fc-save-pill">
               <span className="fc-save-dot" />
-              已保存
-            </span>
+              {"Saved"}</span>
           ) : null}
         </div>
 
@@ -53,8 +52,8 @@ export function CanvasTopBar({ variant = 'fullscreen' }: Props) {
             <button
               type="button"
               className="fc-icon-btn"
-              aria-label="全屏画布"
-              title="全屏画布"
+              aria-label={"Fullscreen Canvas"}
+              title={"Fullscreen Canvas"}
               onClick={() => navigate(`/drama/projects/${projectId}/canvas`)}
             >
               <Maximize2 size={18} strokeWidth={1.8} />
@@ -63,8 +62,8 @@ export function CanvasTopBar({ variant = 'fullscreen' }: Props) {
           <button
             type="button"
             className="fc-icon-btn"
-            aria-label="设置"
-            title="设置"
+            aria-label={"Settings"}
+            title={"Settings"}
             aria-expanded={settingsOpen}
             onClick={() => setSettingsOpen((v) => !v)}
           >
@@ -74,11 +73,11 @@ export function CanvasTopBar({ variant = 'fullscreen' }: Props) {
       </div>
 
       {settingsOpen ? (
-        <div className="fc-settings-pop" role="dialog" aria-label="画布设置">
-          <strong>画布设置</strong>
+        <div className="fc-settings-pop" role="dialog" aria-label={"Canvas Settings"}>
+          <strong>{"Canvas Settings"}</strong>
           {freeCanvasMode
-            ? '在画布上添加节点、连线并生成图片与视频。布局与资产会自动保存。'
-            : '布局与项目资产会自动同步保存。上传走 OSS；合成时按需拉本地缓存。'}
+            ? "Add nodes and connections on the canvas to generate images and videos. The layout and assets are saved automatically."
+            : "The layout and project assets are saved automatically. Uploads use OSS; local cache is fetched as needed during compositing."}
           <div style={{ marginTop: 10 }}>
             <button
               type="button"
@@ -86,8 +85,7 @@ export function CanvasTopBar({ variant = 'fullscreen' }: Props) {
               style={{ width: 'auto', padding: '0 12px', borderRadius: 10 }}
               onClick={() => setSettingsOpen(false)}
             >
-              关闭
-            </button>
+              {"Close"}</button>
           </div>
         </div>
       ) : null}

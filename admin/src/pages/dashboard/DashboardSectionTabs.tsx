@@ -10,10 +10,10 @@ const SECTIONS: {
   desc: string;
   icon: typeof LayoutDashboard;
 }[] = [
-  { id: "overview", label: "经营概览", desc: "核心指标与趋势", icon: LayoutDashboard },
-  { id: "usage", label: "用量分析", desc: "调用与分布", icon: BarChart3 },
-  { id: "finance", label: "财务账单", desc: "充值与成本", icon: Wallet },
-  { id: "projects", label: "项目运维", desc: "生产与快捷入口", icon: Clapperboard },
+  { id: "overview", label: "Business Overview", desc: "Core Metrics and Trends", icon: LayoutDashboard },
+  { id: "usage", label: "Usage Analysis", desc: "Calls and Distribution", icon: BarChart3 },
+  { id: "finance", label: "Financial Billing", desc: "Top-ups and Costs", icon: Wallet },
+  { id: "projects", label: "Project Operations", desc: "Production and Quick Access", icon: Clapperboard },
 ];
 
 type DashboardSectionTabsProps = {
@@ -24,7 +24,7 @@ type DashboardSectionTabsProps = {
 /** 仪表盘板块切换 */
 export function DashboardSectionTabs({ value, onChange }: DashboardSectionTabsProps) {
   return (
-    <div className="admin-dashboard-section-tabs" role="tablist" aria-label="仪表盘板块">
+    <div className="admin-dashboard-section-tabs" role="tablist" aria-label={"Dashboard Sections"}>
       {SECTIONS.map((item) => {
         const active = value === item.id;
         const Icon = item.icon;

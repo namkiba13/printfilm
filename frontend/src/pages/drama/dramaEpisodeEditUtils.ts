@@ -13,9 +13,9 @@ export type AssetScope = 'episode' | 'series'
 export type AssetTab = 'character' | 'scene' | 'prop'
 
 export const ASSET_TABS: Array<{ key: AssetTab; label: string }> = [
-  { key: 'character', label: '角色' },
-  { key: 'scene', label: '场景' },
-  { key: 'prop', label: '道具' },
+  { key: 'character', label: "Character" },
+  { key: 'scene', label: "Scene" },
+  { key: 'prop', label: "Prop" },
 ]
 
 export const RATIO_OPTIONS = DRAMA_RATIO_OPTIONS
@@ -71,7 +71,7 @@ export function buildFragmentRefStripItems(
     const voice = asset && readVoice ? readVoice(asset) : null
     return {
       assetId,
-      name: asset?.name || `资产 ${assetId}`,
+      name: asset?.name || `Asset ${assetId}`,
       type: asset?.type || '',
       previewUrl: preview,
       isCharacter,
@@ -179,9 +179,9 @@ export function readFragmentVideoVersions(frag: DramaFragment | null | undefined
 
 // 分镜队列徽标文案
 export function fragmentQueueBadgeLabel(status: string): string {
-  if (status === 'queued' || status === 'pending' || status === 'leased') return '排队'
-  if (status === 'running' || status === 'generating' || status === 'awaiting_poll') return '生成中'
-  if (status === 'failed') return '失败'
+  if (status === 'queued' || status === 'pending' || status === 'leased') return "Queued"
+  if (status === 'running' || status === 'generating' || status === 'awaiting_poll') return "Generating"
+  if (status === 'failed') return "Failed"
   return ''
 }
 
@@ -200,7 +200,7 @@ export function resolveFragmentDurationSec(
 export function formatFragLabel(index: number, durationSec: number | null | undefined) {
   const n = String(index + 1).padStart(2, '0')
   const sec = durationSec && durationSec > 0 ? durationSec : 8
-  return `片段 ${n} · ${sec}s`
+  return `Clip ${n} · ${sec}s`
 }
 
 // 按本集/全集与分类筛选资产

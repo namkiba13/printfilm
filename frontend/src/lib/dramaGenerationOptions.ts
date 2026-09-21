@@ -28,7 +28,7 @@ export const GENERATION_ASPECT_RATIO_OPTIONS: Array<{
   id: GenerationAspectRatioId
   label: string
 }> = [
-  { id: 'auto', label: '自动' },
+  { id: 'auto', label: "Automatic" },
   { id: '16:9', label: '16:9' },
   { id: '21:9', label: '21:9' },
   { id: '9:16', label: '9:16' },
@@ -65,14 +65,14 @@ export function formatOutputSettingsLabel(
   aspectRatio: GenerationAspectRatioId,
   resolution: GenerationResolution,
 ): string {
-  if (aspectRatio === 'auto') return `自动 · ${resolution}`
+  if (aspectRatio === 'auto') return `Automatic · ${resolution}`
   return `${aspectRatio} · ${resolution}`
 }
 
 /** 解析模型展示名（无目录时回退 id） */
 export function getImageModelLabel(modelId: string | undefined | null): string {
   const id = (modelId || '').trim()
-  return id || '图片模型'
+  return id || "Image Model"
 }
 
 /** 任意非空字符串均可作为生图模型 id */

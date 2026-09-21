@@ -13,7 +13,7 @@ class UserApiKey(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
-    name: Mapped[str] = mapped_column(String(64), default="默认 Key")
+    name: Mapped[str] = mapped_column(String(64), default='Default Key')
     key_prefix: Mapped[str] = mapped_column(String(24), index=True)
     key_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

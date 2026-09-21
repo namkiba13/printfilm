@@ -16,14 +16,15 @@ import { PaginationBar } from "@/components/PaginationBar";
 import { TEMPLATE_PAGE_SIZE } from "@/lib/pagination";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page";
+import { categoryLabel } from "@/lib/categoryLabels";
 
 type ListRes = { items: AdminTemplate[]; meta: PageMeta };
 type MetaRes = { categories: string[] };
 
 const STATUS_OPTIONS = [
-  { value: "", label: "全部状态" },
-  { value: "active", label: "已上架" },
-  { value: "inactive", label: "已下架" },
+  { value: "", label: "All Statuses" },
+  { value: "active", label: "Published" },
+  { value: "inactive", label: "Unlisted" },
   { value: "premium", label: "Premium" },
 ];
 
@@ -82,7 +83,7 @@ export function TemplatesPage() {
       if (statusFilter === "inactive") params.set("is_active", "false");
       setData(await api<ListRes>(`/api/admin/templates?${params}`));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "加载失败");
+      toast.error(err instanceof Error ? err.message : "Failed to Load");
     } finally {
       setLoading(false);
     }
@@ -112,10 +113,10 @@ export function TemplatesPage() {
     const countFor = (cat: string) =>
       items.filter((t) => (t.category || []).includes(cat)).length;
     return [
-      { value: "", label: "全部分类", count: items.length },
+      { value: "", label: "All Categories", count: items.length },
       ...categories.map((cat) => ({
         value: cat,
-        label: cat,
+        label: categoryLabel(cat),
         count: countFor(cat),
       })),
     ];
@@ -159,7 +160,7 @@ export function TemplatesPage() {
       });
       setOpen(true);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "加载模板详情失败");
+      toast.error(err instanceof Error ? err.message : "Failed to load template details");
     }
   }
 
@@ -196,7 +197,7 @@ export function TemplatesPage() {
           }),
         });
       } else {
-        if (!form.id.trim()) throw new Error("请填写模板 ID");
+        if (!form.id.trim()) throw new Error("Please enter a template ID");
         await api(`/api/admin/templates`, {
           method: "POST",
           body: JSON.stringify({
@@ -224,11 +225,11 @@ export function TemplatesPage() {
           }),
         });
       }
-      toast.success("已保存");
+      toast.success("Saved");
       setOpen(false);
       await Promise.all([load(), loadMeta()]);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "保存失败");
+      toast.error(err instanceof Error ? err.message : "Save failed");
     } finally {
       setSaving(false);
     }
@@ -240,7 +241,7 @@ export function TemplatesPage() {
       await api(`/api/admin/templates/${id}`, { method: "PATCH", body: JSON.stringify(body) });
       await load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "更新失败");
+      toast.error(err instanceof Error ? err.message : "Update failed");
     }
   }
 
@@ -250,11 +251,11 @@ export function TemplatesPage() {
     setDeleting(true);
     try {
       await api(`/api/admin/templates/${deleteTarget}`, { method: "DELETE" });
-      toast.success("已删除");
+      toast.success("Deleted");
       setDeleteTarget(null);
       await Promise.all([load(), loadMeta()]);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "删除失败");
+      toast.error(err instanceof Error ? err.message : "Delete failed");
     } finally {
       setDeleting(false);
     }
@@ -263,12 +264,11 @@ export function TemplatesPage() {
   return (
     <div className="admin-list-page">
       <PageHeader
-        description="风格 / 角色 / 提示词以本页为准；已创建项目需在分镜页恢复模板后才会跟随。"
+        description={"Style / Character / Prompt settings on this page take precedence; existing projects will follow them only after the template is restored on the Storyboard page."}
         actions={
           <Button onClick={openCreate} className="gap-2">
             <Plus className="h-4 w-4" />
-            新建模板
-          </Button>
+            {"Create Template"}</Button>
         }
       />
 
@@ -276,13 +276,12 @@ export function TemplatesPage() {
         trailing={
           <>
             <LayoutGrid className="h-4 w-4" />
-            {filteredItems.length} / {data?.meta.total ?? 0} 项
-          </>
+            {filteredItems.length} / {data?.meta.total ?? 0} {"items"}</>
         }
       >
         <AdminSearchInput
           className="min-w-[220px] flex-1 max-w-md"
-          placeholder="搜索名称 / ID / 描述 / 分类"
+          placeholder={"Search name / ID / description / category"}
           value={q}
           onChange={setQ}
           onKeyDown={(e) => {
@@ -302,7 +301,7 @@ export function TemplatesPage() {
           }}
         />
         <AdminChipFilter
-          label="分类"
+          label={"Category"}
           value={categoryFilter}
           options={categoryOptions}
           onChange={(v) => {
@@ -318,21 +317,19 @@ export function TemplatesPage() {
             void load(1);
           }}
         >
-          筛选
-        </Button>
+          {"Filter"}</Button>
       </AdminFilterBar>
 
       {loading ? (
         <div className="template-grid-loading">
           <Loader2 className="h-6 w-6 animate-spin text-[#67c23a]" />
-          <span>加载模板…</span>
+          <span>{"Loading template…"}</span>
         </div>
       ) : filteredItems.length === 0 ? (
         <div className="template-grid-empty">
-          <p>暂无匹配的模板</p>
+          <p>{"No matching templates"}</p>
           <Button variant="outline" size="sm" onClick={openCreate}>
-            新建第一个模板
-          </Button>
+            {"Create the first template"}</Button>
         </div>
       ) : (
         <div className="template-grid">
@@ -371,9 +368,9 @@ export function TemplatesPage() {
 
       <AdminConfirmDialog
         open={Boolean(deleteTarget)}
-        title="删除模板"
-        description={deleteTarget ? `确认删除模板「${deleteTarget}」？已被项目引用的模板无法删除。` : undefined}
-        confirmLabel="删除"
+        title={"Delete template"}
+        description={deleteTarget ? `Are you sure you want to delete template "${deleteTarget}"? Templates referenced by projects cannot be deleted.` : undefined}
+        confirmLabel={"Delete"}
         loading={deleting}
         destructive
         onOpenChange={(next) => {

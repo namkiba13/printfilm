@@ -61,8 +61,8 @@ function scopeLinks(task: AdminTaskRow): ReactNode {
       </span>,
     );
   }
-  if (task.episode_id) parts.push(<span key="ep">分集#{task.episode_id}</span>);
-  if (task.fragment_id) parts.push(<span key="frag">分镜#{task.fragment_id}</span>);
+  if (task.episode_id) parts.push(<span key="ep">{"Episode#"}{task.episode_id}</span>);
+  if (task.fragment_id) parts.push(<span key="frag">{"Storyboard#"}{task.fragment_id}</span>);
   if (parts.length === 0) return <span className="text-[#909399]">—</span>;
   return <div className="flex flex-wrap gap-1">{parts}</div>;
 }
@@ -137,7 +137,7 @@ export function QueuesPage() {
         setData(res);
       } catch (err) {
         if (!silent) {
-          toast.error(err instanceof Error ? err.message : "加载任务失败");
+          toast.error(err instanceof Error ? err.message : "Failed to load tasks");
         }
       } finally {
         setLoading(false);
@@ -153,7 +153,7 @@ export function QueuesPage() {
       try {
         await Promise.all([loadStats(), loadTasks(true)]);
       } catch (err) {
-        if (!silent) toast.error(err instanceof Error ? err.message : "刷新失败");
+        if (!silent) toast.error(err instanceof Error ? err.message : "Refresh Failed");
       } finally {
         setRefreshing(false);
         setLoading(false);
@@ -178,14 +178,14 @@ export function QueuesPage() {
   const handleCancel = useCallback(
     async (task: AdminTaskRow) => {
       if (!canCancel(task)) return;
-      if (!window.confirm(`确定取消任务 #${task.id}（${taskTypeLabel(task.task_type)}）？`)) return;
+      if (!window.confirm(`Cancel task #${task.id} (${taskTypeLabel(task.task_type)})?`)) return;
       setCancelLoading(task.id);
       try {
         await api(`/api/admin/tasks/${task.id}/cancel`, { method: "POST" });
-        toast.success("已提交取消请求");
+        toast.success("Cancellation request submitted");
         await refreshAll(true);
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "取消失败");
+        toast.error(err instanceof Error ? err.message : "Cancellation failed");
       } finally {
         setCancelLoading(null);
       }
@@ -201,7 +201,7 @@ export function QueuesPage() {
   return (
     <div className="admin-page">
       <PageHeader
-        description={`统一任务平台 · 自动刷新 ${REFRESH_MS / 1000}s · 并发 ${stats?.scheduler_running_jobs ?? 0}/${stats?.max_concurrency ?? 0}`}
+        description={`Unified Task Platform · Auto-refresh ${REFRESH_MS / 1000}s · Concurrency ${stats?.scheduler_running_jobs ?? 0}/${stats?.max_concurrency ?? 0}`}
         actions={
           <button
             type="button"
@@ -210,61 +210,59 @@ export function QueuesPage() {
             disabled={refreshing}
           >
             {refreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            刷新
-          </button>
+            {"Refresh"}</button>
         }
       />
 
       {loading && !stats ? (
         <div className="admin-panel flex items-center justify-center py-16 text-[var(--admin-muted)]">
           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-          加载中…
-        </div>
+          {"Loading…"}</div>
       ) : (
         <>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             <StatCard
-              label="排队中"
+              label={"Queued"}
               value={stats?.pending_count ?? 0}
-              hint="含待调度 pending"
+              hint={"Includes pending"}
               icon={Layers}
               tone="warn"
             />
             <StatCard
-              label="进行中"
+              label={"In Progress"}
               value={stats?.active_count ?? 0}
-              hint={`执行 ${stats?.running_count ?? 0} · 轮询 ${stats?.awaiting_poll_count ?? 0}`}
+              hint={`Running ${stats?.running_count ?? 0} · Polling ${stats?.awaiting_poll_count ?? 0}`}
               icon={Activity}
               tone="info"
             />
             <StatCard
-              label="运行时槽位"
+              label={"Runtime Slots"}
               value={
                 <>
                   {stats?.scheduler_running_jobs ?? 0}
                   <span className="text-lg text-[var(--admin-muted)]"> / {stats?.max_concurrency ?? 0}</span>
                 </>
               }
-              hint={`已租约 ${stats?.leased_count ?? 0}`}
+              hint={`Leased ${stats?.leased_count ?? 0}`}
               icon={RefreshCw}
             />
             <div className="admin-panel admin-stat-card tone-success">
               <div className="admin-stat-icon">
                 <Ban className="h-5 w-5" />
               </div>
-              <div className="admin-stat-label">终态统计</div>
+              <div className="admin-stat-label">{"Terminal Status Summary"}</div>
               <div className="admin-stat-value !text-base !leading-relaxed">
-                成功 {stats?.succeeded_count ?? 0} · 失败 {stats?.failed_count ?? 0} · 取消{" "}
+                {"Succeeded"}{stats?.succeeded_count ?? 0} {"· Failed"}{stats?.failed_count ?? 0} {"· Cancelled"}{" "}
                 {stats?.cancelled_count ?? 0}
               </div>
               <div className="admin-stat-hint">
-                更新 {stats?.fetched_at ? new Date(stats.fetched_at).toLocaleTimeString() : "—"}
+                {"Updated"}{stats?.fetched_at ? new Date(stats.fetched_at).toLocaleTimeString() : "—"}
               </div>
             </div>
           </div>
 
           {(stats?.domains.length ?? 0) > 0 ? (
-            <PageSection title="各领域任务" bodyClassName="!pt-0">
+            <PageSection title={"Tasks by Domain"} bodyClassName="!pt-0">
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                 {stats?.domains.map((d) => (
                   <div key={d.domain} className="admin-domain-card">
@@ -283,7 +281,7 @@ export function QueuesPage() {
                       </span>
                     </div>
                     <div className="mt-2 text-xs text-[var(--admin-muted)]">
-                      排队 {d.pending} · 进行 {d.active} · 成功 {d.succeeded}
+                      {"Queued"}{d.pending} {"· Active"}{d.active} {"· Succeeded"}{d.succeeded}
                     </div>
                   </div>
                 ))}
@@ -292,13 +290,13 @@ export function QueuesPage() {
           ) : null}
 
           <PageSection
-            title="任务列表"
+            title={"Task List"}
             actions={
               <div className="flex flex-wrap gap-2">
                 {(
                   [
-                    ["active", `进行中 (${stats?.pending_count ?? 0}+${stats?.active_count ?? 0})`],
-                    ["all", "全部"],
+                    ["active", `In Progress (${stats?.pending_count ?? 0}+${stats?.active_count ?? 0})`],
+                    ["all", "All"],
                   ] as const
                 ).map(([key, label]) => (
                   <button
@@ -327,7 +325,7 @@ export function QueuesPage() {
                   setPage(1);
                 }}
               >
-                <option value="">全部领域</option>
+                <option value="">{"All domains"}</option>
                 {domainOptions.map((d) => (
                   <option key={d} value={d}>
                     {taskDomainLabel(d)}
@@ -343,16 +341,16 @@ export function QueuesPage() {
                   if (e.target.value) setViewTab("all");
                 }}
               >
-                <option value="">全部状态</option>
+                <option value="">{"All Statuses"}</option>
                 {Object.entries({
-                  pending: "排队中",
-                  leased: "已租约",
-                  running: "执行中",
-                  awaiting_poll: "等待轮询",
-                  cancel_requested: "取消中",
-                  succeeded: "已成功",
-                  failed: "失败",
-                  cancelled: "已取消",
+                  pending: "Queued",
+                  leased: "Leased",
+                  running: "Running",
+                  awaiting_poll: "Awaiting Polling",
+                  cancel_requested: "Canceling",
+                  succeeded: "Succeeded",
+                  failed: "Failed",
+                  cancelled: "Canceled",
                 }).map(([value, label]) => (
                   <option key={value} value={value}>
                     {label}
@@ -368,7 +366,7 @@ export function QueuesPage() {
               />
               <input
                 className="admin-input"
-                placeholder="任务类型"
+                placeholder={"Task Type"}
                 value={taskType}
                 onChange={(e) => {
                   setTaskType(e.target.value);
@@ -378,7 +376,7 @@ export function QueuesPage() {
               <AdminSearchInput
                 value={searchInput}
                 onChange={setSearchInput}
-                placeholder="任务类型 / 用户邮箱 / dedupe_key"
+                placeholder={"Task Type / User Email / dedupe_key"}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
@@ -395,8 +393,7 @@ export function QueuesPage() {
                   setPage(1);
                 }}
               >
-                查询
-              </button>
+                {"Search"}</button>
             </Toolbar>
 
             <div className="admin-table-wrap">
@@ -404,16 +401,16 @@ export function QueuesPage() {
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>领域 / 类型</th>
-                    <th>用户</th>
-                    <th>关联</th>
-                    <th>状态</th>
-                    <th>进度</th>
-                    <th>费用</th>
-                    <th>提交参数</th>
-                    <th>结果</th>
-                    <th>时间</th>
-                    <th>操作</th>
+                    <th>{"Domain / Type"}</th>
+                    <th>{"User"}</th>
+                    <th>{"Linked"}</th>
+                    <th>{"Status"}</th>
+                    <th>{"Progress"}</th>
+                    <th>{"Cost"}</th>
+                    <th>{"Submission Parameters"}</th>
+                    <th>{"Result"}</th>
+                    <th>{"Time"}</th>
+                    <th>{"Actions"}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -421,8 +418,8 @@ export function QueuesPage() {
                     <tr>
                       <td colSpan={11}>
                         <div className="admin-empty !py-10">
-                          <div className="admin-empty-title">暂无任务</div>
-                          <div className="admin-empty-desc">切换到「全部」查看历史任务</div>
+                          <div className="admin-empty-title">{"No tasks available"}</div>
+                          <div className="admin-empty-desc">{"Switch to \"All\" to view task history"}</div>
                         </div>
                       </td>
                     </tr>
@@ -466,14 +463,14 @@ export function QueuesPage() {
                           {task.billing_charged_fen != null && task.billing_charged_fen > 0
                             ? `¥${fenToYuan(task.billing_charged_fen)}`
                             : task.billing_status === "frozen"
-                              ? `预扣 ¥${fenToYuan(task.billing_estimate_fen ?? 0)}`
+                              ? `Reserve ¥${fenToYuan(task.billing_estimate_fen ?? 0)}`
                               : "—"}
                         </td>
                         <td className="task-list-json-cell">{jsonCell(task.payload)}</td>
                         <td className="task-list-json-cell">{jsonCell(task.result_payload)}</td>
                         <td className="text-xs text-[#909399]">
-                          <div>创建 {formatTime(task.created_at)}</div>
-                          {task.started_at ? <div>开始 {formatTime(task.started_at)}</div> : null}
+                          <div>{"Create"}{formatTime(task.created_at)}</div>
+                          {task.started_at ? <div>{"Start"}{formatTime(task.started_at)}</div> : null}
                         </td>
                         <td onClick={(e) => e.stopPropagation()}>
                           <div className="flex flex-wrap gap-1">
@@ -483,8 +480,7 @@ export function QueuesPage() {
                               onClick={() => openDetail(task.id)}
                             >
                               <Eye className="mr-1 inline h-3 w-3" />
-                              详情
-                            </button>
+                              {"Details"}</button>
                             {canCancel(task) ? (
                               <button
                                 type="button"
@@ -492,7 +488,7 @@ export function QueuesPage() {
                                 disabled={cancelLoading === task.id}
                                 onClick={() => void handleCancel(task)}
                               >
-                                {cancelLoading === task.id ? "取消中…" : "取消"}
+                                {cancelLoading === task.id ? "Cancelling…" : "Cancel"}
                               </button>
                             ) : null}
                           </div>

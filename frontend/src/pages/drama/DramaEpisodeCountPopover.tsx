@@ -91,13 +91,13 @@ export function DramaEpisodeCountPopover({ value, onChange, disabled = false }: 
         aria-haspopup="dialog"
         onClick={toggle}
       >
-        <span>{value} 集</span>
+        <span>{value} {"Episode"}</span>
         <ChevronDown size={13} strokeWidth={2} className={open ? 'is-open' : ''} />
       </button>
 
       {open ? (
-        <div className="drama-ep-count-panel" role="dialog" aria-label="自定义集数">
-          <p className="drama-ep-count-title">自定义集数</p>
+        <div className="drama-ep-count-panel" role="dialog" aria-label={"Custom Episode Count"}>
+          <p className="drama-ep-count-title">{"Custom Episode Count"}</p>
           <div className="drama-ep-count-presets">
             {EPISODE_COUNT_PRESETS.map((count) => (
               <button
@@ -106,12 +106,11 @@ export function DramaEpisodeCountPopover({ value, onChange, disabled = false }: 
                 className={value === count ? 'is-active' : ''}
                 onClick={() => selectPreset(count)}
               >
-                {count} 集
-              </button>
+                {count} {"Episode"}</button>
             ))}
           </div>
           <div className="drama-ep-count-custom">
-            <p>自定义集数</p>
+            <p>{"Custom Episode Count"}</p>
             <div className="drama-ep-count-custom-row">
               <input
                 type="number"
@@ -124,8 +123,7 @@ export function DramaEpisodeCountPopover({ value, onChange, disabled = false }: 
                 className={usingCustom ? 'is-custom' : ''}
               />
               <button type="button" className="drama-ep-count-confirm" onClick={applyCustom}>
-                确定
-              </button>
+                {"Confirm"}</button>
             </div>
           </div>
         </div>

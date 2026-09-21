@@ -55,7 +55,7 @@ def resolve_speaker_slot(
     if existing.startswith("S_"):
         return existing
     if not pool:
-        raise ValueError("未配置 VOLC_TTS_VOICE_DESIGN_SPEAKER_IDS（控制台购买的 S_ 音色槽）")
+        raise ValueError('VOLC_TTS_VOICE_DESIGN_SPEAKER_IDS is not configured (S_ voice slots purchased in the console)')
     return pool[asset_id % len(pool)]
 
 
@@ -79,9 +79,9 @@ def clamp_voice_design_prompt(text_prompt: str, sample_text: str) -> tuple[str, 
     prompt = (text_prompt or "").strip()[:200]
     text = (sample_text or "").strip()[:300]
     if not prompt:
-        raise ValueError("音色描述 text_prompt 不能为空")
+        raise ValueError('Voice description text_prompt cannot be empty')
     if not text:
-        raise ValueError("试听台词 text 不能为空")
+        raise ValueError('Preview dialogue text cannot be empty')
     return prompt, text
 
 
@@ -128,7 +128,7 @@ async def design_voice(
             speaker_id,
             message,
         )
-        raise RuntimeError(f"音色设计失败({code}): {message}")
+        raise RuntimeError(f'Voice design failed ({code}): {message}')
 
     status = int(payload.get("status") or 0)
     designed_speaker = str(payload.get("speaker_id") or speaker_id).strip()
@@ -143,10 +143,10 @@ async def design_voice(
     )
 
     if status not in VOICE_DESIGN_SUCCESS_STATUS:
-        raise RuntimeError(f"音色设计未完成 status={status} logid={log_id}")
+        raise RuntimeError(f'Voice design incomplete status={status} logid={log_id}')
 
     if not demo_audio:
-        raise RuntimeError(f"音色设计未返回 demo_audio logid={log_id}")
+        raise RuntimeError(f'Voice design did not return demo_audio logid={log_id}')
 
     return VoiceDesignResult(
         speaker_id=designed_speaker,

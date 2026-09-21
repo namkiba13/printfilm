@@ -11,11 +11,11 @@ import { handleBillingError } from '../../lib/billingError'
 import { kepuStepIndex, kepuSteps } from '../../lib/status'
 
 const OUTPUT_MODES: { id: PipelineMode; label: string; desc: string; image: string }[] = [
-  { id: 'full', label: 'AI 视频', desc: '图→视频→配音→合成', image: '/mode-presets/full.jpg' },
+  { id: 'full', label: "AI Video", desc: "Image → Video → Voiceover → Composite", image: '/mode-presets/full.jpg' },
   {
     id: 'image_text',
-    label: '静图成片',
-    desc: '静图+叠字+配音，不生成 AI 视频',
+    label: "Still Image Video",
+    desc: "Still Image + Overlay Text + Voiceover; no AI video generation",
     image: '/mode-presets/image_text.jpg',
   },
 ]
@@ -92,7 +92,7 @@ export default function StyleConfigPage() {
         if (p.image_model) setImageModel(p.image_model)
         if (p.video_model) setVideoModel(p.video_model)
       })
-      .catch((err) => setError(err instanceof Error ? err.message : '加载失败'))
+      .catch((err) => setError(err instanceof Error ? err.message : "Failed to Load"))
   }, [nav, projectId])
 
   useEffect(() => {
@@ -169,12 +169,12 @@ export default function StyleConfigPage() {
       audio.onended = () => setPlayingId(null)
       audio.onerror = () => {
         setPlayingId(null)
-        setError('试听播放失败')
+        setError("Preview playback failed")
       }
       setPlayingId(vid)
       await audio.play()
     } catch (err) {
-      setError(err instanceof Error ? err.message : '试听失败')
+      setError(err instanceof Error ? err.message : "Preview failed")
       setPlayingId(null)
     } finally {
       setPreviewBusy(null)
@@ -209,14 +209,14 @@ export default function StyleConfigPage() {
       const started = await api.generate(project.id)
       nav(`/studio/${started.id}`)
     } catch (err) {
-      const msg = err instanceof Error ? err.message : '生成失败'
+      const msg = err instanceof Error ? err.message : "Generation Failed"
       if (msg.includes('合成成片')) {
         try {
           const composed = await api.compose(project.id)
           nav(`/studio/${composed.id}`)
           return
         } catch (e2) {
-          setError(e2 instanceof Error ? e2.message : '合成失败')
+          setError(e2 instanceof Error ? e2.message : "Synthesis failed")
           return
         }
       }
@@ -231,7 +231,7 @@ export default function StyleConfigPage() {
   if (!project) {
     return (
       <AppShell active="studio">
-        {error ? <BillingErrorNotice message={error} /> : <p className="pf-muted">加载中…</p>}
+        {error ? <BillingErrorNotice message={error} /> : <p className="pf-muted">{"Loading…"}</p>}
       </AppShell>
     )
   }
@@ -243,9 +243,8 @@ export default function StyleConfigPage() {
           <div>
             <button type="button" className="pf-back" onClick={() => nav('/studio/new')}>
               <IconChevronLeft size={18} />
-              返回创作台
-            </button>
-            <h1 className="pf-page-title">{project?.title || '风格配置'}</h1>
+              {"Back to Studio"}</button>
+            <h1 className="pf-page-title">{project?.title || "Style Configuration"}</h1>
           </div>
           <Stepper
             steps={kepuSteps(pipelineMode)}
@@ -257,7 +256,7 @@ export default function StyleConfigPage() {
 
       <div className="pf-style-layout">
         <aside className="pf-create-col">
-          <h3>项目信息</h3>
+          <h3>{"Project Information"}</h3>
           {currentTpl ? (
             <div>
               <div
@@ -273,39 +272,37 @@ export default function StyleConfigPage() {
               <p style={{ margin: '0.5rem 0 0', fontWeight: 600 }}>{currentTpl.name}</p>
               <div className="pf-tags">
                 {currentTpl.category.map((c) => (
-                  <span key={c}>{c}</span>
+                  <span key={c}>{HOME_CATEGORY_LABELS[c] || c}</span>
                 ))}
               </div>
             </div>
           ) : null}
           <ul className="pf-meta-list" style={{ marginTop: '0.85rem' }}>
             <li>
-              <span>主题</span>
+              <span>{"Topic"}</span>
               <span style={{ maxWidth: '55%', textAlign: 'right' }}>
                 {(project?.source_text || '').slice(0, 40)}
               </span>
             </li>
             <li>
-              <span>时长</span>
-              <span>~1–3 分钟</span>
+              <span>{"Duration"}</span>
+              <span>{"~1–3 minutes"}</span>
             </li>
             <li>
-              <span>分镜数</span>
-              <span>AI 自动</span>
+              <span>{"Number of Storyboards"}</span>
+              <span>{"AI Automatic"}</span>
             </li>
           </ul>
           <button type="button" className="pf-btn pf-btn-ghost pf-btn-block pf-btn-sm" disabled>
-            预览模板 <ComingSoon />
+            {"Preview Template"}<ComingSoon />
           </button>
         </aside>
 
         <section className="pf-create-col">
           <div className="pf-style-block">
-            <h3>画面风格</h3>
+            <h3>{"Visual Style"}</h3>
             <p className="pf-muted" style={{ fontSize: '0.78rem', margin: '0 0 0.65rem' }}>
-              已由选题时选择的模板锁定，出图与出视频会自动带上画风。是否出角色由模板规则和主题让 AI
-              决定，不必再选一套人设。
-            </p>
+              {"Locked by the template selected during topic setup. Image and video generation automatically use its visual style. Whether to generate characters is determined by the template rules and topic, so you don't need to choose a character profile."}</p>
             {currentTpl ? (
               <div
                 className={[
@@ -324,11 +321,11 @@ export default function StyleConfigPage() {
                   ) : null}
                 </span>
                 <div className="cap">{currentTpl.name}</div>
-                <div className="cap-sub">模板画风</div>
+                <div className="cap-sub">{"Template Style"}</div>
               </div>
             ) : null}
             <label className="pf-field" style={{ marginTop: '0.75rem' }}>
-              <span className="pf-field-label">风格提示词（可选覆盖）</span>
+              <span className="pf-field-label">{"Style Prompt (Optional Override)"}</span>
               <textarea
                 className="pf-field-input"
                 value={stylePrompt}
@@ -341,9 +338,8 @@ export default function StyleConfigPage() {
 
           <div className="pf-style-block">
             <h3>
-              配音音色
-              <button type="button" className="pf-btn pf-btn-ghost pf-btn-sm" disabled>
-                更多音色 <ComingSoon />
+              {"Voiceover"}<button type="button" className="pf-btn pf-btn-ghost pf-btn-sm" disabled>
+                {"More Voices"}<ComingSoon />
               </button>
             </h3>
             <div className="pf-voice-row">
@@ -368,7 +364,7 @@ export default function StyleConfigPage() {
                   >
                     <strong className="pf-voice-name">{v.label}</strong>
                     <span className="pf-voice-meta">
-                      {v.gender === 'female' ? '女声' : v.gender === 'male' ? '男声' : v.gender}
+                      {v.gender === 'female' ? "Female Voice" : v.gender === 'male' ? "Male Voice" : v.gender}
                     </span>
                     <button
                       type="button"
@@ -383,14 +379,13 @@ export default function StyleConfigPage() {
                       onClick={(e) => previewVoice(v, e)}
                     >
                       {loading ? (
-                        '生成中…'
+                        "Generating…"
                       ) : playing ? (
-                        '播放中'
+                        "Playing"
                       ) : (
                         <>
                           <IconPlay size={12} />
-                          试听
-                        </>
+                          {"Preview"}</>
                       )}
                     </button>
                   </div>
@@ -399,16 +394,14 @@ export default function StyleConfigPage() {
             </div>
             {selectedVoice ? (
               <p className="pf-muted" style={{ fontSize: '0.78rem', margin: '0.55rem 0 0' }}>
-                当前：{selectedVoice.label} · 成片用该音色整片配音；点击「试听」可听约 5 秒样例
-              </p>
+                {"Current:"}{selectedVoice.label} {"· Use this voice for the entire final video; click “Preview” to hear an approximately 5-second sample"}</p>
             ) : null}
           </div>
 
           <div className="pf-style-block">
-            <h3>成片方式</h3>
+            <h3>{"Production Method"}</h3>
             <p className="pf-muted" style={{ fontSize: '0.78rem', margin: '0 0 0.65rem' }}>
-              任意模板都可选择是否生成 AI 视频，与画幅无关。
-            </p>
+              {"Any template can choose whether to generate an AI video, regardless of aspect ratio."}</p>
             <div className="pf-style-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
               {OUTPUT_MODES.map((m) => (
                 <button
@@ -427,10 +420,9 @@ export default function StyleConfigPage() {
 
           {mediaCatalog ? (
             <div className="pf-style-block">
-              <h3>图片模型</h3>
+              <h3>{"Image Model"}</h3>
               <p className="pf-muted" style={{ fontSize: '0.78rem', margin: '0 0 0.65rem' }}>
-                使用管理后台「模型」中已勾选的 TokenFree 模型。
-              </p>
+                {"Uses the TokenFree models selected under “Models” in the admin console."}</p>
               <div className="pf-model-grid">
                 {mediaCatalog.image_models.map((m: MediaModelOption) => (
                   <button
@@ -441,7 +433,7 @@ export default function StyleConfigPage() {
                   >
                     <div className="pf-model-opt-title">
                       <span>{m.label}</span>
-                      {m.recommended ? <span className="pf-model-badge">推荐</span> : null}
+                      {m.recommended ? <span className="pf-model-badge">{"Recommended"}</span> : null}
                     </div>
                     <div className="pf-model-opt-desc">{m.description}</div>
                     <div className="pf-model-opt-provider">TokenFree</div>
@@ -453,10 +445,9 @@ export default function StyleConfigPage() {
 
           {mediaCatalog && pipelineMode === 'full' ? (
             <div className="pf-style-block">
-              <h3>视频模型</h3>
+              <h3>{"Video model"}</h3>
               <p className="pf-muted" style={{ fontSize: '0.78rem', margin: '0 0 0.65rem' }}>
-                图生视频所用模型；静图成片模式不调用。
-              </p>
+                {"Model used for image-to-video generation; not called in still-image final video mode."}</p>
               <div className="pf-model-grid">
                 {mediaCatalog.video_models.map((m: MediaModelOption) => (
                   <button
@@ -467,7 +458,7 @@ export default function StyleConfigPage() {
                   >
                     <div className="pf-model-opt-title">
                       <span>{m.label}</span>
-                      {m.recommended ? <span className="pf-model-badge">推荐</span> : null}
+                      {m.recommended ? <span className="pf-model-badge">{"Recommended"}</span> : null}
                     </div>
                     <div className="pf-model-opt-desc">{m.description}</div>
                     <div className="pf-model-opt-provider">TokenFree</div>
@@ -478,7 +469,7 @@ export default function StyleConfigPage() {
           ) : null}
 
           <div className="pf-style-block">
-            <h3>输出比例</h3>
+            <h3>{"Output Aspect Ratio"}</h3>
             <div className="pf-ratio-row">
               {RATIOS.map((r) => (
                 <button
@@ -496,7 +487,7 @@ export default function StyleConfigPage() {
         </section>
 
         <aside className="pf-create-col">
-          <h3>实时预览</h3>
+          <h3>{"Live Preview"}</h3>
           <div
             className={[
               'pf-editor-preview',
@@ -509,33 +500,32 @@ export default function StyleConfigPage() {
             {currentTpl ? (
               <img src={api.assetUrl(currentTpl.preview_cover)} alt="" />
             ) : (
-              <span className="empty">预览占位</span>
+              <span className="empty">{"Preview Placeholder"}</span>
             )}
           </div>
           <p className="pf-muted" style={{ fontSize: '0.8rem' }}>
-            生成后可在分镜台查看真实画面。当前为模板预览。
-          </p>
-          <h3 style={{ marginTop: '1rem' }}>当前配置概览</h3>
+            {"After generation, view the actual visuals in the Storyboard workspace. This is currently a template preview."}</p>
+          <h3 style={{ marginTop: '1rem' }}>{"Current Configuration Overview"}</h3>
           <ul className="pf-meta-list">
             <li>
-              <span>风格</span>
+              <span>{"Style"}</span>
               <span>{currentTpl?.name || '—'}</span>
             </li>
             <li>
-              <span>角色</span>
-              <span>AI 按模板与主题决定</span>
+              <span>{"Role"}</span>
+              <span>{"AI decides based on the template and theme"}</span>
             </li>
             <li>
-              <span>配音</span>
-              <span>{selectedVoice?.label || '默认'}</span>
+              <span>{"Voiceover"}</span>
+              <span>{selectedVoice?.label || "Default"}</span>
             </li>
             <li>
-              <span>比例</span>
+              <span>{"Aspect Ratio"}</span>
               <span>{ratio}</span>
             </li>
             <li>
-              <span>成片</span>
-              <span>{pipelineMode === 'image_text' ? '静图成片' : 'AI 视频'}</span>
+              <span>{"Final Video"}</span>
+              <span>{pipelineMode === 'image_text' ? "Still Image Video" : "AI Video"}</span>
             </li>
           </ul>
           {selectedVoice ? (
@@ -548,8 +538,8 @@ export default function StyleConfigPage() {
             >
               <IconPlay size={14} />
               {playingId === voiceKey(selectedVoice)
-                ? '停止试听'
-                : `试听「${selectedVoice.label}」`}
+                ? "Stop Preview"
+                : `Preview “${selectedVoice.label}”`}
             </button>
           ) : null}
           {error ? <BillingErrorNotice message={error} style={{ marginTop: '0.75rem' }} /> : null}
@@ -560,14 +550,14 @@ export default function StyleConfigPage() {
             disabled={busy || Boolean(previewBusy)}
             onClick={generate}
           >
-            {busy ? '启动中…' : project.shots?.length ? '保存并继续' : '生成故事板'}
+            {busy ? "Starting…" : project.shots?.length ? "Save and Continue" : "Generate Storyboard"}
             {!busy ? <span aria-hidden>→</span> : null}
           </button>
           <p className="pf-muted" style={{ fontSize: '0.78rem', marginTop: '0.5rem' }}>
-            先生成分镜脚本，确认修改后再手动开始出图与配音。
-          </p>
+            {"Generate the Storyboard script first, then review and edit it before manually starting image generation and voiceover."}</p>
         </aside>
       </div>
     </AppShell>
   )
 }
+import { HOME_CATEGORY_LABELS } from '../../lib/categories'

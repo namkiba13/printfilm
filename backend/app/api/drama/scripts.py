@@ -31,7 +31,7 @@ async def get_script(
 ) -> DramaScriptOut:
     project = await get_owned_drama_project(db, project_id, user, with_script=True)
     if not project.script:
-        raise HTTPException(status_code=404, detail="剧本不存在")
+        raise HTTPException(status_code=404, detail='Script does not exist')
     return DramaScriptOut.model_validate(project.script)
 
 
@@ -44,7 +44,7 @@ async def update_script(
 ) -> DramaScriptOut:
     project = await get_owned_drama_project(db, project_id, user, with_script=True)
     if not project.script:
-        raise HTTPException(status_code=404, detail="剧本不存在")
+        raise HTTPException(status_code=404, detail='Script does not exist')
     script = project.script
     if body.source is not None:
         script.source = body.source

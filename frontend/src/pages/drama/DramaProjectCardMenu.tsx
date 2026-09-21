@@ -87,7 +87,7 @@ export function DramaProjectCardMenu({ onRename, onDelete }: Props) {
       <button
         type="button"
         className="drama-project-row-more-btn"
-        aria-label="更多操作"
+        aria-label={"More Actions"}
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={(event) => {
@@ -115,8 +115,7 @@ export function DramaProjectCardMenu({ onRename, onDelete }: Props) {
               closeThenRun(onRename)
             }}
           >
-            重命名
-          </button>
+            {"Rename"}</button>
           <button
             type="button"
             role="menuitem"
@@ -132,8 +131,7 @@ export function DramaProjectCardMenu({ onRename, onDelete }: Props) {
               closeThenRun(onDelete)
             }}
           >
-            删除
-          </button>
+            {"Delete"}</button>
         </div>
       ) : null}
     </div>

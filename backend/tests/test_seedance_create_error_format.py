@@ -22,7 +22,7 @@ def test_format_seedance_audio_duration_too_short_with_label():
         "角色音色「双龙」",
     ]
     msg = _format_seedance_create_error(400, body, content_labels=labels)
-    assert "参考音频过短" in msg
+    assert "Reference audio is too short" in msg
     assert "角色音色「双龙」" in msg
     assert "1.8" in msg
 
@@ -32,5 +32,5 @@ def test_format_seedance_audio_duration_without_labels():
         '{"error":{"message":"content[3] audio duration must be greater than or equal to 1.8"}}'
     )
     msg = _format_seedance_create_error(400, body, content_labels=None)
-    assert "参考音频过短" in msg
+    assert "Reference audio is too short" in msg
     assert "content[3]" in msg

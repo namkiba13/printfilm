@@ -23,9 +23,9 @@ def test_image_style_catalog_is_aligned():
 
 def test_ghibli_handdrawn_style_resolves():
     prompt = resolve_image_style_prompt("ghibli-handdrawn-anime")
-    assert "水彩" in prompt
-    assert "赛璐璐" in prompt
-    assert IMAGE_STYLE_LABELS["ghibli-handdrawn-anime"] == "宫崎骏气质手绘"
+    assert "watercolor" in prompt
+    assert "cel-shaded" in prompt
+    assert "Miyazaki" in IMAGE_STYLE_LABELS["ghibli-handdrawn-anime"]
 
 
 def test_style_board_prefers_backend_raster_and_skips_svg():
@@ -69,7 +69,7 @@ def test_resolve_image_style_board_url_skips_localhost(monkeypatch):
 def test_append_style_prompt_mentions_style_board():
     text = append_style_prompt("少女站在窗边", "ghibli-handdrawn-anime", has_style_board=True)
     assert STYLE_BOARD_PROMPT_HINT in text
-    assert "禁止复制该图的人物" in text
+    assert "do not copy the people" in text
     locked = build_generation_prompt(
         "黑发少女",
         asset_type="character",

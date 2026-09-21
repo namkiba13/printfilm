@@ -55,7 +55,7 @@ async def save_canvas(
             continue
         seen.add(nid)
         data = node.get("data") if isinstance(node.get("data"), dict) else {}
-        name = str(data.get("label") or data.get("name") or f"节点 {nid}")
+        name = str(data.get("label") or data.get("name") or f'Node {nid}')
         url = data.get("mediaUrl") or data.get("url") or data.get("cover")
         kind = str(data.get("kind") or "none")
         asset_type = str(

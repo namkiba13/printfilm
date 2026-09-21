@@ -90,17 +90,18 @@ def _upstream_timeout(read_sec: float, *, connect: float = 30.0) -> httpx.Timeou
 
 def reraise_upstream_timeout(exc: BaseException, *, kind: str, read_sec: float) -> NoReturn:
     """把 httpx 超时翻成可读 RuntimeError；ReadTimeout 表示已连通但等结果超时。"""
+    kind = {"生图": "Image generation", "生视频": "Video generation"}.get(kind, kind)
     if isinstance(exc, httpx.ReadTimeout):
         raise RuntimeError(
-            f"{kind}等待上游超时（ReadTimeout）：已连通 TokenFree，但 {read_sec:.0f} 秒内未返回结果，请稍后重试"
+            f'{kind} upstream request timed out (ReadTimeout): TokenFree was reached, but no result was returned within {read_sec:.0f} seconds. Please try again later'
         ) from exc
     if isinstance(exc, httpx.WriteTimeout):
         raise RuntimeError(
-            f"{kind}发送请求超时（WriteTimeout）：已连通 TokenFree，但 {read_sec:.0f} 秒内未能发完请求，请稍后重试"
+            f'{kind} upstream request timed out (WriteTimeout): TokenFree was reached, but the request could not be sent within {read_sec:.0f} seconds. Please try again later'
         ) from exc
     name = type(exc).__name__
     raise RuntimeError(
-        f"{kind}无法连接上游（{name}）：请检查网络、代理或 TokenFree 是否可达"
+        f'{kind} cannot connect to the upstream service ({name}): Check your network, proxy, or whether TokenFree is reachable'
     ) from exc
 
 
@@ -116,7 +117,7 @@ def _raise_seedream_http_error(
     if status_code == 403 and "AccountOverdueError" in snippet:
         logger.error("Seedream AccountOverdueError — upstream Ark account overdue: %s", snippet[:200])
         raise RuntimeError(
-            "上游 Seedream 账户欠费（AccountOverdueError），生图暂不可用，请联系管理员充值 TokenFree 账户"
+            'The upstream Seedream account is overdue (AccountOverdueError). Image generation is temporarily unavailable. Contact an administrator to add funds to the TokenFree account'
         )
     logger.warning(
         "出图上游失败 model=%s tokenfree=%s status=%s body=%s",
@@ -128,16 +129,12 @@ def _raise_seedream_http_error(
     if tokenfree:
         if is_tokenfree_input_text_sensitive(status_code=status_code, body=snippet):
             raise RuntimeError(
-                "生图文案未通过内容审核（可能含敏感或历史名人相关表述），"
-                "请修改提示词后重试。"
-                f" 详情：{snippet[:240]}"
+                f'The image-generation prompt did not pass content review (it may contain sensitive or historical-figure-related wording). Revise the prompt and try again. Details: {snippet[:240]}'
             )
         raise RuntimeError(tokenfree_image_user_error(model=model, status_code=status_code, body=snippet))
     if "InputTextSensitive" in snippet or "InputTextSensitiveContentDetected" in snippet:
         raise RuntimeError(
-            "生图文案未通过内容审核（可能含敏感或历史名人相关表述），"
-            "请修改提示词后重试。"
-            f" 详情：{snippet[:240]}"
+            f'The image-generation prompt did not pass content review (it may contain sensitive or historical-figure-related wording). Revise the prompt and try again. Details: {snippet[:240]}'
         )
     raise RuntimeError(f"Seedream error {status_code}: {snippet}")
 
@@ -383,28 +380,25 @@ def _format_seedance_create_error(
         idx, label = _seedance_content_slot_label(text, content_labels)
         if label:
             return (
-                f"参考图疑似真人：{label}（content[{idx}]，PrivacyInformation），"
-                "请更换该形象为动漫或插画后重试"
+                f'The reference image may contain a real person: {label} (content[{idx}], PrivacyInformation). Replace this image with an anime-style or illustrated image and try again'
             )
         if idx >= 0:
             return (
-                f"参考图疑似真人（提交内容第 {idx + 1} 项 / content[{idx}]，PrivacyInformation），"
-                "请更换对应角色/场景形象为动漫或插画后重试"
+                f'The reference image may contain a real person (item {idx + 1} in submitted content / content[{idx}], PrivacyInformation). Replace the corresponding character or scene image with an anime-style or illustrated image and try again'
             )
-        return "参考图疑似真人（PrivacyInformation），请更换角色/场景形象为动漫或插画后重试"
+        return 'The reference image may contain a real person (PrivacyInformation). Replace the character or scene image with an anime-style or illustrated image and try again'
     if "InputTextSensitive" in text or "text sensitive" in text.lower():
-        return "分镜文案未通过内容审核，请修改敏感表述后重试"
+        return 'The storyboard text did not pass content review. Revise the sensitive wording and try again'
     if "resource download failed" in text and "audio" in text.lower():
-        return "参考音频无法下载，请检查角色音色绑定后重试"
+        return 'The reference audio cannot be downloaded. Check the character voice binding and try again'
     # Seedance r2v：reference_audio 时长须 ≥ 1.8 秒
     if re.search(r"audio duration.*(?:1\.8|greater than or equal)", text, re.I) or (
         "audio duration" in text.lower() and "content[" in text.lower()
     ):
         idx, label = _seedance_content_slot_label(text, content_labels)
-        who = label or (f"提交内容第 {idx + 1} 项 / content[{idx}]" if idx >= 0 else "某条参考音频")
+        who = label or (f'Item {idx + 1} in submitted content / content[{idx}]' if idx >= 0 else 'A reference audio clip')
         return (
-            f"参考音频过短：{who}，Seedance 要求时长 ≥ 1.8 秒。"
-            "请打开对应角色/旁白，重新生成或上传更长的试听音频后再生成该分镜。"
+            f'Reference audio is too short: {who}. Seedance requires a duration of ≥ 1.8 seconds. Open the corresponding character/narration, regenerate or upload a longer preview audio clip, and then generate this storyboard shot again.'
         )
     return f"Seedance create error {status_code}: {text}"
 
@@ -469,8 +463,7 @@ class ArkGateway:
         logical_id = resolve_logical_model_id(capability, model_id)
         route = resolve_logical_model(capability, logical_id)
         if not route and not getattr(self.settings, f"model_{capability}", "") and not self.settings.ark_mock:
-            label = "图像" if capability == "image" else "视频"
-            raise RuntimeError(f"{label}模型未配置 / {capability.title()} model not configured. 请联系管理员。")
+            raise RuntimeError(f'{capability.title()} model not configured. Contact an administrator.')
         return route
 
     def _route_headers(self, route: ResolvedModelRoute | None = None) -> dict[str, str]:
@@ -737,7 +730,7 @@ class ArkGateway:
                 )
 
         if not (content or "").strip():
-            raise RuntimeError("分镜模型返回空内容，请检查文字模型渠道配置或稍后重试")
+            raise RuntimeError('The storyboard model returned empty content. Check the text model channel configuration or try again later')
 
         return self._parse_storyboard(
             content,
@@ -957,7 +950,7 @@ class ArkGateway:
             remote = self._extract_image_url(data) or extract_tokenfree_image_url(data)
         if not remote:
             logger.warning("出图响应无图片地址: %s", json.dumps(data, ensure_ascii=False)[:500])
-            raise RuntimeError("出图未返回图片地址，请稍后重试")
+            raise RuntimeError('No image URL was returned. Please try again later')
 
         dest_dir = storage.project_dir(project_id or 0)
         name = f"shot_{(shot_no or 0):03d}_{uuid.uuid4().hex[:12]}.png"
@@ -1021,7 +1014,7 @@ class ArkGateway:
             for k in (
                 "PrivacyInformation",
                 "InputImageSensitive",
-                "参考图疑似真人",
+                'Reference Image May Contain a Real Person',
                 "may contain real person",
             )
         )
@@ -1909,7 +1902,7 @@ class ArkGateway:
                 logger.warning("Ark TTS failed: %s", exc)
 
         logger.error("TTS all providers failed shot=%s", shot_no)
-        raise RuntimeError("配音失败：语音服务暂不可用，请稍后重试")
+        raise RuntimeError('Voiceover failed: The voice service is temporarily unavailable. Please try again later')
 
     def _tts_resource_id(self, speaker: str) -> str:
         if speaker.startswith("S_"):
@@ -2103,11 +2096,10 @@ class ArkGateway:
                 if public and str(public).startswith("https://"):
                     return str(public)
                 raise RuntimeError(
-                    "Seedance 需要公网可访问的图片 URL（请启用 OSS 并确保参考图已上传），"
-                    "本地 /static 图无法被方舟拉取"
+                    'Seedance requires a publicly accessible image URL (enable OSS and ensure the reference image has been uploaded). Local /static images cannot be fetched by Ark'
                 )
             if raw.startswith("data:"):
-                raise RuntimeError("Seedance 不支持 data URI 图片，请使用 Ark CDN https 链接")
+                raise RuntimeError('Seedance does not support data URI images. Use an Ark CDN https link')
         if raw.startswith("http://") or raw.startswith("https://") or raw.startswith("data:"):
             return raw
         local = storage.local_path_from_url(raw)
@@ -2199,7 +2191,7 @@ class ArkGateway:
         for i, text in enumerate(chunks, start=1):
             # Mock: invent short summary titles, do not slice narration mid-token
             topic_bit = re.sub(r"^(引入主题|核心概念解释|一个关键例子说明)[：:]?", "", text).strip()
-            title = f"要点{i}" if len(topic_bit) > 10 else (topic_bit[:8] or f"场景{i}")
+            title = f'Point {i}' if len(topic_bit) > 10 else (topic_bit[:8] or f'Scene {i}')
             if "：" in text or ":" in text:
                 title = text.split("：", 1)[0].split(":", 1)[0][-6:] or title
             subtitle = _fallback_overlay_subtitle(text)
@@ -2240,11 +2232,11 @@ class ArkGateway:
     ) -> StoryboardResult:
         raw = (content or "").strip()
         if not raw:
-            raise RuntimeError("分镜 JSON 为空，无法解析")
+            raise RuntimeError('The storyboard JSON is empty and cannot be parsed')
         try:
             data = _extract_json(raw)
         except json.JSONDecodeError as exc:
-            raise RuntimeError(f"分镜 JSON 解析失败：{exc}") from exc
+            raise RuntimeError(f'Failed to parse storyboard JSON: {exc}') from exc
         character_bible = ""
         bgm_lock = ""
         items = data
@@ -2255,9 +2247,9 @@ class ArkGateway:
             bgm_lock = str(data.get("bgm_lock") or data.get("bgm") or "").strip()
             items = data.get("shots") or data.get("storyboard") or data.get("scenes") or []
         if not isinstance(items, list):
-            raise RuntimeError("LLM storyboard JSON 格式无效：需要 shots 数组")
+            raise RuntimeError('Invalid LLM storyboard JSON format: a shots array is required')
         if not items:
-            raise RuntimeError("分镜模型未返回任何镜头（shots 为空）")
+            raise RuntimeError('The storyboard model returned no shots (the shots array is empty)')
         hi = min(duration_max, max_shot_duration)
         plans: list[ShotPlan] = []
         for i, item in enumerate(items, start=1):
@@ -2340,7 +2332,7 @@ class ArkGateway:
 
     def _mock_expand_content(self, topic: str, mode: str) -> dict[str, str]:
         short = topic[:18].rstrip("？?。.!！") or "科普短片"
-        title = short if len(short) >= 4 else f"{short}的科普"
+        title = short if len(short) >= 4 else f'{short} Short Video'
         if mode == "script":
             content = (
                 f"你有没有想过：{topic.rstrip('？?')}？\n\n"

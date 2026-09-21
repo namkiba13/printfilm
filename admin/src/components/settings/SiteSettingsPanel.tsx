@@ -19,7 +19,7 @@ export function SiteSettingsPanel() {
         ffmpeg_path: form.ffmpeg_path,
         ffprobe_path: form.ffprobe_path,
       },
-      "站点配置已保存",
+      "Site configuration saved",
     );
   }
 
@@ -34,28 +34,28 @@ export function SiteSettingsPanel() {
   return (
     <SettingsTabShell onSave={() => void handleSave()} saving={saving}>
       <SettingsStatusBar
-        title="站点工具状态"
+        title={"Site Tool Status"}
         items={[
           {
             id: "public",
-            label: "公网地址",
+            label: "Public URL",
             ready: hasPublic,
-            readyText: "已配置",
-            pendingText: "未填写",
+            readyText: "Configured",
+            pendingText: "Not entered",
           },
           {
             id: "ffmpeg",
             label: "ffmpeg",
             ready: hasFfmpeg,
-            readyText: form.ffmpeg_path || "已配置",
-            pendingText: "使用默认 PATH",
+            readyText: form.ffmpeg_path || "Configured",
+            pendingText: "Use default PATH",
           },
           {
             id: "ffprobe",
             label: "ffprobe",
             ready: hasFfprobe,
-            readyText: form.ffprobe_path || "已配置",
-            pendingText: "使用默认 PATH",
+            readyText: form.ffprobe_path || "Configured",
+            pendingText: "Use default PATH",
           },
         ]}
       />
@@ -63,13 +63,13 @@ export function SiteSettingsPanel() {
       <div className="settings-routing-grid">
         <SettingsPanel
           className="settings-panel--compact"
-          title="1. 公网地址"
-          description="支付回调、分享链接与 OSS 回填"
+          title={"1. Public URL"}
+          description={"Payment callbacks, share links, and OSS callbacks"}
         >
           <div className="settings-field-grid">
             <LabeledControl
-              label="后端公网基址"
-              hint="例：https://www.printfilm.com"
+              label={"Backend Public Base URL"}
+              hint={"Example: https://www.printfilm.com"}
               className="settings-field-span-full"
             >
               <input
@@ -80,17 +80,16 @@ export function SiteSettingsPanel() {
             </LabeledControl>
           </div>
           <p className="settings-panel-footnote">
-            数据库、Redis、SECRET_KEY 等基础设施仍通过服务器环境变量配置，不在此页修改。
-          </p>
+            {"Infrastructure such as the database, Redis, and SECRET_KEY is still configured through server environment variables and cannot be modified on this page."}</p>
         </SettingsPanel>
 
         <SettingsPanel
           className="settings-panel--compact"
-          title="2. 媒体工具"
-          description="合成与抽帧依赖本机 ffmpeg / ffprobe"
+          title={"2. Media Tools"}
+          description={"Local ffmpeg / ffprobe required for compositing and frame extraction"}
         >
           <div className="settings-field-grid">
-            <LabeledControl label="ffmpeg 路径">
+            <LabeledControl label={"ffmpeg Path"}>
               <input
                 className="settings-input"
                 placeholder="ffmpeg"
@@ -98,7 +97,7 @@ export function SiteSettingsPanel() {
                 onChange={(e) => patchField("ffmpeg_path", e.target.value)}
               />
             </LabeledControl>
-            <LabeledControl label="ffprobe 路径">
+            <LabeledControl label={"ffprobe Path"}>
               <input
                 className="settings-input"
                 placeholder="ffprobe"

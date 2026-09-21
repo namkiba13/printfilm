@@ -50,7 +50,7 @@ export function catalogImageModels(catalog: MediaModelsCatalog | null): MediaMod
 export function catalogModelLabel(
   modelId: string | undefined | null,
   models: Array<{ id: string; label: string }>,
-  fallback = '模型',
+  fallback = "Model",
 ): string {
   const id = (modelId || '').trim()
   if (!id) return fallback

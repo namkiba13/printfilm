@@ -17,10 +17,10 @@ import { pageCountOf } from '../lib/pagination'
 const PAGE_SIZE_DEFAULT = 8
 
 const STATUS_CN: Record<string, string> = {
-  queued: '生成中',
-  running: '生成中',
-  succeeded: '已完成',
-  failed: '失败',
+  queued: "Generating",
+  running: "Generating",
+  succeeded: "Completed",
+  failed: "Failed",
 }
 
 // 格式化记录时间
@@ -92,7 +92,7 @@ export default function SettingsToolRunsPanel() {
         setTotal(res.total)
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : '加载失败')
+        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to Load")
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -114,7 +114,7 @@ export default function SettingsToolRunsPanel() {
       setDetail(fresh)
       setItems((prev) => prev.map((row) => (row.id === fresh.id ? fresh : row)))
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : '加载详情失败')
+      setActionError(err instanceof Error ? err.message : "Failed to load details")
     } finally {
       setDetailLoading(false)
     }
@@ -130,7 +130,7 @@ export default function SettingsToolRunsPanel() {
       const blob = await fetchMediaBlob(abs)
       triggerBlobDownload(blob, downloadName(item, abs))
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : '下载失败')
+      setActionError(err instanceof Error ? err.message : "Download Failed")
     } finally {
       setDownloading('')
     }
@@ -140,24 +140,22 @@ export default function SettingsToolRunsPanel() {
     <section className="pf-settings-card">
       <div className="pf-settings-card-head">
         <div>
-          <h1>工具创作</h1>
-          <p className="pf-muted">文生图、图生图、视频等独立工具的生成记录</p>
+          <h1>{"Tool Creations"}</h1>
+          <p className="pf-muted">{"Generation records for standalone tools such as text-to-image, image-to-image, and video"}</p>
         </div>
         <div className="pf-settings-actions">
           <Link className="pf-btn pf-btn-lime pf-btn-sm" to="/tools">
-            去创作
-          </Link>
+            {"Create Now"}</Link>
         </div>
       </div>
-      {loading ? <p className="pf-muted">加载中…</p> : null}
+      {loading ? <p className="pf-muted">{"Loading…"}</p> : null}
       {error ? <BillingErrorNotice message={error} /> : null}
       {actionError ? <BillingErrorNotice message={actionError} /> : null}
       {!loading && !error && items.length === 0 ? (
         <div className="pf-settings-empty">
-          <p>还没有工具创作记录</p>
+          <p>{"No tool creation records yet"}</p>
           <Link className="pf-btn pf-btn-lime pf-btn-sm" to="/tools">
-            去创作
-          </Link>
+            {"Create Now"}</Link>
         </div>
       ) : null}
       {items.length > 0 ? (
@@ -197,8 +195,7 @@ export default function SettingsToolRunsPanel() {
                       onClick={() => void openDetail(item)}
                     >
                       <Eye size={14} aria-hidden />
-                      查看
-                    </button>
+                      {"View"}</button>
                     <button
                       type="button"
                       className="pf-btn pf-btn-ghost pf-btn-sm"
@@ -206,7 +203,7 @@ export default function SettingsToolRunsPanel() {
                       onClick={() => void downloadUrl(item, firstUrl)}
                     >
                       <Download size={14} aria-hidden />
-                      {downloading === resolveToolMediaUrl(firstUrl) ? '下载中…' : '下载'}
+                      {downloading === resolveToolMediaUrl(firstUrl) ? "Downloading…" : "Download"}
                     </button>
                   </span>
                 </div>
@@ -225,21 +222,20 @@ export default function SettingsToolRunsPanel() {
           setPage(1)
         }}
         onChange={setPage}
-        ariaLabel="工具创作分页"
+        ariaLabel={"Tool Creations Pagination"}
       />
 
       <Modal
         open={Boolean(detail)}
         onClose={() => setDetail(null)}
-        title={detail ? getToolDef(detail.tool_id)?.title || '创作详情' : '创作详情'}
+        title={detail ? getToolDef(detail.tool_id)?.title || "Creation Details" : "Creation Details"}
         size="lg"
         className="pf-tool-run-modal"
         footer={
           detail ? (
             <div className="pf-tool-run-foot">
               <Link className="pf-btn pf-btn-ghost pf-btn-sm" to={`/tools/${detail.tool_id}`} onClick={() => setDetail(null)}>
-                再创作
-              </Link>
+                {"Create Again"}</Link>
               {detail.urls[0] || detail.preview_url ? (
                 <button
                   type="button"
@@ -251,14 +247,13 @@ export default function SettingsToolRunsPanel() {
                   onClick={() => void downloadUrl(detail, detail.urls[0] || detail.preview_url || '')}
                 >
                   <Download size={14} aria-hidden />
-                  下载结果
-                </button>
+                  {"Download Results"}</button>
               ) : null}
             </div>
           ) : null
         }
       >
-        {detailLoading && !detail?.urls.length ? <p className="pf-muted">加载中…</p> : null}
+        {detailLoading && !detail?.urls.length ? <p className="pf-muted">{"Loading…"}</p> : null}
         {detail ? (
           <div className="pf-tool-run-detail">
             <div className="pf-tool-run-media">
@@ -268,52 +263,52 @@ export default function SettingsToolRunsPanel() {
                 ) : (
                   <img
                     src={resolveToolMediaUrl(detail.urls[0] || detail.preview_url)}
-                    alt="生成结果"
+                    alt={"Generated Result"}
                   />
                 )
               ) : (
                 <p className="pf-muted">
                   {STATUS_CN[detail.status] || detail.status}
-                  {detail.error ? ` · ${detail.error}` : ' · 结果尚未就绪'}
+                  {detail.error ? ` · ${detail.error}` : " · Result Not Ready"}
                 </p>
               )}
             </div>
             <dl className="pf-tool-run-meta">
               <div>
-                <dt>状态</dt>
+                <dt>{"Status"}</dt>
                 <dd>{STATUS_CN[detail.status] || detail.status}</dd>
               </div>
               <div>
-                <dt>时间</dt>
+                <dt>{"Time"}</dt>
                 <dd>{formatWhen(detail.created_at)}</dd>
               </div>
               {detail.prompt ? (
                 <div className="is-block">
-                  <dt>提示词</dt>
+                  <dt>{"Prompt"}</dt>
                   <dd>{detail.prompt}</dd>
                 </div>
               ) : null}
               {detail.params?.ratio ? (
                 <div>
-                  <dt>画幅</dt>
+                  <dt>{"Aspect Ratio"}</dt>
                   <dd>{detail.params.ratio}</dd>
                 </div>
               ) : null}
               {detail.params?.mode ? (
                 <div>
-                  <dt>输出类型</dt>
+                  <dt>{"Output Type"}</dt>
                   <dd>{detail.params.mode}</dd>
                 </div>
               ) : null}
               {detail.params?.pack ? (
                 <div>
-                  <dt>工具包</dt>
+                  <dt>{"Toolbox"}</dt>
                   <dd>{detail.params.pack}</dd>
                 </div>
               ) : null}
               {detail.error ? (
                 <div className="is-block">
-                  <dt>错误</dt>
+                  <dt>{"Error"}</dt>
                   <dd className="pf-error">{detail.error}</dd>
                 </div>
               ) : null}
@@ -329,7 +324,7 @@ export default function SettingsToolRunsPanel() {
                     onClick={() => void downloadUrl(detail, url)}
                   >
                     <Download size={14} aria-hidden />
-                    下载文件 {idx + 1}
+                    {"Download File"}{idx + 1}
                   </button>
                 ))}
               </div>

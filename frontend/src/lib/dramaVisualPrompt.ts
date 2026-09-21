@@ -52,10 +52,10 @@ function manjuJoinCharacterPrompt(params: Record<string, unknown>): string {
   const personality = String(params.personality || '').trim()
   const parts = [
     visual,
-    title ? `身份：${title}` : '',
-    roleType ? `定位：${roleType}` : '',
-    coreTags ? `标签：${coreTags}` : '',
-    personality ? `性格：${personality}` : '',
+    title ? `Identity: ${title}` : '',
+    roleType ? `Positioning: ${roleType}` : '',
+    coreTags ? `Tags: ${coreTags}` : '',
+    personality ? `Personality: ${personality}` : '',
   ].filter(Boolean)
   return parts.join('。')
 }
@@ -90,7 +90,7 @@ export function readVisualPrompt(asset: DramaAsset): string {
   }
 
   if (kind === 'scene' && name) {
-    return `场景：${name}，影视级写实场景，构图清晰，适合短剧拍摄`
+    return `Scene: ${name}, cinematic-realistic scene with clear composition, suitable for AI Drama filming`
   }
 
   if (stored) return stored

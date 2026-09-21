@@ -145,13 +145,13 @@ def tokenfree_image_failed_task_message(data: dict[str, Any]) -> str:
     err = data.get("error") if isinstance(data.get("error"), dict) else {}
     body = json.dumps(data, ensure_ascii=False)
     if is_tokenfree_input_text_sensitive(status_code=200, body=body):
-        return "生图文案未通过内容审核（可能含敏感或历史名人相关表述），请修改提示词后重试。"
+        return 'The image-generation prompt did not pass content review (it may contain sensitive content or references to historical figures). Please revise the prompt and try again.'
     code = str((err or {}).get("code") or "").lower()
     msg = str((err or {}).get("message") or "")
     if code in {"server_error", "internal_error"} or "task failed" in msg.lower():
-        return "出图上游任务失败，请稍后再点「生成画面」"
+        return 'The upstream image-generation task failed. Please click “Generate Scene” again later.'
     snippet = (msg or code or "failed")[:200]
-    return f"出图失败：{snippet}"
+    return f'Image generation failed: {snippet}'
 
 
 def raise_tokenfree_image_if_failed(data: dict[str, Any]) -> None:
@@ -252,15 +252,15 @@ def is_tokenfree_input_text_sensitive(*, status_code: int = 0, body: str = "") -
 def tokenfree_image_user_error(*, model: str = "", status_code: int = 0, body: str = "") -> str:
     """用户可见的 TokenFree 出图失败文案；通道挂了不再误导改模型。"""
     if is_tokenfree_rate_limit(status_code=status_code, body=body):
-        return "出图通道繁忙，同时进行的任务过多，请稍后再点「生成画面」"
+        return 'The image-generation channel is busy. Too many tasks are running simultaneously. Please click “Generate Scene” again later.'
     if tokenfree_image_channel_dead(status_code=status_code, body=body):
         # TokenFree 上已会把 Seedream 改走 gpt-image，再提示「请改用」会误导
-        return "出图通道暂时失败，请稍后再点「生成画面」"
+        return 'The image-generation channel temporarily failed. Please click “Generate Scene” again later.'
     payload = _parse_json_object(body)
     if payload and is_tokenfree_image_task_failed(payload):
         return tokenfree_image_failed_task_message(payload)
     snippet = (body or "")[:800]
-    return f"出图失败 {status_code}: {snippet}"
+    return f'Image generation failed {status_code}: {snippet}'
 
 
 def tokenfree_image_slot() -> asyncio.Semaphore:

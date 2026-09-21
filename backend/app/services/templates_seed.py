@@ -20,57 +20,39 @@ from app.services.templates_seed_huoke import HUOKE_TEMPLATES
 TEMPLATES: list[dict] = [
     {
         "id": "opensource_showcase",
-        "name": "开源项目展示",
-        "description": "按项目内容动态规划：人物操作系统界面与真实使用场景，适合开源工具与平台介绍。",
+        "name": 'Open Source Project Showcase',
+        "description": 'Dynamically planned based on project content: people operating system interfaces in real-world usage scenarios, suitable for introducing open-source tools and platforms.',
         "category": ["开源", "图文", "商业"],
         "preview_cover": "/static/templates/covers/opensource_showcase.png",
         "style_prefix": (
-            "高品质产品演示静帧：人物在真实工位前操作软件/文档站/工作台，"
-            "手部点击与屏幕界面清晰，排版克制、信息层级清楚，"
-            "材质与配色由内容决定（浅色SaaS、纸感文档、深色IDE、终端均可），"
-            "电影级产品演示质感，干净留白便于叠字，非任务清单界面"
+            'High-quality product demonstration still: a person operates software, documentation sites, or workbenches at a real workstation, with clear hand interactions and screen interfaces, restrained layout, clear information hierarchy, and materials and colors determined by the content (light SaaS, paper-like documents, dark IDE, or terminal); cinematic product-demo quality, clean negative space for overlaid text, not a task-list interface'
         ),
         "negative_prompt": (
-            "任务列表，todolist，勾选框，看板卡片堆叠，"
-            "霓虹蓝，赛博朋克蓝光，全屏蓝紫渐变，发光网格地板，科幻HUD堆叠，"
-            "卡通夸张，动漫美少女，手绘潦草，画面乱码文字，字幕水印，logo乱码，模糊，"
-            "空界面无操作者，纯抽象色块"
+            'Task lists, todo lists, checkboxes, stacked kanban cards, neon blue, cyberpunk blue glow, full-screen blue-purple gradients, glowing grid floors, layered sci-fi HUDs, exaggerated cartoon style, anime girls, sloppy hand-drawn style, garbled text in the image, subtitles or watermarks, garbled logos, blurry, empty interface with no operator, pure abstract color blocks'
         ),
         "default_ratio": "9:16",
         "shot_duration_min": 5,
         "shot_duration_max": 12,
         "llm_system_addon": (
-            "这是开源/产品展示片。先【分析】用户文案：项目类型、核心能力、典型用户与使用路径，"
-            "再规划分镜与视觉，不要套固定蓝光大屏。"
-            "【画面硬性要求】每镜必须出现「人在操作系统」："
-            "操作员坐在工位前使用电脑/笔记本/平板，点击界面、填写配置、查看看板、"
-            "演示核心流程、部署发布或阅读文档；可辅以屏幕特写，但禁止整片只有空 UI 无人。"
-            "【逐段】每镜输出 segments：visual 与 narration 交替；单段 3-12 秒，镜合计适配口播。"
-            "【视觉】色板与界面气质跟内容走（浅色后台、IDE、文档站、终端等），禁止默认霓虹蓝。"
-            "【分镜】每镜对应不同能力或操作场景，构图必须明显不同，禁止待办清单/人物剧情戏。"
-            "title=模块短名（2-8字），subtitle=能力卖点（10-22字），text=口播；"
-            "img_prompt 写清人物姿态、面前界面类型、操作动作与主色。"
+            "This is an open-source/product showcase video. First analyze the user copy: project type, core capabilities, typical users, and usage path; then plan the storyboard and visuals instead of applying a fixed blue-glowing dashboard style. [Mandatory visual requirements] Every shot must show a person operating a system: an operator seated at a workstation using a computer, laptop, or tablet, clicking interfaces, entering configuration, viewing dashboards, demonstrating core processes, deploying or releasing, or reading documentation; screen close-ups may supplement this, but the entire video must not consist only of empty UI without people. [Per segment] Each shot must output segments with alternating visual and narration; each segment lasts 3–12 seconds, and the total shot duration must match the voiceover. [Visuals] Let the color palette and interface character follow the content (light back office, IDE, documentation site, terminal, etc.); do not default to neon blue. [Storyboard] Each shot should represent a different capability or operating scenario, with clearly distinct compositions; task lists and character-driven plots are prohibited. title = short module name (2–8 characters), subtitle = capability benefit (10–22 characters), text = voiceover; img_prompt must clearly specify the person's posture, the interface type in front of them, the operating action, and the primary color."
         ),
         "seedream_config": {
             "ref_images": [],
             "strength": 0.72,
             "consistency_mode": "diverse",
             "character_prompt": (
-                "产品演示操作员：侧脸或过肩视角，坐在工位前操作笔记本电脑或双屏，"
-                "商务休闲着装，手部与屏幕为视觉重点，五官不必抢戏，全片气质统一"
+                'Product demonstration operator: profile or over-the-shoulder view, seated at a workstation operating a laptop or dual monitors, wearing business-casual attire. Hands and screens are the visual focus; facial features need not draw attention. Maintain a consistent tone throughout.'
             ),
             "extra_prompt": (
-                "主体为人操作系统界面，手部点击可读，禁止霓虹蓝赛博大屏；"
-                "顶部与底部留白便于叠大字，画面内不要出现任何文字；"
-                "本镜布局与操作动作须与其他镜头明显不同"
+                'The subject is a person operating a system interface, with clearly readable hand clicks. No neon-blue cyberpunk screens; leave blank space at the top and bottom for large text overlays; do not include any text in the image; the layout and operating action in this shot must be clearly different from those in other shots.'
             ),
         },
         "seedance_config": {
-            "motion_bias": "手部轻微点击与屏幕内容切换，缓慢推近工位",
+            "motion_bias": 'Slight hand movement and screen content changes, with a slow push toward the workstation',
             "character_consistency": False,
             "generate_audio": True,
         },
-        "audio_config": {"voice_preset": "urban_editorial", "bgm_mood": "轻快专业"},
+        "audio_config": {"voice_preset": "urban_editorial", "bgm_mood": 'Upbeat professional'},
         "subtitle_config": {
             "font": "SourceHanSans",
             "position": "split",
@@ -84,29 +66,21 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "opensource_live_work",
-        "name": "真人工作场景",
-        "description": "真人写实工位操作：侧脸/过肩操作系统，适合开源工具与产品工作流科普。",
+        "name": 'Real Work Setting',
+        "description": 'Realistic workstation operation by a person: profile or over-the-shoulder view of system operation, suitable for Short Video content about open-source tools and product workflows.',
         "category": ["开源", "真人感", "写实感"],
         "preview_cover": "/static/templates/covers/opensource_live_work.png",
         "style_prefix": (
-            "真人写实摄影，真实办公室工位，侧脸或过肩视角操作笔记本电脑/双屏，"
-            "手部点击与屏幕界面清晰，自然窗光与显示器补光，商务休闲着装，"
-            "皮肤与材质真实，非卡通非动漫，干净留白便于叠字"
+            'Realistic photography of a person working at an actual office workstation, using a laptop or dual monitors from a profile or over-the-shoulder angle, with clear hand interactions and screen interfaces, natural window light supplemented by monitor light, business-casual clothing, realistic skin and materials, non-cartoon, non-anime, clean negative space for overlaid text'
         ),
         "negative_prompt": (
-            "卡通，动漫，赛璐璐，二次元，美颜过度磨皮，CGI假人，"
-            "霓虹蓝赛博大屏，任务清单堆叠，空界面无操作者，画面文字水印，模糊"
+            'Cartoon, anime, cel shading, 2D anime style, over-smoothed beauty retouching, CGI mannequin, neon-blue cyberpunk dashboard, piles of task lists, empty interface with no operator, text or watermarks in the image, blurry'
         ),
         "default_ratio": "16:9",
         "shot_duration_min": 6,
         "shot_duration_max": 12,
         "llm_system_addon": (
-            "这是开源「真人工作场景」片。先分析项目能力与使用路径，再按内容拆多镜短镜。"
-            "【硬性】每镜必须出现真人在工位操作系统（侧脸/过肩/手部焦点，少正脸特写）。"
-            "【逐段】每镜必须输出 segments 数组：交替 visual（景别+动作+界面类型）与 narration（口播）；"
-            "单段 duration 3-12 秒，镜内合计不超过 12 秒；旁白按约 5 字/秒估时长，禁止拖腔注水。"
-            "【节拍】痛点工位→接入配置→核心工作台→流程结果→协作/部署；构图与操作动作禁止雷同。"
-            "title=模块短名，subtitle=卖点句，bgm 全片统一为轻快专业。"
+            "This is an open-source Real Work Setting video. First analyze the project's capabilities and usage path, then break it into multiple short shots based on the content. [Mandatory] Every shot must show a real person operating a system at a workstation (profile, over-the-shoulder, or hand-focused view; minimize extreme front-facing close-ups). [Per segment] Each shot must output a segments array alternating visual (shot size + action + interface type) and narration (voiceover); each segment lasts 3–12 seconds, and the total duration within a shot must not exceed 12 seconds; estimate voiceover duration at approximately 5 characters per second, with no drawn-out or padded delivery. [Pacing] Pain point at workstation → integration and configuration → core workbench → process result → collaboration or deployment; do not repeat compositions or operating actions. title = short module name, subtitle = selling point sentence, bgm = consistent light and professional music throughout."
         ),
         "seedream_config": {
             "ref_images": [],
@@ -114,20 +88,18 @@ TEMPLATES: list[dict] = [
             "photoreal": True,
             "consistency_mode": "diverse",
             "character_prompt": (
-                "写实产品演示操作员：侧脸或过肩，坐在工位前操作笔记本或双屏，"
-                "商务休闲着装，手部与屏幕为视觉重点，五官不抢戏，气质全片统一"
+                'Photorealistic product demonstration operator: profile or over-the-shoulder view, seated at a workstation operating a laptop or dual monitors, wearing business-casual attire. Hands and screens are the visual focus; facial features should not draw attention. Maintain a consistent tone throughout.'
             ),
             "extra_prompt": (
-                "真人写实工位，手部点击可读，界面类型随内容变化；"
-                "禁止正脸大特写与霓虹赛博大屏；画面内不要出现文字"
+                'Photorealistic workstation with clearly readable hand clicks; the interface type changes according to the content. No frontal close-ups or neon cyberpunk screens; do not include text in the image.'
             ),
         },
         "seedance_config": {
-            "motion_bias": "手部轻微点击与屏幕内容切换，缓慢推近工位",
+            "motion_bias": 'Slight hand movement and screen content changes, with a slow push toward the workstation',
             "character_consistency": False,
             "generate_audio": True,
         },
-        "audio_config": {"voice_preset": "urban_editorial", "bgm_mood": "轻快专业"},
+        "audio_config": {"voice_preset": "urban_editorial", "bgm_mood": 'Upbeat professional'},
         "subtitle_config": {
             "font": "SourceHanSans",
             "position": "split",
@@ -141,35 +113,33 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "live_street_interview",
-        "name": "真人街访口播",
-        "description": "街头/通勤场景的真人出镜口播感，适合观点、体验与轻访谈科普。",
+        "name": 'Live Street Interview Voiceover',
+        "description": 'A real-person on-camera voiceover style in street or commuting settings, suitable for Short Video content featuring opinions, experiences, and light interviews.',
         "category": ["真人感", "纪录片"],
         "preview_cover": "/static/templates/covers/live_street_interview.png",
         "style_prefix": (
-            "真人纪实街访摄影，自然光与轻微手持感，城市街道或通勤场景，"
-            "真实皮肤与环境噪音感克制，非棚拍浓妆，非卡通非动漫"
+            'Documentary-style street interview photography with natural light and a slight handheld feel, set on city streets or in commuting environments, with realistic skin and restrained ambient-noise character, no studio-heavy makeup, non-cartoon, non-anime'
         ),
-        "negative_prompt": "卡通，动漫，赛璐璐，二次元，棚拍浓妆，CGI假人，霓虹赛博，画面文字水印",
+        "negative_prompt": 'Cartoon, anime, cel shading, 2D anime style, heavy studio makeup, CGI mannequin, neon cyberpunk, text or watermarks in the image',
         "default_ratio": "9:16",
         "shot_duration_min": 5,
         "shot_duration_max": 12,
         "llm_system_addon": (
-            "真人街访/口播节奏。每镜输出 segments：建立环境 visual → narration 口播 → 反应/细节 visual。"
-            "人物外形全片一致；少正脸极端特写。title 短、subtitle 观点句。"
+            "Real-person street interview and voiceover pacing. Each shot outputs segments: establishing environment visual → narration voiceover → reaction or detail visual. Keep the person's appearance consistent throughout; minimize extreme front-facing close-ups. title should be short, and subtitle should be an opinion statement."
         ),
         "seedream_config": {
             "ref_images": [],
             "strength": 0.72,
             "photoreal": True,
-            "character_prompt": "真人街访主角：年龄气质、发型服装日常感固定，自然表情，全片同一人",
-            "extra_prompt": "自然光街景或通勤场景，竖屏主体清晰，顶部可留白叠字",
+            "character_prompt": 'Real-person street interview subject: keep the age, demeanor, hairstyle, clothing, and everyday appearance consistent, with natural expressions. The same person throughout.',
+            "extra_prompt": 'Natural-light street or commuting scene, with a clear vertical subject and blank space at the top for text overlays',
         },
         "seedance_config": {
-            "motion_bias": "轻微手持感，缓慢推近",
+            "motion_bias": 'Slight handheld feel, with a slow push-in',
             "character_consistency": True,
             "generate_audio": True,
         },
-        "audio_config": {"voice_preset": "warm_storyteller", "bgm_mood": "温暖人文"},
+        "audio_config": {"voice_preset": "warm_storyteller", "bgm_mood": 'Warm and humanistic'},
         "subtitle_config": {"font": "SourceHanSans", "position": "top", "caption_scale": 1.3},
         "sort_order": 3,
         "is_active": True,
@@ -177,36 +147,34 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "live_product_desk",
-        "name": "真人桌面演示",
-        "description": "桌面俯拍/斜俯写实：真人双手演示产品或笔记本流程，适合工具评测与教程。",
+        "name": 'Live-Action Desktop Demonstration',
+        "description": 'Realistic top-down/angled top-down view: real hands demonstrate a product or laptop workflow, suitable for tool reviews and tutorials.',
         "category": ["真人感", "写实感", "商业"],
         "preview_cover": "/static/templates/covers/live_product_desk.png",
         "style_prefix": (
-            "真人桌面产品演示摄影，斜俯或过肩，木质/浅色桌面，笔记本与手部清晰，"
-            "柔和棚灯或窗光，材质真实，非卡通非插画"
+            'Live-action desktop product demonstration photography, angled top-down or over-the-shoulder view, wooden/light-colored desk, laptop and hands clearly visible, soft studio lighting or window light, realistic materials, non-cartoon, non-illustration'
         ),
-        "negative_prompt": "卡通，动漫，赛璐璐，二次元，空桌无手，霓虹赛博，画面乱码文字水印",
+        "negative_prompt": 'Cartoon, anime, cel shading, 2D anime style, empty desk with no hands, neon cyberpunk, garbled text, watermark',
         "default_ratio": "16:9",
         "shot_duration_min": 5,
         "shot_duration_max": 12,
         "llm_system_addon": (
-            "桌面演示片。每镜 segments 必须含手部操作 visual + narration；"
-            "景别在全桌建立、手部特写、屏幕内容之间切换，禁止各镜雷同。"
+            'Desktop demonstration video. Each segment must include hand-operation visual + narration; switch between wide desk establishing shots, hand close-ups, and screen content. Do not repeat the same framing across shots.'
         ),
         "seedream_config": {
             "ref_images": [],
             "strength": 0.7,
             "photoreal": True,
             "consistency_mode": "diverse",
-            "character_prompt": "写实双手与小臂为主，可露侧脸；着装简洁，全片气质统一",
-            "extra_prompt": "桌面斜俯，手部与产品/屏幕清晰，画面内无文字",
+            "character_prompt": 'Realistic hands and forearms as the main focus; a partial side profile may be visible; simple clothing with a consistent tone throughout',
+            "extra_prompt": 'Oblique overhead desktop view, with hands and the product/screen clearly visible; no text in the frame',
         },
         "seedance_config": {
-            "motion_bias": "手部点击滑动，轻微推近屏幕",
+            "motion_bias": 'Hands tapping and swiping, with a slight push-in toward the screen',
             "character_consistency": False,
             "generate_audio": True,
         },
-        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": "冷静纪实"},
+        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": 'Calm documentary'},
         "subtitle_config": {
             "font": "SourceHanSans",
             "position": "split",
@@ -220,27 +188,27 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "portrait_story",
-        "name": "竖屏图文故事",
-        "description": "竖屏插画叙事，电影感构图，适合历史人文短片。",
+        "name": 'Portrait Illustrated Story',
+        "description": 'Portrait illustration narrative with cinematic composition, suitable for historical and cultural short videos.',
         "category": ["图文", "电影感", "故事"],
         "preview_cover": "/static/templates/covers/portrait_story.png",
-        "style_prefix": "统一二维概念插画，细腻光影与电影感构图，非写实摄影、非日系赛璐璐动漫，竖屏主体偏中下，顶部留白便于叠字，画面干净无文字",
-        "negative_prompt": "写实照片，真人，真实人脸，摄影棚，电影真人剧照，日系动漫赛璐璐，画面文字，字幕，水印，标题字，logo，模糊",
+        "style_prefix": 'Consistent 2D concept illustration, delicate lighting and cinematic composition, non-photorealistic, non-Japanese cel-shaded anime, portrait-oriented subject positioned slightly below center, leave blank space at the top for overlaid text, clean image with no text',
+        "negative_prompt": 'Realistic photo, real person, realistic face,',
         "default_ratio": "9:16",
         "shot_duration_min": 4,
         "shot_duration_max": 12,
-        "llm_system_addon": "按故事节拍拆镜：起承转合。每镜 title 短标题、subtitle 叠字副标题、text 为可朗读旁白。画面必须全片统一插画风与人物外形，禁止某镜突然变成真人照片或另一套动漫风。",
+        "llm_system_addon": 'Break the story into shots according to its beats: beginning, development, twist, and resolution. Each shot should have a short title, an overlaid subtitle, and text serving as readable narration. The illustration style and character appearance must remain consistent throughout; do not suddenly change any shot into a live-action photo or a different anime style.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.7,
-            "character_prompt": "故事主角外形固定：年龄感、发型发色、服装配色与辨识物全片一致，细腻插画五官，非真人照片",
-            "extra_prompt": "竖屏构图，主体偏中下，顶部约1/4留白，电影感光影，画面内无文字",
+            "character_prompt": "Fixed appearance for the story's main character: age impression, hairstyle and hair color, clothing palette, and distinctive features remain consistent throughout; delicate illustrated facial features, not a real-person photo",
+            "extra_prompt": 'Vertical composition, with the subject slightly below center, approximately 1/4 of the top left blank; cinematic lighting, no text in the frame',
         },
         "seedance_config": {
-            "motion_bias": "缓慢推近或轻拉远",
+            "motion_bias": 'Slow push-in or slight pull-out',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": "叙事氛围"},
+        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": 'Narrative atmosphere'},
         "subtitle_config": {
             "font": "SourceHanSans",
             "position": "top",
@@ -254,47 +222,39 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "anim_3d",
-        "name": "3D 动画",
-        "description": "电影级三维动画质感，圆润造型与柔和体积光，适合科普讲解与故事短片。",
+        "name": '3D animation',
+        "description": 'Cinematic 3D animation quality, rounded forms and soft volumetric lighting, suitable for Short Video explainers and story shorts.',
         "category": ["3D", "动漫", "科普"],
         "preview_cover": "/static/templates/covers/anim_3d.png",
         "style_prefix": (
-            "电影级三维动画渲染，皮克斯/梦工厂气质，圆润造型与清晰轮廓，"
-            "柔和体积光与次表面散射，干净材质与饱和配色，浅景深，"
-            "非写实摄影、非日系赛璐璐平面、非剪纸扁平"
+            'Cinematic 3D animation rendering, Pixar/DreamWorks-inspired aesthetic, rounded forms and clear contours, soft volumetric lighting and subsurface scattering, clean materials and saturated colors, shallow depth of field, non-photorealistic, non-Japanese cel-shaded flat style, non-flat paper-cutout style'
         ),
         "negative_prompt": (
-            "写实照片，真人皮肤毛孔，摄影棚实拍，日系赛璐璐，二次元平涂，"
-            "剪纸扁平，像素风，手绘潦草，血腥恐怖，水印，画面文字，字幕乱码"
+            'Realistic photo, real human skin pores, live-action studio photography, Japanese cel shading, 2D anime flat coloring, flat paper-cutout style, pixel art, rough hand-drawn style, gore and horror, watermark, text in the image, subtitles, garbled text'
         ),
         "default_ratio": "16:9",
         "shot_duration_min": 4,
         "shot_duration_max": 12,
         "llm_system_addon": (
-            "三维动画叙事节奏：建立场景→角色动作→关键演示/知识点。"
-            "【画风】全片必须统一 3D CGI 动画风与同一角色造型，禁止某镜变成真人照片或二维赛璐璐。"
-            "涉及软件/系统/科普时，优先 3D 角色在工位或场景中操作界面、演示流程。"
-            "每镜 title 短、subtitle 卖点句；img_prompt 写清三维材质、光影与角色姿态。"
+            '3D animation narrative rhythm: establish the scene → character action → key demonstration/knowledge point. [Art style] The entire video must maintain a consistent 3D CGI animation style and the same character designs; do not change any shot into a live-action photo or 2D cel-shaded animation. When software, systems, or Short Video content is involved, prioritize 3D characters operating interfaces and demonstrating workflows at a workstation or in the scene. Each shot should have a short title and a selling-point subtitle; img_prompt should clearly describe 3D materials, lighting, and character poses.'
         ),
         "seedream_config": {
             "ref_images": [],
             "strength": 0.72,
             "consistency_mode": "character",
             "character_prompt": (
-                "固定 3D 动画角色：圆润比例、简洁五官、识别度高的发型发色与服装配色，"
-                "塑料感柔和皮肤与布料材质，全片同一人物设定"
+                'Fixed 3D animated character: rounded proportions, simple facial features, distinctive hairstyle and hair color, and clothing palette; soft, plastic-like skin and fabric materials; the same character design throughout'
             ),
             "extra_prompt": (
-                "三维渲染体积光，干净材质，饱和但不刺眼，主体清晰，"
-                "画面内不要出现文字；可留白便于叠字"
+                'Three-dimensional volumetric lighting, clean materials, saturated but not harsh, clear subject, no text in the frame; leave blank space for overlay text'
             ),
         },
         "seedance_config": {
-            "motion_bias": "轻微布料与发丝飘动，缓慢推近，动画感运镜平滑",
+            "motion_bias": 'Slight movement in the fabric and hair, slow push-in, smooth animation-style camera movement',
             "character_consistency": True,
             "generate_audio": True,
         },
-        "audio_config": {"voice_preset": "warm_storyteller", "bgm_mood": "轻快专业"},
+        "audio_config": {"voice_preset": "warm_storyteller", "bgm_mood": 'Upbeat professional'},
         "subtitle_config": {
             "font": "SourceHanSans",
             "position": "bottom",
@@ -308,28 +268,28 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "live_cinematic",
-        "name": "真人电影感",
-        "description": "真人实拍电影质感，戏剧光影与浅景深，适合叙事短片。",
+        "name": 'Live-Action Cinematic',
+        "description": 'Live-action cinematic quality, dramatic lighting and shallow depth of field, suitable for narrative short videos.',
         "category": ["电影感", "真人感"],
         "preview_cover": "/static/templates/covers/live_cinematic.png",
-        "style_prefix": "真人电影感摄影，电影级打光与浅景深，胶片质感与轻微颗粒，青橙调色，写实皮肤与真实材质，宽银幕构图，非卡通非动漫",
-        "negative_prompt": "卡通，动漫，赛璐璐，二次元，扁平插画，剪纸，像素，夸张五官，塑料皮肤，水印，画面文字",
+        "style_prefix": 'Live-action cinematic photography, cinematic lighting and shallow depth of field, film texture with subtle grain, teal-and-orange color grading, realistic skin and materials, widescreen composition, non-cartoon, non-anime',
+        "negative_prompt": 'Cartoon, anime, cel shading, anime-style, flat illustration, paper cutout, pixel art, exaggerated facial features, plastic-looking skin, watermark, text in the image',
         "default_ratio": "16:9",
         "shot_duration_min": 4,
         "shot_duration_max": 12,
-        "llm_system_addon": "按真人电影分镜：建立镜头→中景→特写。全片必须同一真人写实画风与同一演员外形，禁止某镜变成卡通。",
+        "llm_system_addon": 'Follow live-action film Storyboard language: establish the scene → medium shot → close-up. The entire film must maintain the same realistic live-action style and actor appearance; no Shot may become cartoon-like.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.75,
             "photoreal": True,
-            "character_prompt": "真人演员外形固定：年龄、发型发色、面部特征、服装全片一致，写实皮肤质感",
-            "extra_prompt": "电影打光、浅景深、胶片颗粒，真实场景材质",
+            "character_prompt": 'Fixed real-person actor appearance: age, hairstyle and hair color, facial features, and clothing remain consistent throughout; realistic skin texture',
+            "extra_prompt": 'Cinematic lighting, shallow depth of field, film grain, realistic scene materials',
         },
         "seedance_config": {
-            "motion_bias": "电影感推轨或轻微横移，自然运动模糊",
+            "motion_bias": 'Cinematic tracking shot or slight lateral movement, with natural motion blur',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": "电影氛围"},
+        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": 'Cinematic atmosphere'},
         "subtitle_config": {"font": "SourceHanSans", "position": "bottom", "caption_scale": 1.3},
         "sort_order": 6,
         "is_active": True,
@@ -337,28 +297,28 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "live_person",
-        "name": "真人感叙事",
-        "description": "生活化真人出镜感，适合人物故事、口播与纪实短片。",
+        "name": 'Live-Action Narrative',
+        "description": 'A lifelike live-action presence suited to character stories, talking-head videos, and documentary Short Videos.',
         "category": ["真人感", "故事"],
         "preview_cover": "/static/templates/covers/live_person.png",
-        "style_prefix": "真人感生活摄影，自然光与柔和环境光，真实人物五官与皮肤质感，纪实构图，非棚拍浓妆，非卡通非动漫",
-        "negative_prompt": "卡通，动漫，赛璐璐，二次元，美颜过度磨皮，CGI假人，扁平插画，水印，画面文字",
+        "style_prefix": 'Lifestyle live-action photography, natural light and soft ambient light, realistic facial features and skin texture, documentary composition, no studio makeup, not cartoon or anime',
+        "negative_prompt": 'Cartoon, anime, cel shading, anime-style, excessive beauty retouching, over-smoothed skin, CGI mannequin, flat illustration, watermark, text in the image',
         "default_ratio": "9:16",
         "shot_duration_min": 3,
         "shot_duration_max": 12,
-        "llm_system_addon": "人物叙事节奏，旁白口语化。全片统一真人写实画风与同一人物外形。",
+        "llm_system_addon": 'Character-driven narrative pacing with conversational voice-over. Maintain a consistent realistic live-action style and the same character appearance throughout.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.72,
             "photoreal": True,
-            "character_prompt": "真人出镜主角：年龄气质、发型发色、服装日常感固定，自然表情，全片同一人",
-            "extra_prompt": "自然光、生活场景、竖屏主体清晰，顶部可留白叠字",
+            "character_prompt": 'Real-person protagonist on camera: age impression, demeanor, hairstyle and hair color, and everyday clothing style remain consistent; natural expressions; the same person throughout',
+            "extra_prompt": 'Natural light, everyday setting, clear vertical subject, with blank space at the top for overlay text',
         },
         "seedance_config": {
-            "motion_bias": "轻微手持感，缓慢推近",
+            "motion_bias": 'Slight handheld feel, with a slow push-in',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "warm_storyteller", "bgm_mood": "温暖人文"},
+        "audio_config": {"voice_preset": "warm_storyteller", "bgm_mood": 'Warm and humanistic'},
         "subtitle_config": {"font": "SourceHanSans", "position": "top"},
         "sort_order": 7,
         "is_active": True,
@@ -366,28 +326,28 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "photo_realism",
-        "name": "写实摄影",
-        "description": "照片级写实质感，适合产品、风光与纪实科普。",
+        "name": 'Realistic Photography',
+        "description": 'Photo-realistic quality suited to products, landscapes, and documentary Short Videos.',
         "category": ["写实感", "摄影"],
         "preview_cover": "/static/templates/covers/photo_realism.png",
-        "style_prefix": "照片级写实摄影，清晰细节与真实材质，自然色彩，高动态范围，微距或风光皆可，非卡通非插画非动漫",
-        "negative_prompt": "卡通，动漫，赛璐璐，扁平插画，油画笔触，剪纸，像素，过度HDR伪色，水印，画面文字",
+        "style_prefix": 'Photo-realistic photography, clear details and realistic materials, natural colors, high dynamic range, suitable for macro or landscape shots, not cartoon, illustration, or anime',
+        "negative_prompt": 'Cartoon, anime, cel shading, flat illustration, painterly brushstrokes, paper cutout, pixel art, excessive HDR false colors, watermark, text in the image',
         "default_ratio": "16:9",
         "shot_duration_min": 3,
         "shot_duration_max": 12,
-        "llm_system_addon": "写实镜头语言：全景建立→细节特写。若有人物须外形全片一致；可无人物纯场景。禁止卡通化。",
+        "llm_system_addon": 'Realistic camera language: wide establishing shot → detailed close-up. If people appear, their appearance must remain consistent throughout; scenes may contain no people. No cartoon styling.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.7,
             "photoreal": True,
-            "character_prompt": "若出现人物：写实五官与发型服装固定；若无人物则专注真实场景与材质",
-            "extra_prompt": "照片级细节、真实材质、自然色彩，清晰主体",
+            "character_prompt": 'If people appear: keep realistic facial features, hairstyle, and clothing consistent; if no people appear, focus on realistic scenes and materials',
+            "extra_prompt": 'Photographic detail, realistic materials, natural colors, clear subject',
         },
         "seedance_config": {
-            "motion_bias": "缓慢推近或轻微横移，真实空间感",
+            "motion_bias": 'Slow push-in or slight lateral movement, with a realistic sense of space',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": "冷静纪实"},
+        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": 'Calm documentary'},
         "subtitle_config": {"font": "SourceHanSans", "position": "bottom"},
         "sort_order": 7,
         "is_active": True,
@@ -395,27 +355,27 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "film_cinematic",
-        "name": "电影感胶片",
-        "description": "宽银幕胶片质感与戏剧光影，适合叙事短片与氛围故事。",
+        "name": 'Cinematic Film',
+        "description": 'Widescreen film texture and dramatic lighting, suited to narrative Short Videos and atmospheric stories.',
         "category": ["电影感", "胶片"],
         "preview_cover": "/static/templates/covers/film_cinematic.png",
-        "style_prefix": "电影感概念插画，宽银幕构图，胶片颗粒与轻微暗角，戏剧光影（侧光/逆光），青橙调色倾向，浅景深氛围，非写实摄影、非赛璐璐动漫",
-        "negative_prompt": "写实照片，真人，真实人脸，日系动漫，赛璐璐，扁平贴纸风，过曝，水印，画面文字，卡通简笔画",
+        "style_prefix": 'Cinematic concept illustration, widescreen composition, film grain and subtle vignetting, dramatic lighting (side light/backlight), a teal-and-orange color grading tendency, shallow-depth-of-field atmosphere, not realistic photography or cel-shaded anime',
+        "negative_prompt": 'Realistic photos, live-action people, real faces, Japanese-style anime, cel shading, flat sticker style, overexposure, watermark, text in the image, cartoon line drawings',
         "default_ratio": "16:9",
         "shot_duration_min": 4,
         "shot_duration_max": 12,
-        "llm_system_addon": "按电影分镜节奏：建立镜头→特写→反应镜头。台词克制，留白给画面。全片统一胶片插画风与角色外形。",
+        "llm_system_addon": 'Follow cinematic Storyboard pacing: establishing shot → close-up → reaction shot. Keep dialogue restrained and leave space for the visuals. Maintain a consistent film illustration style and character appearance throughout.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.72,
-            "character_prompt": "电影感插画主角，明确年龄与发型发色，服装轮廓与辨识物固定，面部细节适中非照片，全片同一人设",
-            "extra_prompt": "胶片颗粒、暗角、戏剧光影，青橙氛围，宽银幕主体明确",
+            "character_prompt": 'Cinematic illustrated protagonist, with clearly defined age, hairstyle, and hair color; clothing silhouette and distinctive features remain consistent; moderately detailed facial features, not a photo; the same character design throughout',
+            "extra_prompt": 'Film grain, vignette, dramatic lighting, teal-and-orange atmosphere, clearly defined widescreen subject',
         },
         "seedance_config": {
-            "motion_bias": "缓慢推轨或轻微横移，电影感运镜，避免抖动",
+            "motion_bias": 'Slow tracking shot or slight lateral movement, cinematic camera motion, avoid shaking',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": "电影氛围"},
+        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": 'Cinematic atmosphere'},
         "subtitle_config": {"font": "SourceHanSans", "position": "bottom"},
         "sort_order": 8,
         "is_active": True,
@@ -423,27 +383,27 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "noir_thriller",
-        "name": "黑色悬疑",
-        "description": "高对比光影与冷调氛围，适合悬疑、案件与暗夜叙事。",
+        "name": 'Noir Thriller',
+        "description": 'High-contrast lighting and a cool-toned atmosphere, suitable for suspense, crime cases, and nighttime storytelling.',
         "category": ["悬疑", "电影感"],
         "preview_cover": "/static/templates/covers/noir_thriller.png",
-        "style_prefix": "黑色电影概念插画，高对比明暗交界，冷青灰与少量暖光点缀，雨夜或室内台灯氛围，剪影与侧脸，非写实摄影",
-        "negative_prompt": "明亮粉彩，儿童绘本，日系美少女，写实照片，真人，血腥特写，水印，画面文字",
+        "style_prefix": 'Film noir concept illustration with high-contrast light and shadow, cool cyan-gray tones with subtle warm highlights, rainy-night or indoor-lamp atmosphere, silhouettes and profiles, non-photorealistic.',
+        "negative_prompt": "Bright pastels, children's picture-book style, Japanese anime girls, realistic photos, real people, gory close-ups, watermarks, text in the image.",
         "default_ratio": "16:9",
         "shot_duration_min": 4,
         "shot_duration_max": 12,
-        "llm_system_addon": "悬疑节奏：线索→反转→压迫。台词短句，画面多用阴影与构图张力。全片统一黑色电影插画风。",
+        "llm_system_addon": 'Suspenseful pacing: clues → twists → pressure. Use short dialogue lines, with shadows and compositional tension throughout. Maintain a consistent film noir illustration style across the entire film.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.72,
-            "character_prompt": "Noir 风插画角色，轮廓清晰，大衣或标志性剪影，面部少光，外形全片一致",
-            "extra_prompt": "高对比阴影、冷调、雨夜或台灯，强构图张力",
+            "character_prompt": 'Noir-style illustrated character, clear silhouette, trench coat or distinctive silhouette, face mostly in shadow, consistent appearance throughout',
+            "extra_prompt": 'High-contrast shadows, cool tones, rainy night or lamplight, strong compositional tension',
         },
         "seedance_config": {
-            "motion_bias": "极慢推近，烟雾或雨丝轻微飘动",
+            "motion_bias": 'Extremely slow push-in, with smoke or rain streaks drifting slightly',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": "悬疑低沉"},
+        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": 'Dark suspense'},
         "subtitle_config": {"font": "SourceHanSans", "position": "bottom"},
         "sort_order": 9,
         "is_active": True,
@@ -451,48 +411,37 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "vox_papercut",
-        "name": "Vox剪纸科普",
-        "description": "低饱和扁平剪纸，以人物操作电脑/系统界面为主画面，适合硬核科普与产品讲解。",
+        "name": 'Vox Papercut Short Video',
+        "description": 'Low-saturation flat papercut style, with people operating computers or system interfaces as the main subject, suitable for in-depth Short Video content and product tutorials.',
         "category": ["科普", "剪纸"],
         "preview_cover": "/static/templates/covers/vox_papercut.png",
         "style_prefix": (
-            "Vox剪纸扁平插画，层叠剪纸边缘，低饱和，干净剪影，科普解说片气质；"
-            "画面以人物操作电脑或业务系统为主：工位前操作、手指点击界面、多屏监控、"
-            "配置参数、流程演示，屏幕与手部动作清晰，信息图表为辅"
+            'Vox flat papercut illustration, layered papercut edges, low saturation, clean silhouettes, an educational explainer-video feel; scenes focus on people operating computers or business systems: working at desks, clicking interfaces, multi-screen monitoring, configuring parameters, demonstrating workflows, with screens and hand movements clearly visible and infographics as supporting elements.'
         ),
         "negative_prompt": (
-            "写实照片，真人照片级皮肤，三维写实渲染，日系动漫，模糊，噪点，水印，"
-            "画面乱码文字，空镜风景无人物无界面，纯抽象色块无操作场景"
+            'Realistic photos, photorealistic human skin, 3D photorealistic rendering, Japanese anime, blur, noise, watermarks, garbled text in the image, empty landscape shots with no people or interfaces, purely abstract color blocks with no operational scene.'
         ),
         "default_ratio": "16:9",
         "shot_duration_min": 4,
         "shot_duration_max": 15,
         "llm_system_addon": (
-            "按科普讲解节奏拆镜，台词口语化、信息密度适中。"
-            "【画面硬性要求】每镜必须出现「人在操作系统」："
-            "剪纸人物坐在工位/控制台前操作电脑或平板，点击鼠标键盘、切换菜单、"
-            "查看仪表盘、填写表单、对比前后状态、演示关键流程等；"
-            "可辅以屏幕特写或架构示意图，但禁止整片只有空概念图、无操作者。"
-            "title/subtitle 概括本镜知识点；img_prompt 写清人物姿态、面前屏幕内容类型与操作动作。"
-            "全片同一剪纸画风与同一操作员外形。"
+            'Break shots according to the Short Video explanation rhythm, with conversational dialogue and moderate information density. [Mandatory visual requirements] Every shot must show "a person operating a system": a papercut character seated at a workstation or control console, operating a computer or tablet, clicking a mouse or keyboard, switching menus, checking dashboards, filling out forms, comparing before-and-after states, demonstrating key workflows, and so on. Screen close-ups or architecture diagrams may be added, but the entire film must not consist only of empty conceptual images without an operator. title/subtitle should summarize the key knowledge point of the shot; img_prompt must clearly specify the person\'s posture, the type of content on the screen in front of them, and the operating action. Maintain the same papercut style and the same operator appearance throughout the film.'
         ),
         "seedream_config": {
             "ref_images": [],
             "strength": 0.7,
             "character_prompt": (
-                "固定剪纸操作员：简洁人形剪影、低细节面部、工装或休闲色块服装固定，"
-                "常坐工位前操作笔记本电脑或双屏控制台，发型与配色全片一致"
+                'Fixed paper-cutout operator: simple human silhouette, low-detail face, consistent workwear or casual color-block clothing; usually seated at a workstation operating a laptop or dual-screen console; hairstyle and color palette remain consistent throughout'
             ),
             "extra_prompt": (
-                "主体为人操作电脑/系统界面，屏幕区块与点击手势可读，"
-                "层叠纸片边缘清晰，低饱和，单镜一个视觉焦点，避免写实皮肤"
+                'The subject is operating a computer/system interface; screen sections and clicking gestures should be readable, layered paper edges clearly defined, low saturation, one visual focal point per shot, avoid realistic skin'
             ),
         },
         "seedance_config": {
-            "motion_bias": "手部轻微点击与光标移动感，屏幕内容轻切换，缓慢推近工位",
+            "motion_bias": 'Slight hand clicks and cursor movement, subtle screen content transitions, slow push-in toward the workstation',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": "好奇纪录片"},
+        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": 'Curious documentary'},
         "subtitle_config": {"font": "SourceHanSans", "position": "bottom"},
         "sort_order": 10,
         "is_active": True,
@@ -500,27 +449,27 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "docu_warm",
-        "name": "温暖纪实",
-        "description": "纪实插画气质与暖色调，适合人物故事与人文纪录短片。",
+        "name": 'Warm Documentary',
+        "description": 'Documentary-style illustration with warm colors, ideal for personal stories and human-interest shorts.',
         "category": ["纪录片", "电影感"],
         "preview_cover": "/static/templates/covers/docu_warm.png",
-        "style_prefix": "温暖纪实概念插画，自然光感，柔和暖棕与米白，生活场景细节，纪录片构图，非写实照片、非动漫赛璐璐",
-        "negative_prompt": "赛博霓虹，日系美少女，血腥，夸张卡通，写实照片，真人，水印，画面文字",
+        "style_prefix": 'Warm documentary concept illustration, natural lighting, soft warm browns and off-white, everyday details, documentary composition; not photorealistic or anime cel shading',
+        "negative_prompt": 'Cyber neon, anime girls, gore, exaggerated cartoons, photorealistic images, live action, watermarks, text in the image',
         "default_ratio": "16:9",
         "shot_duration_min": 4,
         "shot_duration_max": 14,
-        "llm_system_addon": "人文纪录节奏：观察→细节→情感落点。旁白平和真诚。全片统一温暖纪实插画风与人物外形。",
+        "llm_system_addon": 'Human-interest documentary pacing: observation, details, then an emotional conclusion. Use calm, sincere narration. Keep the warm documentary illustration style and character appearance consistent throughout.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.68,
-            "character_prompt": "纪实插画人物，生活化发型服装，亲切五官，年龄感明确，全片同一人设",
-            "extra_prompt": "暖色自然光，生活场景，纪录片式构图，柔和颗粒",
+            "character_prompt": 'Documentary-style illustrated character, everyday hairstyle and clothing, approachable facial features, clearly defined age impression, the same character design throughout',
+            "extra_prompt": 'Warm natural light, everyday setting, documentary-style composition, soft grain',
         },
         "seedance_config": {
-            "motion_bias": "手持感极轻晃动或缓慢横移，纪实运镜",
+            "motion_bias": 'Very slight handheld shake or slow lateral pan, documentary-style camera movement',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "warm_storyteller", "bgm_mood": "温暖人文"},
+        "audio_config": {"voice_preset": "warm_storyteller", "bgm_mood": 'Warm and humanistic'},
         "subtitle_config": {"font": "SourceHanSans", "position": "bottom"},
         "sort_order": 12,
         "is_active": True,
@@ -528,27 +477,27 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "kids_flat",
-        "name": "儿童绘本扁平",
-        "description": "柔和配色与圆润造型，适合儿童科普与故事。",
+        "name": "Flat Children's Picture Book",
+        "description": "Soft colors and rounded shapes for children's educational videos and stories.",
         "category": ["儿童", "绘本"],
         "preview_cover": "/static/templates/covers/kids_flat.png",
-        "style_prefix": "儿童绘本扁平插画，柔和粉彩，圆润造型，友好角色，简洁背景",
-        "negative_prompt": "恐怖，阴暗，写实照片，复杂纹理，血腥",
+        "style_prefix": "Flat children's picture-book illustration, soft pastels, rounded shapes, friendly characters, simple backgrounds",
+        "negative_prompt": 'Horror, dark, photorealistic, complex textures, gore',
         "default_ratio": "16:9",
         "shot_duration_min": 3,
         "shot_duration_max": 12,
-        "llm_system_addon": "用孩子听得懂的短句，每镜突出一个可爱视觉元素，节奏轻快。",
+        "llm_system_addon": 'Use short sentences children can understand, highlight one cute visual element per shot, and keep the pace lively.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.65,
-            "character_prompt": "圆润可爱卡通角色，大眼睛简化五官，柔和配色服装，友好表情，全片同一角色外形",
-            "extra_prompt": "粉彩柔光，背景简洁，造型圆润，适合儿童观看",
+            "character_prompt": 'Rounded, cute cartoon character with large eyes and simplified features, softly colored clothing, a friendly expression, and a consistent appearance throughout',
+            "extra_prompt": 'Pastel soft lighting, simple background, rounded design, suitable for children',
         },
         "seedance_config": {
-            "motion_bias": "轻微弹跳感，柔和镜头漂移",
+            "motion_bias": 'Slight bouncing feel, gentle camera drift',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "warm_storyteller", "bgm_mood": "俏皮轻快"},
+        "audio_config": {"voice_preset": "warm_storyteller", "bgm_mood": 'Playful and upbeat'},
         "subtitle_config": {"font": "RoundedSans", "position": "bottom"},
         "sort_order": 20,
         "is_active": True,
@@ -556,27 +505,27 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "soft_anime",
-        "name": "柔光动漫",
-        "description": "日系柔光赛璐璐，适合青春故事与情感短片。",
+        "name": 'Soft-Light Anime',
+        "description": 'Japanese soft-light cel-shading, suitable for coming-of-age stories and emotional short films.',
         "category": ["动漫", "故事"],
         "preview_cover": "/static/templates/covers/soft_anime.png",
-        "style_prefix": "日系柔光赛璐璐动漫，干净线稿，柔和渐变天空，大眼睛精致五官，统一角色设定，非写实摄影、非水墨、非剪纸",
-        "negative_prompt": "写实照片，真人，真实人脸，水墨，剪纸，像素风，血腥恐怖，水印，画面文字，三头身Q版混用",
+        "style_prefix": 'Japanese soft-light cel-shaded anime, clean line art, softly gradient skies, large eyes and refined facial features, consistent character designs, non-photorealistic, non-ink-wash, non-paper-cut',
+        "negative_prompt": 'Photorealistic, live-action people, real faces, ink wash, paper cutout, pixel art, bloody horror, watermark, text in the image, mixed three-head chibi proportions',
         "default_ratio": "16:9",
         "shot_duration_min": 3,
         "shot_duration_max": 12,
-        "llm_system_addon": "青春动漫叙事：情绪镜+对话镜交替。全片必须同一赛璐璐画风与角色外形，禁止某镜变真人。",
+        "llm_system_addon": 'Coming-of-age anime narrative: alternate emotional shots with dialogue shots. The entire film must maintain the same cel-shaded style and character appearances; no shot may switch to live action.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.7,
-            "character_prompt": "日系动漫主角，发型发色瞳色固定，校服或常服配色固定，赛璐璐五官，全片同一人设",
-            "extra_prompt": "柔光、干净线稿、柔和天空，统一赛璐璐上色",
+            "character_prompt": 'Japanese anime protagonist with fixed hairstyle, hair color, and eye color; fixed color palette for school or casual clothes; cel-shaded features and a consistent character design throughout',
+            "extra_prompt": 'Soft lighting, clean linework, gentle skies, consistent cel shading',
         },
         "seedance_config": {
-            "motion_bias": "轻微发丝与衣袂飘动，缓慢推近",
+            "motion_bias": 'Slight hair and clothing flutter, slow push-in',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "warm_storyteller", "bgm_mood": "青春轻音乐"},
+        "audio_config": {"voice_preset": "warm_storyteller", "bgm_mood": 'Youthful light music'},
         "subtitle_config": {"font": "SourceHanSans", "position": "bottom"},
         "sort_order": 22,
         "is_active": True,
@@ -584,37 +533,33 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "chalk_whiteboard",
-        "name": "粉笔白板手绘",
-        "description": "黑板粉笔讲解风，突出人物操作系统/画流程图的课堂演示。",
+        "name": 'Chalk-and-Whiteboard Hand-Drawn',
+        "description": 'Blackboard chalk explanation style, highlighting classroom demonstrations of people operating systems and drawing flowcharts.',
         "category": ["科普", "手绘"],
         "preview_cover": "/static/templates/covers/chalk_whiteboard.png",
         "style_prefix": (
-            "黑板粉笔与白板手绘讲解风，粉笔笔触，示意图箭头；"
-            "画面常含简笔人物在白板或电脑前操作系统、画流程、指点界面"
+            'Blackboard chalk and whiteboard hand-drawn explanation style, chalk strokes, diagram arrows; scenes often include simple characters operating systems in front of whiteboards or computers, drawing processes, and pointing at interfaces'
         ),
-        "negative_prompt": "写实照片，光滑三维，杂乱界面，空教室无人物",
+        "negative_prompt": 'Photorealistic, smooth 3D, cluttered interfaces, empty classroom with no people',
         "default_ratio": "16:9",
         "shot_duration_min": 4,
         "shot_duration_max": 15,
         "llm_system_addon": (
-            "偏讲解结构：定义→例子→对比。"
-            "每镜尽量出现简笔人物操作系统或在白板上演示系统流程"
-            "（指点屏幕、画模块箭头、对比操作前后），避免只有抽象符号没有操作者。"
+            'Explanatory structure: definition → example → comparison. Whenever possible, show simple characters operating systems or demonstrating system processes on a whiteboard in every shot (pointing at screens, drawing module arrows, comparing before and after operations); avoid showing only abstract symbols without an operator.'
         ),
         "seedream_config": {
             "ref_images": [],
             "strength": 0.6,
             "character_prompt": (
-                "粉笔简笔讲解者/操作员，线条简洁特征固定，"
-                "常站在白板前或坐在电脑前指点界面"
+                'Chalk stick-figure explainer/operator with simple, consistent features, usually standing in front of a whiteboard or sitting at a computer while pointing at the interface'
             ),
-            "extra_prompt": "黑板/白板底，人物操作系统或画流程图，箭头清晰，教学感构图",
+            "extra_prompt": 'Blackboard/whiteboard background, character operating a system or drawing a flowchart, clear arrows, instructional composition',
         },
         "seedance_config": {
-            "motion_bias": "手部指点与线条逐步显现，镜头基本固定或轻推",
+            "motion_bias": 'Hands pointing and lines gradually appearing, camera mostly static or with a slight push-in',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "teacher_clear", "bgm_mood": "专注氛围"},
+        "audio_config": {"voice_preset": "teacher_clear", "bgm_mood": 'Focused atmosphere'},
         "subtitle_config": {"font": "SourceHanSans", "position": "bottom"},
         "sort_order": 30,
         "is_active": True,
@@ -622,27 +567,27 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "cyber_neon",
-        "name": "赛博霓虹",
-        "description": "霓虹夜城与未来感，适合科技、都市与科幻话题。",
+        "name": 'Cyber Neon',
+        "description": 'Neon night city and a futuristic feel, suitable for technology, urban, and science-fiction topics.',
         "category": ["科幻", "赛博"],
         "preview_cover": "/static/templates/covers/cyber_neon.png",
-        "style_prefix": "赛博朋克概念插画，霓虹粉青对比，雨夜反光街道，未来都市剪影，高对比夜景，非写实摄影、非儿童绘本",
-        "negative_prompt": "日光沙滩，田园水彩，儿童粉彩，写实照片，真人，水墨留白，水印，画面文字",
+        "style_prefix": "Cyberpunk concept illustration, neon pink-and-cyan contrast, rain-soaked reflective streets, futuristic city silhouettes, high-contrast night scenes, non-photorealistic, non-children's picture-book style",
+        "negative_prompt": "Sunny beaches, pastoral watercolor, children's pastels, photorealistic, live-action people, blank-space ink wash, watermark, text in the image",
         "default_ratio": "16:9",
         "shot_duration_min": 3,
         "shot_duration_max": 12,
-        "llm_system_addon": "科技/都市节奏偏快，每镜一个强视觉符号（霓虹、屏幕、雨夜）。全片统一赛博插画风。",
+        "llm_system_addon": 'Fast-paced technology and urban rhythm, with one strong visual symbol per shot (neon, screens, rain at night). Maintain a consistent cyberpunk illustration style throughout.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.72,
-            "character_prompt": "赛博风插画角色，外套剪裁与发色固定，霓虹边缘光，面部非照片，全片同一人设",
-            "extra_prompt": "霓虹粉青、雨夜反光、未来都市，强对比夜景",
+            "character_prompt": 'Cyberpunk illustration character with a fixed jacket cut and hair color, neon rim lighting, non-photorealistic face, and a consistent character design throughout',
+            "extra_prompt": 'Neon pink and cyan, rainy-night reflections, futuristic city, high-contrast night scene',
         },
         "seedance_config": {
-            "motion_bias": "霓虹闪烁，雨丝下落，缓慢穿梭运镜",
+            "motion_bias": 'Flickering neon, falling rain, slow tracking camera movement',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "urban_editorial", "bgm_mood": "赛博电子"},
+        "audio_config": {"voice_preset": "urban_editorial", "bgm_mood": 'Cyber electronic'},
         "subtitle_config": {"font": "DisplaySans", "position": "bottom"},
         "sort_order": 35,
         "is_active": True,
@@ -650,27 +595,27 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "epic_fantasy",
-        "name": "奇幻史诗",
-        "description": "宏大场景与奇幻光影，适合神话、冒险与世界观短片。",
+        "name": 'Epic Fantasy',
+        "description": 'Grand settings and fantastical lighting, ideal for mythological, adventure, and world-building short videos.',
         "category": ["奇幻", "电影感"],
         "preview_cover": "/static/templates/covers/epic_fantasy.png",
-        "style_prefix": "奇幻史诗概念插画，宏大远景与英雄中景，暮光与神性光束，岩石城堡与云海，戏剧构图，非写实摄影、非现代都市",
-        "negative_prompt": "现代城市，手机界面，写实照片，真人，儿童简笔画，赛博霓虹，水印，画面文字",
+        "style_prefix": 'Epic fantasy concept illustration, grand wide shots and heroic medium shots, twilight and divine light rays, rocky castles and seas of clouds, dramatic composition, non-photorealistic, no modern cities',
+        "negative_prompt": "Modern cities, phone interfaces, realistic photos, real people, children's simple drawings, cyberpunk neon, watermarks",
         "default_ratio": "16:9",
         "shot_duration_min": 4,
         "shot_duration_max": 14,
-        "llm_system_addon": "史诗叙事：远景建立世界观→人物登场→冲突高潮。台词可略庄重。全片统一奇幻插画风。",
+        "llm_system_addon": 'Epic storytelling: establish the world with a wide shot → introduce the characters → build to the conflict climax. Dialogue can be somewhat solemn. Maintain a consistent fantasy illustration style throughout.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.72,
-            "character_prompt": "奇幻主角外形固定：盔甲或斗篷轮廓、发色、武器辨识物全片一致，插画五官非照片",
-            "extra_prompt": "宏大场景、暮光神性光束、戏剧构图，史诗氛围",
+            "character_prompt": 'Fixed fantasy protagonist design: consistent armor or cloak silhouette, hair color, and distinctive weapon throughout; illustrated, non-photorealistic features',
+            "extra_prompt": 'Grand scenery, divine twilight beams, dramatic composition, epic atmosphere',
         },
         "seedance_config": {
-            "motion_bias": "缓慢升降镜头，云雾与旗帜飘动",
+            "motion_bias": 'Slow camera rise and descent, drifting clouds and flags',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": "史诗管弦"},
+        "audio_config": {"voice_preset": "narrator_calm", "bgm_mood": 'Epic orchestral'},
         "subtitle_config": {"font": "SourceHanSans", "position": "bottom"},
         "sort_order": 38,
         "is_active": True,
@@ -678,27 +623,27 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "magazine_collage",
-        "name": "杂志拼贴",
-        "description": "剪报拼贴与印刷纹理，适合文化话题与品牌故事。",
+        "name": 'Magazine Collage',
+        "description": 'Newspaper clipping collage and print textures, ideal for cultural topics and brand stories.',
         "category": ["商业", "拼贴"],
         "preview_cover": "/static/templates/covers/magazine_collage.png",
-        "style_prefix": "杂志纸质拼贴，撕边，网纹印刷质感，层叠剪贴，大胆平面构图",
-        "negative_prompt": "纯净矢量，写实皮肤，脏污发灰的色彩",
+        "style_prefix": 'Magazine paper collage, torn edges, halftone print texture, layered cutouts, bold flat composition',
+        "negative_prompt": 'Clean vector art, realistic skin, dirty and grayish colors',
         "default_ratio": "9:16",
         "shot_duration_min": 4,
         "shot_duration_max": 12,
-        "llm_system_addon": "视觉冲击优先，每镜一个强构图，文案短而有力。",
+        "llm_system_addon": 'Prioritize visual impact, with one strong composition per shot and short, powerful copy.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.75,
-            "character_prompt": "杂志剪贴人像剪影或印刷半调人物，外形与配色全片统一",
-            "extra_prompt": "撕边纸质、网纹印刷、大胆色块，竖屏强构图",
+            "character_prompt": 'Magazine cutout portrait silhouette or printed halftone figure, with a consistent appearance and color palette throughout',
+            "extra_prompt": 'Torn-edge paper texture, halftone printing, bold color blocks, strong vertical composition',
         },
         "seedance_config": {
-            "motion_bias": "图层轻微滑动旋转，纸张沙沙感",
+            "motion_bias": 'Layers sliding and rotating slightly, paper-rustling feel',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "urban_editorial", "bgm_mood": "时髦轻电子"},
+        "audio_config": {"voice_preset": "urban_editorial", "bgm_mood": 'Stylish light electronica'},
         "subtitle_config": {"font": "DisplaySans", "position": "center"},
         "sort_order": 40,
         "is_active": True,
@@ -706,27 +651,27 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "brand_clean",
-        "name": "极简品牌",
-        "description": "干净色块与强留白，适合产品解说与品牌短片。",
+        "name": 'Clean Minimalist Brand',
+        "description": 'Clean color blocks and generous negative space, ideal for product explainers and brand short videos.',
         "category": ["商业", "极简"],
         "preview_cover": "/static/templates/covers/brand_clean.png",
-        "style_prefix": "极简品牌概念插画，大面积留白，有限色板（黑白+一强调色），几何构图，干净产品感，非写实摄影、非杂乱拼贴",
-        "negative_prompt": "杂乱纹理，霓虹赛博，血腥，儿童粉彩堆砌，写实照片，真人，水印，画面乱文字",
+        "style_prefix": 'Minimalist brand concept illustration, expansive negative space, limited color palette (black and white + one accent color), geometric composition, clean product aesthetic, non-photorealistic, no cluttered collage',
+        "negative_prompt": "Cluttered textures, cyberpunk neon, gore, piled-up children's pastels, realistic photos, real people, watermarks, chaotic text in the image",
         "default_ratio": "9:16",
         "shot_duration_min": 3,
         "shot_duration_max": 10,
-        "llm_system_addon": "商业短句：卖点→场景→收束。每镜一个视觉焦点。全片统一极简品牌插画风。",
+        "llm_system_addon": 'Commercial copy: selling point → scenario → conclusion. One visual focal point per shot. Maintain a consistent minimalist brand illustration style throughout.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.68,
-            "character_prompt": "极简几何化人物或手部剪影，配色固定，低细节面部，全片外形一致",
-            "extra_prompt": "大留白、有限色板、几何构图，竖屏品牌感",
+            "character_prompt": 'Minimalist geometric figure or hand silhouette with a fixed color palette, low-detail face, and consistent appearance throughout',
+            "extra_prompt": 'Ample negative space, limited color palette, geometric composition, vertical brand aesthetic',
         },
         "seedance_config": {
-            "motion_bias": "色块轻移，极慢推近，干净无抖动",
+            "motion_bias": 'Color blocks shifting slightly, extremely slow push-in, clean and steady',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "urban_editorial", "bgm_mood": "极简电子"},
+        "audio_config": {"voice_preset": "urban_editorial", "bgm_mood": 'Minimalist electronica'},
         "subtitle_config": {"font": "DisplaySans", "position": "center"},
         "sort_order": 42,
         "is_active": True,
@@ -734,30 +679,29 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "pixel_retro",
-        "name": "像素复古科普",
-        "description": "8-bit/16-bit 像素风，适合科技史与游戏化讲解。",
+        "name": 'Pixel Retro Short Video',
+        "description": '8-bit/16-bit pixel art, ideal for technology history and gamified explanations.',
         "category": ["复古", "像素"],
         "preview_cover": "/static/templates/covers/pixel_retro.png",
-        "style_prefix": "复古像素画，16位有限色板，清晰像素块，简单游戏场景，无抗锯齿",
-        "negative_prompt": "平滑渐变，写实照片，模糊像素",
+        "style_prefix": 'Retro pixel art, 16-bit limited color palette, crisp pixel blocks, simple game scenes, no anti-aliasing',
+        "negative_prompt": 'Smooth gradients, realistic photos, blurry pixels',
         "default_ratio": "16:9",
         "shot_duration_min": 3,
         "shot_duration_max": 12,
         "llm_system_addon": (
-            "节奏偏游戏关卡感，信息点做成可辨识像素图标。"
-            "涉及软件/系统/工具时，优先像素小人坐在电脑前操作系统、点击菜单、通关式演示流程。"
+            'Game-level pacing, with key information presented as recognizable pixel icons. When software, systems, or tools are involved, prioritize pixel characters sitting at computers, operating systems, clicking menus, and demonstrating processes like clearing game stages.'
         ),
         "seedream_config": {
             "ref_images": [],
             "strength": 0.7,
-            "character_prompt": "16位像素小人操作员，坐在电脑前，有限色板，外形与调色全片不变",
-            "extra_prompt": "像素小人操作系统界面，清晰像素块，无抗锯齿，游戏关卡式场景",
+            "character_prompt": '16-bit pixel operator sitting at a computer, limited color palette, with unchanged appearance and color grading throughout',
+            "extra_prompt": 'Pixel character operating a system interface, crisp pixel blocks, no antialiasing, video game level-style scene',
         },
         "seedance_config": {
-            "motion_bias": "逐帧点击与屏幕切换，轻微视差滚动",
+            "motion_bias": 'Frame-by-frame clicking and screen transitions, slight parallax scrolling',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "retro_host", "bgm_mood": "8位好奇"},
+        "audio_config": {"voice_preset": "retro_host", "bgm_mood": '8-bit curiosity'},
         "subtitle_config": {"font": "PixelFont", "position": "bottom"},
         "sort_order": 50,
         "is_active": True,
@@ -765,27 +709,27 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "retro_vhs",
-        "name": "复古 VHS",
-        "description": "磁带录像与扫描线质感，适合怀旧故事与年代感内容。",
+        "name": 'Retro VHS',
+        "description": 'Tape recording and scanline textures, suitable for nostalgic stories and period-themed content.',
         "category": ["复古", "电影感"],
         "preview_cover": "/static/templates/covers/retro_vhs.png",
-        "style_prefix": "复古 VHS 概念插画，轻微色差与扫描线暗示，1980–90s 色调，圆角电视框感构图，怀旧氛围，非写实照片、非现代超清UI",
-        "negative_prompt": "超清现代广告，赛博霓虹堆砌，写实照片，真人，儿童粉彩，水印，画面乱码文字",
+        "style_prefix": 'Retro VHS concept illustration, with subtle color fringing and scanline effects, 1980–90s color tones, rounded TV-frame composition, nostalgic atmosphere, non-photorealistic, not a modern ultra-HD UI',
+        "negative_prompt": 'Ultra-HD modern advertising, excessive cyberpunk neon, photorealistic photos, real people, children',
         "default_ratio": "16:9",
         "shot_duration_min": 3,
         "shot_duration_max": 12,
-        "llm_system_addon": "怀旧叙事，旁白可带年代感。全片统一 VHS 插画质感与角色外形。",
+        "llm_system_addon": 'Nostalgic storytelling, with narration that may evoke the period. Maintain a consistent VHS illustration texture and character appearance throughout.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.7,
-            "character_prompt": "怀旧风插画人物，年代感发型服装固定，轻微色差边缘，非照片，全片同一人设",
-            "extra_prompt": "扫描线暗示、轻微色差、80/90年代色调，怀旧构图",
+            "character_prompt": 'Nostalgic illustration character with a fixed period hairstyle and clothing, slight chromatic aberration at the edges, non-photorealistic, and a consistent character design throughout',
+            "extra_prompt": 'Scanline hints, slight chromatic aberration, 1980s/1990s color tones, nostalgic composition',
         },
         "seedance_config": {
-            "motion_bias": "轻微磁带抖动感，慢推，色差微闪",
+            "motion_bias": 'Slight VHS jitter, slow push-in, subtle chromatic flicker',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "retro_host", "bgm_mood": "怀旧合成器"},
+        "audio_config": {"voice_preset": "retro_host", "bgm_mood": 'Nostalgic synthesizer'},
         "subtitle_config": {"font": "SourceHanSans", "position": "bottom"},
         "sort_order": 52,
         "is_active": True,
@@ -793,27 +737,27 @@ TEMPLATES: list[dict] = [
     },
     {
         "id": "ink_guofeng",
-        "name": "水墨国风",
-        "description": "水墨留白与写意笔触，适合历史与文化短故事。",
+        "name": 'Ink Wash Chinese Style',
+        "description": 'Ink wash negative space and freehand brushstrokes, suitable for short historical and cultural stories.',
         "category": ["国风", "水墨"],
         "preview_cover": "/static/templates/covers/ink_guofeng.png",
-        "style_prefix": "中国水墨写意插画，富有表现力的笔触，大量留白，诗意氛围，淡雅墨色，非写实摄影",
-        "negative_prompt": "写实照片，真人，真实人脸，霓虹，赛博朋克，日系动漫，欧美卡通，画面文字，字幕，水印",
+        "style_prefix": 'Chinese ink wash freehand illustration, expressive brushstrokes, abundant negative space, poetic atmosphere, elegant ink tones, non-photorealistic',
+        "negative_prompt": 'Photorealistic photos, real people, realistic faces, neon, cyberpunk, Japanese anime, Western cartoons, text in the image, subtitles, watermarks',
         "default_ratio": "9:16",
         "shot_duration_min": 4,
         "shot_duration_max": 12,
-        "llm_system_addon": "叙事偏意境与转折，台词可略文言白话混用，留白节奏。适合竖屏图文：每镜短标题+诗意副标题叠字，并写可朗读的旁白。",
+        "llm_system_addon": 'Narrative focused on atmosphere and turning points, with dialogue that may blend classical and modern vernacular Chinese styles, and a rhythm built around negative space. Suitable for vertical text-and-image content: add a short title and poetic subtitle overlay to each shot, along with readable narration.',
         "seedream_config": {
             "ref_images": [],
             "strength": 0.7,
-            "character_prompt": "水墨写意人物，简笔眉眼，宽袍或古装轮廓固定，墨色淡雅，全片同一人设",
-            "extra_prompt": "大量留白，淡墨渲染，诗意意境，竖屏顶部可叠字",
+            "character_prompt": 'Ink-wash freehand figure with simple brows and eyes, a fixed loose-robe or traditional-costume silhouette, elegant light ink tones, and a consistent character design throughout',
+            "extra_prompt": 'Ample negative space, light ink washes, poetic mood, room for text overlay at the top of the vertical frame',
         },
         "seedance_config": {
-            "motion_bias": "墨晕渗开与消散，缓慢升降镜头，薄雾飘动",
+            "motion_bias": 'Ink wash spreading and fading, slow camera rise and descent, drifting mist',
             "character_consistency": True,
         },
-        "audio_config": {"voice_preset": "guqin_narrator", "bgm_mood": "古筝氛围"},
+        "audio_config": {"voice_preset": "guqin_narrator", "bgm_mood": 'Guzheng ambience'},
         "subtitle_config": {"font": "KaiTi", "position": "top"},
         "sort_order": 60,
         "is_active": True,

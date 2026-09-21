@@ -9,7 +9,7 @@ type Props = {
 }
 
 // 渲染图片放大层
-export function DramaImageLightbox({ src, alt = '预览', onClose }: Props) {
+export function DramaImageLightbox({ src, alt = "Preview", onClose }: Props) {
   useEffect(() => {
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -31,10 +31,10 @@ export function DramaImageLightbox({ src, alt = '预览', onClose }: Props) {
       className="drama-lightbox-backdrop"
       role="dialog"
       aria-modal="true"
-      aria-label="图片预览"
+      aria-label={"Image Preview"}
       onClick={onClose}
     >
-      <button type="button" className="drama-lightbox-close" aria-label="关闭" onClick={onClose}>
+      <button type="button" className="drama-lightbox-close" aria-label={"Close"} onClick={onClose}>
         ×
       </button>
       <img

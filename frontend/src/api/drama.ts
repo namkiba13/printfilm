@@ -59,7 +59,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }))
-    throwApiError(res.status, err.detail, '请求失败')
+    throwApiError(res.status, err.detail, "Request Failed")
   }
   return res.json()
 }
@@ -353,7 +353,7 @@ export const dramaApi = {
           : Array.isArray(detail)
             ? detail.map((d: { msg?: string }) => d.msg || JSON.stringify(d)).join('; ')
             : res.statusText
-      throw new Error(message || '上传失败')
+      throw new Error(message || "Upload Failed")
     }
     return res.json() as Promise<DramaAsset>
   },

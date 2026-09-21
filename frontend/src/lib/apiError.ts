@@ -1,7 +1,7 @@
 import { notifyBillingErrorIfNeeded } from './billingError'
 
 /** 解析 FastAPI detail 并抛出；402 / 余额不足时弹出充值引导 */
-export function throwApiError(status: number, detail: unknown, fallback = '请求失败'): never {
+export function throwApiError(status: number, detail: unknown, fallback = "Request Failed"): never {
   const message =
     typeof detail === 'string'
       ? detail

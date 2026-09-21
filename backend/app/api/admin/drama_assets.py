@@ -164,7 +164,7 @@ async def get_drama_asset(
         )
     ).first()
     if not row:
-        raise HTTPException(status_code=404, detail="漫剧资产不存在")
+        raise HTTPException(status_code=404, detail='AI Drama asset does not exist')
     asset, project, email = row
     base = _asset_to_out(
         asset,

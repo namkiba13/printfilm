@@ -11,7 +11,7 @@ export default function TemplatesPage() {
   const nav = useNavigate()
   const [templates, setTemplates] = useState<Template[]>([])
   const [error, setError] = useState('')
-  const [category, setCategory] = useState('全部')
+  const [category, setCategory] = useState("All")
   const [q, setQ] = useState('')
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function TemplatesPage() {
         if (CATEGORY_ORDER.includes(c)) found.add(c)
       }
     }
-    return ['全部', ...CATEGORY_ORDER.filter((c) => found.has(c))]
+    return ["All", ...CATEGORY_ORDER.filter((c) => found.has(c))]
   }, [templates])
 
   const categoryLabels = categoryKeys.map((k) => HOME_CATEGORY_LABELS[k] || k)
@@ -40,7 +40,7 @@ export default function TemplatesPage() {
 
   const filtered = useMemo(() => {
     let list = templates
-    if (category !== '全部') list = list.filter((t) => (t.category || []).includes(category))
+    if (category !== "All") list = list.filter((t) => (t.category || []).includes(category))
     if (q.trim()) {
       const s = q.trim().toLowerCase()
       list = list.filter(
@@ -62,22 +62,22 @@ export default function TemplatesPage() {
     <AppShell active="templates">
       <div className="pf-section-head">
         <div>
-          <h2>模板库</h2>
-          <p>为科普与知识短片挑选画面语言</p>
+          <h2>{"Template Library"}</h2>
+          <p>{"Choose a visual language for Short Videos and knowledge shorts"}</p>
         </div>
       </div>
       <div className="pf-search" style={{ maxWidth: 420, marginBottom: '1rem' }}>
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="搜索模板名称或描述"
+          placeholder={"Search template names or descriptions"}
         />
       </div>
       <PillTabs
         items={categoryLabels}
         value={HOME_CATEGORY_LABELS[category] || category}
-        onChange={(label) => setCategory(labelToKey.get(label) || '全部')}
-        ariaLabel="模板分类"
+        onChange={(label) => setCategory(labelToKey.get(label) || "All")}
+        ariaLabel={"Template Categories"}
       />
       {error ? <BillingErrorNotice message={error} /> : null}
       <div className="pf-template-grid" style={{ marginTop: '1rem' }}>
@@ -89,14 +89,14 @@ export default function TemplatesPage() {
               <p>{t.description}</p>
               <div className="pf-tags">
                 {t.category.map((c) => (
-                  <span key={c}>{c}</span>
+                  <span key={c}>{HOME_CATEGORY_LABELS[c] || c}</span>
                 ))}
               </div>
             </div>
           </button>
         ))}
       </div>
-      {filtered.length === 0 ? <p className="pf-muted">没有匹配的模板。</p> : null}
+      {filtered.length === 0 ? <p className="pf-muted">{"No matching templates."}</p> : null}
     </AppShell>
   )
 }

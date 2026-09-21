@@ -17,6 +17,7 @@ tests
 scripts/*
 !scripts/__init__.py
 !scripts/create_admin.py
+!scripts/localize_templates.py
 *.md
 .git
 .gitignore

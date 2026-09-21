@@ -28,7 +28,7 @@ async def execute_task_run(task_id: int) -> None:
         if handler is None:
             task.status = "failed"
             task.error_code = "handler_missing"
-            task.error_message = f"未注册任务处理器: {task.domain}/{task.task_type}"
+            task.error_message = f'Unregistered task handler: {task.domain}/{task.task_type}'
             task.finished_at = datetime.now(UTC)
             # 未进入预扣，保持 none
             task.billing_status = "none"
@@ -65,7 +65,7 @@ async def execute_task_run(task_id: int) -> None:
                 task,
                 step,
                 error_code=type(exc).__name__,
-                message=format_exception_message(exc, fallback="预扣失败", limit=500),
+                message=format_exception_message(exc, fallback='Reserve failed', limit=500),
             )
             return
 
@@ -81,7 +81,7 @@ async def execute_task_run(task_id: int) -> None:
             event_type="task.started",
             status=task.status,
             phase=task.current_step_key,
-            message="任务开始执行",
+            message='Task execution started',
         )
         await db.commit()
 
@@ -145,7 +145,7 @@ async def _complete_task(db, task, result: dict) -> None:
         event_type="task.completed" if task.status == "succeeded" else "task.cancelled",
         status=task.status,
         phase=task.current_step_key,
-        message="任务执行完成" if task.status == "succeeded" else "任务已取消",
+        message='Task execution completed' if task.status == "succeeded" else 'Task cancelled',
         payload=result,
     )
     try:
@@ -193,7 +193,7 @@ async def _fail_task(db, task, exc: Exception) -> None:
     set_task_step_state(task, step, status="failed", now=now)
     task.status = "failed"
     task.error_code = type(exc).__name__
-    task.error_message = format_exception_message(exc, fallback="任务执行失败", limit=500)
+    task.error_message = format_exception_message(exc, fallback='Task execution failed', limit=500)
     task.finished_at = now
     await append_task_event(
         db,
@@ -278,7 +278,7 @@ async def _mark_cancelled(db, task) -> None:
         event_type="task.cancelled",
         status=task.status,
         phase=task.current_step_key,
-        message="任务已取消",
+        message='Task cancelled',
     )
     try:
         await settle_task(db, task.id)
@@ -319,6 +319,6 @@ async def _requeue_interrupted_task(db, task) -> None:
         event_type="task.requeued",
         status=task.status,
         phase=task.current_step_key,
-        message="任务被中断，已重新排队",
+        message='Task interrupted and requeued',
     )
     await db.commit()

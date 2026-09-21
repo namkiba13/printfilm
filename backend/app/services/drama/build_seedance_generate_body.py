@@ -359,7 +359,7 @@ def describe_seedance_content_slots(
         asset = asset_by_id.get(image.asset_id) or {}
         kind = str(asset.get("type") or "").lower()
         kind_zh = _KIND_ZH.get(kind, "参考图")
-        name = str(asset.get("name") or "").strip() or f"资产#{image.asset_id}"
+        name = str(asset.get("name") or "").strip() or f'Asset#{image.asset_id}'
         labels.append(f"{kind_zh}「{name}」")
     board = (style_board_url or "").strip() if catalog.images else ""
     if board:
@@ -368,7 +368,7 @@ def describe_seedance_content_slots(
         asset = asset_by_id.get(audio.asset_id) or {}
         kind = str(asset.get("type") or "").lower()
         kind_zh = _KIND_ZH.get(kind, "音色")
-        name = str(asset.get("name") or "").strip() or f"资产#{audio.asset_id}"
+        name = str(asset.get("name") or "").strip() or f'Asset#{audio.asset_id}'
         labels.append(f"{kind_zh}音色「{name}」")
     if (continuity_first_frame_url or "").strip():
         labels.append("上一镜尾帧")

@@ -92,7 +92,7 @@ export function useAgentSkillSelection(): UseAgentSkillSelectionResult {
         return next
       })
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : '上传失败')
+      setUploadError(err instanceof Error ? err.message : "Upload Failed")
     } finally {
       setUploading(false)
     }

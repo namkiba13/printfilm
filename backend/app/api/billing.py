@@ -131,7 +131,7 @@ async def create_order(
     await billing.close_expired_pending_orders(db, user_id=user.id)
     sku = billing.sku_by_id(body.sku_id)
     if not sku:
-        raise HTTPException(status_code=400, detail="未知充值包")
+        raise HTTPException(status_code=400, detail='Unknown top-up package')
     out_trade_no = f"PF{int(time.time())}{user.id:04d}{uuid.uuid4().hex[:8]}"
     order = Order(
         out_trade_no=out_trade_no,
@@ -250,7 +250,7 @@ async def billing_alert_ack(
 
     ok = await acknowledge_user_alert(db, user.id, alert_id)
     if not ok:
-        raise HTTPException(status_code=404, detail="告警不存在")
+        raise HTTPException(status_code=404, detail='Alert does not exist')
     await db.commit()
     return {"ok": True}
 
@@ -282,15 +282,15 @@ async def usage_events(
     items = []
     for ev, kepu_title, drama_title in rows:
         if drama_title:
-            context = f"漫剧 · {drama_title}"
+            context = f'AI Drama · {drama_title}'
         elif kepu_title:
-            context = f"科普 · {kepu_title}"
+            context = f'Short Video · {kepu_title}'
         elif ev.project_id:
-            context = f"科普 · 项目 #{ev.project_id}"
+            context = f'Short Video · Project #{ev.project_id}'
         elif ev.drama_project_id:
-            context = f"漫剧 · 项目 #{ev.drama_project_id}"
+            context = f'AI Drama · Project #{ev.drama_project_id}'
         else:
-            context = "工具创作"
+            context = 'Tool Creations'
         charge_fen = int(ev.charge_fen or 0)
         items.append(
             {
@@ -357,7 +357,7 @@ async def get_order(
     result = await db.execute(select(Order).where(Order.out_trade_no == out_trade_no))
     order = result.scalar_one_or_none()
     if not order or order.user_id != user.id:
-        raise HTTPException(status_code=404, detail="订单不存在")
+        raise HTTPException(status_code=404, detail='Order does not exist')
     return {
         "out_trade_no": order.out_trade_no,
         "status": order.status,
@@ -378,13 +378,13 @@ async def close_order(
     result = await db.execute(select(Order).where(Order.out_trade_no == out_trade_no))
     order = result.scalar_one_or_none()
     if not order or order.user_id != user.id:
-        raise HTTPException(status_code=404, detail="订单不存在")
+        raise HTTPException(status_code=404, detail='Order does not exist')
     if order.status == "paid":
-        raise HTTPException(status_code=400, detail="已支付订单无法关闭")
+        raise HTTPException(status_code=400, detail='Paid orders cannot be closed')
     if order.status == "closed":
         return {"out_trade_no": order.out_trade_no, "status": "closed"}
     if order.status != "pending":
-        raise HTTPException(status_code=400, detail="当前状态不可关闭")
+        raise HTTPException(status_code=400, detail='Current status cannot be closed')
     order.status = "closed"
     await db.commit()
     return {"out_trade_no": order.out_trade_no, "status": "closed"}

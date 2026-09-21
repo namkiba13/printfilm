@@ -146,18 +146,18 @@ def _format_neighbor_episode_briefs(episodes: list[dict[str, Any]], number: int,
     others.sort(key=lambda x: abs(int(x.get("episodeNumber") or 0) - number))
     picked = others[:limit]
     if not picked:
-        return "（暂无邻集）"
+        return '(No adjacent episodes available)'
     blocks: list[str] = []
     for item in sorted(picked, key=lambda x: int(x.get("episodeNumber") or 0)):
         num = item.get("episodeNumber")
-        title = item.get("title") or f"第 {num} 集"
+        title = item.get("title") or f'Episode {num}'
         creative = str(item.get("creative") or "").strip()
         summary = str(item.get("summary") or "").strip()
-        parts = [f"第 {num} 集《{title}》"]
+        parts = [f'Episode {num} "{title}"']
         if creative:
-            parts.append(f"创意：{creative[:400]}")
+            parts.append(f'Idea: {creative[:400]}')
         if summary:
-            parts.append(f"摘要：{summary[:500]}")
+            parts.append(f'Summary: {summary[:500]}')
         blocks.append("\n".join(parts))
     return "\n\n".join(blocks)
 
@@ -178,14 +178,14 @@ def _format_neighbor_episode_bodies(
     others.sort(key=lambda x: abs(int(x.get("episodeNumber") or 0) - number))
     picked = others[:limit]
     if not picked:
-        return "（暂无邻集正文）"
+        return '(No adjacent episode content available)'
     blocks: list[str] = []
     for item in sorted(picked, key=lambda x: int(x.get("episodeNumber") or 0)):
         num = item.get("episodeNumber")
-        title = item.get("title") or f"第 {num} 集"
+        title = item.get("title") or f'Episode {num}'
         body = str(item.get("body") or item.get("content") or "").strip()
         if len(body) > 1800:
-            body = body[:1800] + "\n…（上文已截断）"
+            body = body[:1800] + '\n…(Content above truncated)'
         blocks.append(f"{num}.{title}：\n{body}")
     return "\n\n".join(blocks)
 
@@ -198,9 +198,9 @@ def format_character_asset_names_line(names: list[str] | None) -> str:
         if name and name not in cleaned:
             cleaned.append(name)
     if not cleaned:
-        return "（暂无定妆角色资产；新角色须在出场人物行写清全名）"
+        return '(No finalized character assets available; new characters must have their full names clearly specified in the cast list.)'
     joined = "、".join(cleaned[:80])
-    return f"须优先使用这些定妆名：{joined}；新角色须在出场人物行写清全名"
+    return f"Prioritize using these established character names: {joined}; write each new character's full name in the cast list"
 
 
 def build_single_episode_context(
@@ -235,7 +235,7 @@ async def run_episode_summary_from_creative(
     """本集创意 → 集级 summary（可更新 title）。"""
     brief = (creative or "").strip()
     if len(brief) < 20:
-        raise ValueError("本集原始创意至少 20 字")
+        raise ValueError('The original idea for this episode must be at least 20 characters')
     title_text = (title or "").strip() or f"第 {number} 集"
     user_parts = [
         *build_single_episode_context(
@@ -257,11 +257,11 @@ async def run_episode_summary_from_creative(
     )
     episodes = data.get("episodes") if isinstance(data, dict) else None
     if not isinstance(episodes, list) or not episodes:
-        raise ValueError("模型未返回本集摘要")
+        raise ValueError('The model did not return a summary for this episode')
     item = episodes[0] if isinstance(episodes[0], dict) else {}
     out_summary = str(item.get("summary") or item.get("synopsis") or "").strip()
     if len(out_summary) < 40:
-        raise ValueError("本集摘要过短，请重试")
+        raise ValueError('The episode summary is too short. Please try again')
     out_title = str(item.get("title") or "").strip() or title_text
     return [
         {
@@ -289,7 +289,7 @@ async def run_episode_body_from_brief(
     brief = (creative or "").strip()
     syn = (summary or "").strip()
     if len(brief) < 10 and len(syn) < 40:
-        raise ValueError("请先填写本集创意或摘要")
+        raise ValueError('Please enter the idea or summary for this episode first')
     title_text = (title or "").strip() or f"第 {number} 集"
     user_parts = [
         *build_single_episode_context(
@@ -312,11 +312,11 @@ async def run_episode_body_from_brief(
     )
     episodes = data.get("episodes") if isinstance(data, dict) else None
     if not isinstance(episodes, list):
-        raise ValueError("模型未返回本集正文")
+        raise ValueError('The model did not return the body of this episode')
     title_by_num = {number: title_text}
     normalized = _normalize_batch_episodes(episodes, number, number, title_by_num)
     if not normalized:
-        raise ValueError(f"模型未返回第 {number} 集正文")
+        raise ValueError(f'The model did not return the body for Episode {number}')
     row = normalized[0]
     row["creative"] = brief or str(row.get("creative") or "")
     row["summary"] = syn or str(row.get("summary") or "")
@@ -393,7 +393,7 @@ async def run_episode_brief_from_body(
     """已有拍摄正文 → 反推本集 creative + summary（不改 body）。"""
     script_body = (body or "").strip()
     if len(script_body) < 80:
-        raise ValueError("本集剧本内容过短，无法反推创意与摘要")
+        raise ValueError('The episode script is too short to infer the idea and summary')
     title_text = (title or "").strip() or f"第 {number} 集"
     user_parts = [
         *build_single_episode_context(
@@ -415,14 +415,14 @@ async def run_episode_brief_from_body(
     )
     episodes = data.get("episodes") if isinstance(data, dict) else None
     if not isinstance(episodes, list) or not episodes:
-        raise ValueError("模型未返回本集创意与摘要")
+        raise ValueError('The model did not return the episode idea and summary')
     item = episodes[0] if isinstance(episodes[0], dict) else {}
     out_creative = str(item.get("creative") or "").strip()
     out_summary = str(item.get("summary") or item.get("synopsis") or "").strip()
     if len(out_creative) < 20:
-        raise ValueError("反推的本集创意过短，请重试")
+        raise ValueError('The inferred episode idea is too short. Please try again')
     if len(out_summary) < 40:
-        raise ValueError("反推的本集摘要过短，请重试")
+        raise ValueError('The inferred episode summary is too short. Please try again')
     out_title = str(item.get("title") or "").strip() or title_text
     return [
         {
@@ -443,7 +443,7 @@ async def run_script_summary(
     # Build structured outline from creative brief
     trimmed = (creative or "").strip()
     if len(trimmed) < 10:
-        raise ValueError("原始创意至少需要 10 个字")
+        raise ValueError('The original idea must be at least 10 characters')
 
     user_message = build_script_summary_user_message(
         trimmed,
@@ -500,7 +500,7 @@ def merge_episode_bodies(
         body = str(item.get("body") or item.get("content") or "")
         creative = str(item.get("creative") or "").strip()
         summary = str(item.get("summary") or item.get("synopsis") or "").strip()
-        title = str(item.get("title") or "").strip() or f"第 {number} 集"
+        title = str(item.get("title") or "").strip() or f'Episode {number}'
         prev = by_number.get(number)
         if prev:
             prev_body = str(prev.get("body") or "")
@@ -590,7 +590,7 @@ def append_manual_episode(
     if next_number < 1:
         next_number = 1
     if next_number > MAX_DRAMA_EPISODES:
-        raise ValueError(f"最多 {MAX_DRAMA_EPISODES} 集")
+        raise ValueError(f'Up to {MAX_DRAMA_EPISODES} episodes')
     title_text = (title or "").strip() or f"第 {next_number} 集"
     added = {
         "episodeNumber": next_number,
@@ -664,23 +664,21 @@ def pick_auto_project_title(
 def format_summary_text(summary: dict[str, Any]) -> str:
     # Human-readable outline for UI / LLM context
     lines = [
-        f"剧名：{summary.get('seriesTitle', '')}",
-        f"集数：{summary.get('episodeCount', '')}",
-        f"类型：{summary.get('storyType', '')}",
-        f"受众：{summary.get('targetAudience', '')}",
-        f"钩子：{summary.get('coreHook', '')}",
-        f"一句话：{summary.get('oneLineStory', '')}",
+        f"Series title: {summary.get('seriesTitle', '')}",
+        f"Episode count: {summary.get('episodeCount', '')}",
+        f"Genre: {summary.get('storyType', '')}",
+        f"Target audience: {summary.get('targetAudience', '')}",
+        f"Hook: {summary.get('coreHook', '')}",
+        f"One-liner: {summary.get('oneLineStory', '')}",
         "",
-        "人物：",
+        'Characters:',
     ]
     for c in summary.get("characters") or []:
         if isinstance(c, dict):
             lines.append(
-                f"- {c.get('name', '')}（{c.get('roleType', '')}/{c.get('title', '')}）："
-                f"{c.get('visualImage', '')}；标签：{c.get('coreTags', '')}；"
-                f"弧光：{c.get('growthArc', '')}"
+                f"- {c.get('name', '')} ({c.get('roleType', '')}/{c.get('title', '')}): {c.get('visualImage', '')}; Tags: {c.get('coreTags', '')}; Arc: {c.get('growthArc', '')}"
             )
-    lines.extend(["", "梗概：", str(summary.get("synopsis") or "")])
+    lines.extend(["", 'Synopsis:', str(summary.get("synopsis") or "")])
     return "\n".join(lines)
 
 
@@ -688,9 +686,9 @@ def _format_episode_title_list(episodes: list[dict[str, Any]]) -> str:
     rows: list[str] = []
     for item in sorted(episodes, key=lambda x: int(x.get("episodeNumber") or 0)):
         num = item.get("episodeNumber")
-        title = item.get("title") or f"第 {num} 集"
-        rows.append(f"第 {num} 集：{title}")
-    return "\n".join(rows) if rows else "（暂无分集规划）"
+        title = item.get("title") or f'Episode {num}'
+        rows.append(f'Episode {num}: {title}')
+    return "\n".join(rows) if rows else '(No episode plan available)'
 
 
 def _format_existing_episode_content(episodes: list[dict[str, Any]], limit: int = 3) -> str:
@@ -702,16 +700,16 @@ def _format_existing_episode_content(episodes: list[dict[str, Any]], limit: int 
     ]
     completed.sort(key=lambda x: int(x.get("episodeNumber") or 0))
     if not completed:
-        return "（暂无，本批次从开篇写起）"
+        return '(None available; start from the opening for this batch)'
     tail = completed[-limit:]
     blocks: list[str] = []
     for item in tail:
         num = item.get("episodeNumber")
-        title = item.get("title") or f"第 {num} 集"
+        title = item.get("title") or f'Episode {num}'
         body = str(item.get("body") or item.get("content") or "").strip()
         # 过长时截断尾部摘要，避免挤占当前集生成空间
         if len(body) > 1800:
-            body = body[:1800] + "\n…（上文已截断）"
+            body = body[:1800] + '\n…(Content above truncated)'
         blocks.append(f"{num}.{title}：\n{body}")
     return "\n\n".join(blocks)
 
@@ -763,7 +761,7 @@ async def run_episode_outline(
     data = await drama_chat_json(EPISODE_OUTLINE_SYSTEM, user, max_tokens=4096)
     episodes = data.get("episodes") if isinstance(data, dict) else data
     if not isinstance(episodes, list) or not episodes:
-        raise ValueError("分集大纲返回格式无效")
+        raise ValueError('Invalid episode outline response format')
     result: list[dict[str, Any]] = []
     for i, item in enumerate(episodes):
         if not isinstance(item, dict):
@@ -772,14 +770,14 @@ async def run_episode_outline(
             number = int(item.get("episodeNumber") or (i + 1))
         except (TypeError, ValueError):
             number = i + 1
-        title = str(item.get("title") or "").strip() or f"第 {number} 集"
+        title = str(item.get("title") or "").strip() or f'Episode {number}'
         result.append({"episodeNumber": number, "title": title, "body": ""})
     if len(result) < episode_count:
         # 补齐缺失集号
         have = {int(x["episodeNumber"]) for x in result}
         for n in range(1, episode_count + 1):
             if n not in have:
-                result.append({"episodeNumber": n, "title": f"第 {n} 集", "body": ""})
+                result.append({"episodeNumber": n, "title": f'Episode {n}', "body": ""})
     result.sort(key=lambda x: int(x["episodeNumber"]))
     return result[:episode_count]
 
@@ -856,7 +854,7 @@ async def run_episode_script_batch(
 
     episodes = data.get("episodes") if isinstance(data, dict) else data
     if not isinstance(episodes, list):
-        raise ValueError("分集剧本返回格式无效")
+        raise ValueError('Invalid episode script response format')
 
     normalized = _normalize_batch_episodes(episodes, start, end, title_by_num)
     # 正文过短则带强调提示重试一次
@@ -883,7 +881,7 @@ async def run_episode_script_batch(
             normalized = _normalize_batch_episodes(retry_eps, start, end, title_by_num)
 
     if not normalized:
-        raise ValueError(f"模型未返回第 {start}–{end} 集正文")
+        raise ValueError(f'The model did not return the body for Episodes {start}–{end}')
     return normalized
 
 
@@ -899,9 +897,9 @@ async def run_episode_script_from_draft(
     number = int(episode_number)
     draft_text = (draft or "").strip()
     if number < 1:
-        raise ValueError("集号无效")
+        raise ValueError('Invalid episode number')
     if len(draft_text) < 20:
-        raise ValueError("请先输入至少 20 字的分集剧本草稿")
+        raise ValueError('Please enter an episode script draft of at least 20 characters first')
 
     title_by_num = {
         int(item.get("episodeNumber") or 0): str(item.get("title") or "")
@@ -935,7 +933,7 @@ async def run_episode_script_from_draft(
     )
     episodes = data.get("episodes") if isinstance(data, dict) else data
     if not isinstance(episodes, list):
-        raise ValueError("分集剧本返回格式无效")
+        raise ValueError('Invalid episode script response format')
     normalized = _normalize_batch_episodes(episodes, number, number, title_by_num)
     too_short = [
         item
@@ -961,7 +959,7 @@ async def run_episode_script_from_draft(
         if isinstance(retry_eps, list):
             normalized = _normalize_batch_episodes(retry_eps, number, number, title_by_num)
     if not normalized:
-        raise ValueError(f"模型未返回第 {number} 集正文")
+        raise ValueError(f'The model did not return the body for Episode {number}')
     origin_item = next(
         (
             item
@@ -1000,7 +998,7 @@ def _normalize_batch_episodes(
         title = (
             str(item.get("title") or "").strip()
             or title_by_num.get(number_i)
-            or f"第 {number_i} 集"
+            or f'Episode {number_i}'
         )
         row: dict[str, Any] = {
             "episodeNumber": number_i,

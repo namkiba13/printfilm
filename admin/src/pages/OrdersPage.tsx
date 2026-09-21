@@ -34,7 +34,7 @@ function ledgerRefLink(row: AdminLedger) {
   if (row.ref_type === "order" && row.ref_id) {
     const id = Number(row.ref_id);
     if (Number.isFinite(id) && id > 0) {
-      return <AdminEntityLink kind="order" id={id} label={`订单#${id}`} />;
+      return <AdminEntityLink kind="order" id={id} label={`Order#${id}`} />;
     }
     return (
       <Link
@@ -86,7 +86,7 @@ export function OrdersPage() {
       if (orderUserId) params.set("user_id", String(orderUserId));
       setOrders(await api<OrderRes>(`/api/admin/orders?${params}`));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "加载订单失败");
+      toast.error(err instanceof Error ? err.message : "Failed to load orders");
     }
   }
 
@@ -97,7 +97,7 @@ export function OrdersPage() {
       if (ledgerUserId) params.set("user_id", String(ledgerUserId));
       setLedger(await api<LedgerRes>(`/api/admin/ledger?${params}`));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "加载流水失败");
+      toast.error(err instanceof Error ? err.message : "Failed to load ledger");
     }
   }
 
@@ -119,7 +119,7 @@ export function OrdersPage() {
       if (usageDateTo) params.set("created_to", `${usageDateTo}T23:59:59`);
       setUsage(await api<AdminUsageEventListRes>(`/api/admin/usage-events?${params}`));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "加载用量失败");
+      toast.error(err instanceof Error ? err.message : "Failed to load usage");
     }
   }
 
@@ -180,28 +180,28 @@ export function OrdersPage() {
   async function copyText(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success("已复制");
+      toast.success("Copied");
     } catch {
-      toast.error("复制失败");
+      toast.error("Copy failed");
     }
   }
 
   return (
     <div className="admin-list-page">
-      <PageHeader description="查看充值单、钱包流水与 AI 用量明细" />
+      <PageHeader description={"View recharge orders, wallet ledger, and AI usage details"} />
       <Tabs value={tab} onValueChange={onTabChange}>
         <TabsList>
-          <TabsTrigger value="orders">充值订单</TabsTrigger>
-          <TabsTrigger value="ledger">钱包流水</TabsTrigger>
-          <TabsTrigger value="usage">用量明细</TabsTrigger>
+          <TabsTrigger value="orders">{"Recharge orders"}</TabsTrigger>
+          <TabsTrigger value="ledger">{"Wallet Ledger"}</TabsTrigger>
+          <TabsTrigger value="usage">{"Usage Details"}</TabsTrigger>
         </TabsList>
         <TabsContent value="orders" className="space-y-4">
           <AdminFilterBar>
             <Select value={orderStatus} onChange={(e) => setOrderStatus(e.target.value)}>
-              <option value="">全部状态</option>
-              <option value="pending">待支付</option>
-              <option value="paid">已支付</option>
-              <option value="closed">已关闭</option>
+              <option value="">{"All Statuses"}</option>
+              <option value="pending">{"Pending Payment"}</option>
+              <option value="paid">{"Paid"}</option>
+              <option value="closed">{"Disabled"}</option>
             </Select>
             <AdminUserSearchSelect value={orderUserId} onChange={(id) => setOrderUserId(id)} />
             <Button
@@ -213,24 +213,23 @@ export function OrdersPage() {
                 void loadOrders(1);
               }}
             >
-              筛选
-            </Button>
+              {"Filter"}</Button>
           </AdminFilterBar>
           <div className="rounded-lg border bg-background">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>ID</TableHead>
-                  <TableHead>商户单号</TableHead>
-                  <TableHead>用户</TableHead>
+                  <TableHead>{"Merchant order number"}</TableHead>
+                  <TableHead>{"User"}</TableHead>
                   <TableHead>SKU</TableHead>
-                  <TableHead>金额</TableHead>
-                  <TableHead>入账</TableHead>
-                  <TableHead>支付</TableHead>
-                  <TableHead>状态</TableHead>
-                  <TableHead>渠道单号</TableHead>
-                  <TableHead>支付时间</TableHead>
-                  <TableHead>创建时间</TableHead>
+                  <TableHead>{"Amount"}</TableHead>
+                  <TableHead>{"Credited"}</TableHead>
+                  <TableHead>{"Payment"}</TableHead>
+                  <TableHead>{"Status"}</TableHead>
+                  <TableHead>{"Channel order number"}</TableHead>
+                  <TableHead>{"Payment Time"}</TableHead>
+                  <TableHead>{"Created at"}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -281,14 +280,14 @@ export function OrdersPage() {
         <TabsContent value="ledger" className="space-y-4">
           <AdminFilterBar>
             <Select value={ledgerKind} onChange={(e) => setLedgerKind(e.target.value)}>
-              <option value="">全部类型</option>
-              <option value="topup">充值</option>
-              <option value="grant">赠送</option>
-              <option value="adjust">调账</option>
-              <option value="freeze">冻结</option>
-              <option value="unfreeze">解冻</option>
-              <option value="settle">结算</option>
-              <option value="refund">退款</option>
+              <option value="">{"All types"}</option>
+              <option value="topup">{"Top Up"}</option>
+              <option value="grant">{"Grant"}</option>
+              <option value="adjust">{"Account Adjustment"}</option>
+              <option value="freeze">{"Reserved"}</option>
+              <option value="unfreeze">{"Unfreeze"}</option>
+              <option value="settle">{"Settle"}</option>
+              <option value="refund">{"Refund"}</option>
             </Select>
             <AdminUserSearchSelect value={ledgerUserId} onChange={(id) => setLedgerUserId(id)} />
             <Button
@@ -300,21 +299,20 @@ export function OrdersPage() {
                 void loadLedger(1);
               }}
             >
-              筛选
-            </Button>
+              {"Filter"}</Button>
           </AdminFilterBar>
           <div className="rounded-lg border bg-background">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>ID</TableHead>
-                  <TableHead>用户</TableHead>
-                  <TableHead>变动</TableHead>
-                  <TableHead>余额后</TableHead>
-                  <TableHead>类型</TableHead>
-                  <TableHead>关联</TableHead>
-                  <TableHead>备注</TableHead>
-                  <TableHead>时间</TableHead>
+                  <TableHead>{"User"}</TableHead>
+                  <TableHead>{"Change"}</TableHead>
+                  <TableHead>{"Balance After"}</TableHead>
+                  <TableHead>{"Type"}</TableHead>
+                  <TableHead>{"Linked"}</TableHead>
+                  <TableHead>{"Notes"}</TableHead>
+                  <TableHead>{"Time"}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -354,13 +352,13 @@ export function OrdersPage() {
         <TabsContent value="usage" className="space-y-4">
           <AdminFilterBar>
             <AdminUserSearchSelect value={usageUserId} onChange={(id) => setUsageUserId(id)} />
-            <Input placeholder="任务 ID" value={usageTaskId} onChange={(e) => setUsageTaskId(e.target.value)} />
+            <Input placeholder={"Task ID"} value={usageTaskId} onChange={(e) => setUsageTaskId(e.target.value)} />
             <Select value={usageDomain} onChange={(e) => setUsageDomain(e.target.value)}>
-              <option value="">全部领域</option>
-              <option value="kepu">科普</option>
-              <option value="drama">漫剧</option>
-              <option value="studio">工作室</option>
-              <option value="api">开放 API</option>
+              <option value="">{"All domains"}</option>
+              <option value="kepu">{"Short Video"}</option>
+              <option value="drama">{"AI Drama"}</option>
+              <option value="studio">{"Studio"}</option>
+              <option value="api">{"Open API"}</option>
             </Select>
             <Input
               placeholder="billing_key"
@@ -368,18 +366,18 @@ export function OrdersPage() {
               onChange={(e) => setUsageBillingKey(e.target.value)}
             />
             <Select value={usageCapability} onChange={(e) => setUsageCapability(e.target.value)}>
-              <option value="">全部能力</option>
-              <option value="llm">LLM 文本</option>
-              <option value="image">生图</option>
-              <option value="video">视频</option>
-              <option value="tts">配音</option>
+              <option value="">{"All capabilities"}</option>
+              <option value="llm">{"LLM Text"}</option>
+              <option value="image">{"Image Generation"}</option>
+              <option value="video">{"Video"}</option>
+              <option value="tts">{"Voiceover"}</option>
             </Select>
             <Select value={usageBasis} onChange={(e) => setUsageBasis(e.target.value)}>
-              <option value="">全部计费依据</option>
-              <option value="estimate">估算</option>
-              <option value="upstream">实测（上游）</option>
-              <option value="upstream_usage">实测(token)</option>
-              <option value="upstream_cost">实测(费用)</option>
+              <option value="">{"All billing bases"}</option>
+              <option value="estimate">{"Estimated"}</option>
+              <option value="upstream">{"Actual (upstream)"}</option>
+              <option value="upstream_usage">{"Actual (token)"}</option>
+              <option value="upstream_cost">{"Actual (cost)"}</option>
             </Select>
             <AdminDateRangeFilter
               from={usageDateFrom}
@@ -400,8 +398,7 @@ export function OrdersPage() {
                 void loadUsage(1, { billing_key: "llm_chat", capability: "llm" });
               }}
             >
-              LLM 用量
-            </Button>
+              {"LLM usage"}</Button>
             <Button
               size="sm"
               variant="secondary"
@@ -411,24 +408,23 @@ export function OrdersPage() {
                 void loadUsage(1);
               }}
             >
-              筛选
-            </Button>
+              {"Filter"}</Button>
           </AdminFilterBar>
           <div className="rounded-lg border bg-background">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>时间</TableHead>
-                  <TableHead>用户</TableHead>
-                  <TableHead>任务</TableHead>
-                  <TableHead>项目</TableHead>
-                  <TableHead>领域</TableHead>
-                  <TableHead>能力</TableHead>
-                  <TableHead>模型</TableHead>
+                  <TableHead>{"Time"}</TableHead>
+                  <TableHead>{"User"}</TableHead>
+                  <TableHead>{"Tasks"}</TableHead>
+                  <TableHead>{"Project"}</TableHead>
+                  <TableHead>{"Domain"}</TableHead>
+                  <TableHead>{"Capabilities"}</TableHead>
+                  <TableHead>{"Model"}</TableHead>
                   <TableHead>Tokens</TableHead>
-                  <TableHead>扣费</TableHead>
-                  <TableHead>上游成本</TableHead>
-                  <TableHead>计费依据</TableHead>
+                  <TableHead>{"Charge"}</TableHead>
+                  <TableHead>{"Upstream cost"}</TableHead>
+                  <TableHead>{"Billing Basis"}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -444,7 +440,7 @@ export function OrdersPage() {
                       {row.task_run_id ? (
                         <AdminEntityLink kind="task" id={row.task_run_id} />
                       ) : (
-                        "历史/未关联"
+                        "Historical/Unlinked"
                       )}
                     </TableCell>
                     <TableCell className="text-xs">
@@ -471,13 +467,13 @@ export function OrdersPage() {
                         }
                         title={
                           row.billing_basis === "upstream_cost"
-                            ? "按 TokenFree 返回的实际费用扣费"
+                            ? "Charge based on the actual cost returned by TokenFree"
                             : row.billing_basis === "upstream_usage"
-                              ? "按 TokenFree usage token × 官方单价扣费"
-                              : "上游未返回 usage，按配置估算 token 扣费"
+                              ? "Charge based on TokenFree usage tokens × official unit price"
+                              : "Upstream usage not returned; charge based on estimated tokens from configuration"
                         }
                       >
-                        {row.billing_basis_label ?? (row.estimated ? "估算" : "实测")}
+                        {row.billing_basis_label ?? (row.estimated ? "Estimated" : "Measured")}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -505,13 +501,12 @@ export function OrdersPage() {
           }
         }}
         size="md"
-        title={orderDetail ? `订单明细 #${orderDetail.id}` : "订单明细"}
+        title={orderDetail ? `Order details #${orderDetail.id}` : "Order details"}
         subtitle={orderDetail?.out_trade_no}
         footer={
           orderDetail ? (
             <Button size="sm" variant="outline" onClick={() => void copyText(orderDetail.out_trade_no)}>
-              复制商户单号
-            </Button>
+              {"Copy merchant order number"}</Button>
           ) : undefined
         }
       >
@@ -520,7 +515,7 @@ export function OrdersPage() {
             <AdminDetailMeta
               items={[
                 {
-                  label: "用户",
+                  label: "User",
                   value: (
                     <AdminEntityLink
                       kind="user"
@@ -530,17 +525,17 @@ export function OrdersPage() {
                   ),
                 },
                 { label: "SKU", value: orderDetail.sku_id },
-                { label: "金额", value: `¥${fenToYuan(orderDetail.amount_fen)}` },
-                { label: "入账", value: `¥${fenToYuan(orderDetail.credit_fen)}` },
-                { label: "支付方式", value: payTypeLabel(orderDetail.pay_type) },
-                { label: "状态", value: orderStatusLabel(orderDetail.status) },
-                { label: "渠道单号", value: orderDetail.trade_no || "—" },
+                { label: "Amount", value: `¥${fenToYuan(orderDetail.amount_fen)}` },
+                { label: "Credited", value: `¥${fenToYuan(orderDetail.credit_fen)}` },
+                { label: "Payment method", value: payTypeLabel(orderDetail.pay_type) },
+                { label: "Status", value: orderStatusLabel(orderDetail.status) },
+                { label: "Channel order number", value: orderDetail.trade_no || "—" },
                 {
-                  label: "支付时间",
+                  label: "Payment Time",
                   value: orderDetail.paid_at ? new Date(orderDetail.paid_at).toLocaleString() : "—",
                 },
                 {
-                  label: "创建时间",
+                  label: "Created at",
                   value: new Date(orderDetail.created_at).toLocaleString(),
                   full: true,
                 },
@@ -554,14 +549,14 @@ export function OrdersPage() {
         open={!!ledgerDetail}
         onOpenChange={(open) => !open && setLedgerDetail(null)}
         size="md"
-        title={ledgerDetail ? `流水明细 #${ledgerDetail.id}` : "流水明细"}
+        title={ledgerDetail ? `Ledger details #${ledgerDetail.id}` : "Ledger details"}
       >
         {ledgerDetail ? (
           <AdminDetailSection>
             <AdminDetailMeta
               items={[
                 {
-                  label: "用户",
+                  label: "User",
                   value: (
                     <AdminEntityLink
                       kind="user"
@@ -570,13 +565,13 @@ export function OrdersPage() {
                     />
                   ),
                 },
-                { label: "类型", value: ledgerKindLabel(ledgerDetail.kind) },
-                { label: "变动", value: `¥${fenToYuan(ledgerDetail.delta_fen)}` },
-                { label: "余额后", value: `¥${fenToYuan(ledgerDetail.balance_after)}` },
-                { label: "关联", value: ledgerRefLink(ledgerDetail) },
-                { label: "备注", value: ledgerDetail.note || "—" },
+                { label: "Type", value: ledgerKindLabel(ledgerDetail.kind) },
+                { label: "Change", value: `¥${fenToYuan(ledgerDetail.delta_fen)}` },
+                { label: "Balance After", value: `¥${fenToYuan(ledgerDetail.balance_after)}` },
+                { label: "Linked", value: ledgerRefLink(ledgerDetail) },
+                { label: "Notes", value: ledgerDetail.note || "—" },
                 {
-                  label: "时间",
+                  label: "Time",
                   value: new Date(ledgerDetail.created_at).toLocaleString(),
                   full: true,
                 },

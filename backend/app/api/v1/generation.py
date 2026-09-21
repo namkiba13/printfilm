@@ -57,7 +57,7 @@ async def generate_image(
         prompt = body.prompt.strip()
         if body.image_url:
             refs = [body.image_url.strip()]
-            prompt = f"{prompt}。在保持主体可识别的前提下适度改变风格"
+            prompt = f'{prompt}. Moderately vary the style while keeping the subject recognizable'
         size = ratio_to_size(body.ratio)
         try:
             result = await ark.gen_image(
@@ -158,7 +158,7 @@ async def forward_seedance(
 ) -> V1GenerationOut:
     """转发 Seedance 多模态 body 到 TokenFree。"""
     if not body.content:
-        raise HTTPException(status_code=400, detail="content 不能为空")
+        raise HTTPException(status_code=400, detail='content cannot be empty')
     settings = get_settings()
     payload: dict = {
         "model": settings.model_video,
@@ -206,7 +206,7 @@ async def get_task(
 ) -> V1GenerationOut:
     """查询 Seedance 视频任务状态（仅可查询本人提交的任务）。"""
     if not task_id.strip():
-        raise HTTPException(status_code=400, detail="缺少 task_id")
+        raise HTTPException(status_code=400, detail='Missing task_id')
     tid = task_id.strip()
     # 归属校验：上游 task_id 本身是可传递的凭据，不校验会拖走他人视频
     owned = (
@@ -217,7 +217,7 @@ async def get_task(
         )
     ).scalar_one_or_none()
     if owned is None:
-        raise HTTPException(status_code=404, detail="任务不存在")
+        raise HTTPException(status_code=404, detail='Task does not exist')
     data = await poll_video_task(user, tid)
     await settle_deferred_video_poll(
         db,

@@ -35,7 +35,7 @@ export function EpisodeEditPromptEditor({
   assets,
   referencedIds,
   editing,
-  placeholder = '输入画面描述、对白、旁白；键入 @ 引用资产或插入时长…',
+  placeholder = "Enter scene descriptions, dialogue, and narration; type @ to reference assets or insert duration…",
   onContentChange,
   onOpenAsset,
 }: Props) {
@@ -189,7 +189,7 @@ export function EpisodeEditPromptEditor({
         className={`drama-ep-prompt-editor${editing ? ' is-editing' : ''}`}
         role="textbox"
         aria-multiline="true"
-        aria-label="分镜脚本"
+        aria-label={"Storyboard Script"}
         aria-readonly={!editing}
         contentEditable={editing}
         suppressContentEditableWarning

@@ -39,10 +39,10 @@ settings = get_settings()
 @router.post("/register", response_model=TokenResponse)
 async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)) -> TokenResponse:
     if not get_settings().registration_enabled:
-        raise HTTPException(status_code=403, detail="注册暂未开放 / Registration is closed")
+        raise HTTPException(status_code=403, detail='Registration is closed / Registration is closed')
     existing = await get_user_by_email(db, body.email)
     if existing:
-        raise HTTPException(status_code=400, detail="邮箱已注册")
+        raise HTTPException(status_code=400, detail='Email is already registered')
     grant = int(settings.billing_signup_grant_fen or 0)
     user = User(
         email=body.email.lower(),
@@ -75,7 +75,7 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)) ->
 async def login(body: LoginRequest, db: AsyncSession = Depends(get_db)) -> TokenResponse:
     user = await get_user_by_email(db, body.email.lower())
     if not user or not verify_password(body.password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="邮箱或密码错误")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Incorrect email or password')
     return TokenResponse(access_token=create_access_token(str(user.id)))
 
 
@@ -92,9 +92,9 @@ async def change_password(
 ) -> dict[str, bool]:
     """校验当前密码后写入新密码。"""
     if not verify_password(body.current_password, user.hashed_password):
-        raise HTTPException(status_code=400, detail="当前密码不正确")
+        raise HTTPException(status_code=400, detail='Current password is incorrect')
     if body.current_password == body.new_password:
-        raise HTTPException(status_code=400, detail="新密码不能与当前密码相同")
+        raise HTTPException(status_code=400, detail='New password cannot be the same as the current password')
     user.hashed_password = hash_password(body.new_password)
     await db.commit()
     return {"ok": True}
@@ -146,7 +146,7 @@ async def update_me(
     if fields["email"] != user.email:
         taken = await get_user_by_email(db, fields["email"])
         if taken and taken.id != user.id:
-            raise HTTPException(status_code=400, detail="该邮箱已被使用")
+            raise HTTPException(status_code=400, detail='This email is already in use')
 
     user.nickname = fields["nickname"]
     user.email = fields["email"]
@@ -177,13 +177,13 @@ async def upload_avatar(
         if suffix in {".jpg", ".jpeg", ".png", ".webp", ".gif"}:
             ext = ".jpg" if suffix == ".jpeg" else suffix
         else:
-            raise HTTPException(status_code=400, detail="仅支持 JPG / PNG / WebP / GIF")
+            raise HTTPException(status_code=400, detail='Only JPG / PNG / WebP / GIF are supported')
 
     raw = await file.read()
     if not raw:
-        raise HTTPException(status_code=400, detail="空文件")
+        raise HTTPException(status_code=400, detail='Empty file')
     if len(raw) > 5 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="头像不能超过 5MB")
+        raise HTTPException(status_code=400, detail='Avatar cannot exceed 5MB')
 
     dest = storage.user_dir(user.id) / f"avatar{ext}"
     dest.write_bytes(raw)

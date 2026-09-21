@@ -159,10 +159,10 @@ export function buildEpisodeFragmentFlow(
         assetId,
         linkedFragments: fragmentIds.map((fragmentId) => ({
           fragmentId,
-          label: fragLabels.get(fragmentId) || `镜 ${fragmentId}`,
+          label: fragLabels.get(fragmentId) || `Shot ${fragmentId}`,
         })),
-        name: asset?.name || `资产 ${assetId}`,
-        typeLabel: tab || asset?.type || '资产',
+        name: asset?.name || `Asset ${assetId}`,
+        typeLabel: tab || asset?.type || "Assets",
         previewUrl: resolveDramaMediaUrl(asset?.cover || asset?.url) || '',
       },
       draggable: true,

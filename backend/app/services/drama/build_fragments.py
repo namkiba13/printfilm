@@ -62,8 +62,9 @@ VISUAL_SHOT_LABEL_RE = re.compile(
     r"^(?:"
     r"空镜|画面|远景|近景|中景|全景|特写|大特写|"
     r"跟拍|俯拍|仰拍|航拍|推镜|拉镜|摇镜|环境|镜头|动作|转场|闪回|"
-    r"建立镜头|气氛镜头"
-    r")\s*[：:]"
+    r"建立镜头|气氛镜头|Establishing Shot|Long Shot|Wide Shot|Medium Shot|Close Shot|Close-up|Extreme Close-up|"
+    r"Atmospheric Shot|Push-in|Pull-out|Pan|Tracking Shot|Follow Shot|High-angle Shot|Low-angle Shot|Aerial Shot"
+    r")\s*[：:]", re.I
 )
 # 「角色名（动作）：台词」——动作应走画面行，冒号后才是口播
 DIALOGUE_WITH_ACTION_BODY_RE = re.compile(

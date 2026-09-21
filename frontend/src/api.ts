@@ -362,7 +362,7 @@ export const api = {
           : Array.isArray(detail)
             ? detail.map((d: { msg?: string }) => d.msg || JSON.stringify(d)).join('; ')
             : res.statusText
-      throw new Error(message || '头像上传失败')
+      throw new Error(message || "Avatar Upload Failed")
     }
     return res.json() as Promise<User>
   },
@@ -431,7 +431,7 @@ export const api = {
           : Array.isArray(detail)
             ? detail.map((d: { msg?: string }) => d.msg || JSON.stringify(d)).join('; ')
             : res.statusText
-      throw new Error(message || '封面上传失败')
+      throw new Error(message || "Cover Upload Failed")
     }
     return res.json() as Promise<Project>
   },
@@ -494,7 +494,7 @@ export const api = {
           : Array.isArray(detail)
             ? detail.map((d: { msg?: string }) => d.msg || JSON.stringify(d)).join('; ')
             : res.statusText
-      throw new Error(message || '打包下载失败')
+      throw new Error(message || "Package Download Failed")
     }
     const blob = await res.blob()
     const cd = res.headers.get('Content-Disposition') || ''
@@ -542,7 +542,7 @@ export const api = {
     if (!res.ok) {
       const err = await res.json().catch(() => ({ detail: res.statusText }))
       const detail = err.detail
-      throw new Error(typeof detail === 'string' ? detail : '画面上传失败')
+      throw new Error(typeof detail === 'string' ? detail : "Image upload failed")
     }
     return res.json() as Promise<Project>
   },

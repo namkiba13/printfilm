@@ -8,10 +8,10 @@ from typing import Any
 from app.config import Settings, get_settings
 
 SKUS: list[dict[str, Any]] = [
-    {"id": "topup_10", "name": "体验充值", "amount_fen": 10000, "credit_fen": 10000},
-    {"id": "topup_49", "name": "基础充值", "amount_fen": 49000, "credit_fen": 49000},
-    {"id": "topup_99", "name": "进阶充值", "amount_fen": 99000, "credit_fen": 104000, "recommended": True},
-    {"id": "topup_199", "name": "专业充值", "amount_fen": 199000, "credit_fen": 220000},
+    {"id": "topup_10", "name": 'Trial Top-Up', "amount_fen": 10000, "credit_fen": 10000},
+    {"id": "topup_49", "name": 'Basic Top-Up', "amount_fen": 49000, "credit_fen": 49000},
+    {"id": "topup_99", "name": 'Advanced Top-Up', "amount_fen": 99000, "credit_fen": 104000, "recommended": True},
+    {"id": "topup_199", "name": 'Professional Top-Up', "amount_fen": 199000, "credit_fen": 220000},
 ]
 
 ORDER_EXPIRE_SECONDS = 300
@@ -249,8 +249,8 @@ def billing_key_to_capability(billing_key: str) -> str:
 
 def billing_key_label(billing_key: str) -> str:
     cap = billing_key_to_capability(billing_key)
-    labels = {"llm": "LLM 对话", "image": "图片生成", "video": "视频生成", "tts": "语音合成"}
-    return labels.get(cap, billing_key or "其他")
+    labels = {"llm": 'LLM Chat', "image": 'Image Generation', "video": 'Video Generation', "tts": 'Speech Synthesis'}
+    return labels.get(cap, billing_key or 'Other')
 
 
 def billing_model_rate_rows(settings: Settings | None = None) -> list[dict[str, Any]]:

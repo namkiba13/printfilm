@@ -38,9 +38,9 @@ type TabKey = 'assets' | 'tools'
 type ToolsView = 'list' | 'duration' | 'camera'
 
 const TYPE_LABEL: Record<string, string> = {
-  character: '角色',
-  scene: '场景',
-  prop: '道具',
+  character: "Character",
+  scene: "Scene",
+  prop: "Prop",
 }
 
 // 渲染 @ 引用弹层
@@ -192,7 +192,7 @@ export function EpisodeEditMentionPopover({
       className="drama-ep-mention-pop"
       style={{ top, left }}
       role="listbox"
-      aria-label="@ 引用"
+      aria-label={"@ Reference"}
     >
       <div className="drama-ep-mention-pop-tabs">
         <button
@@ -202,8 +202,7 @@ export function EpisodeEditMentionPopover({
           onClick={() => setTab('assets')}
         >
           <LayoutGrid size={14} />
-          资产
-        </button>
+          {"Assets"}</button>
         <button
           type="button"
           className={tab === 'tools' ? 'is-active' : ''}
@@ -214,8 +213,7 @@ export function EpisodeEditMentionPopover({
           }}
         >
           <Timer size={14} />
-          小工具
-        </button>
+          {"Tools"}</button>
       </div>
 
       {tab === 'assets' ? (
@@ -227,16 +225,14 @@ export function EpisodeEditMentionPopover({
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => onScopeChange('episode')}
             >
-              本集
-            </button>
+              {"This Episode"}</button>
             <button
               type="button"
               className={scope === 'series' ? 'is-active' : ''}
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => onScopeChange('series')}
             >
-              全剧
-            </button>
+              {"Entire Series"}</button>
           </div>
           <label className="drama-ep-mention-pop-search">
             <Search size={14} strokeWidth={2} aria-hidden />
@@ -244,7 +240,7 @@ export function EpisodeEditMentionPopover({
               ref={searchRef}
               type="search"
               value={searchQuery}
-              placeholder="搜索资产名称、类型…"
+              placeholder={"Search asset name or type…"}
               onChange={(e) => setSearchQuery(e.target.value)}
               onMouseDown={(e) => e.stopPropagation()}
               onKeyDown={(e) => {
@@ -263,7 +259,7 @@ export function EpisodeEditMentionPopover({
           </label>
           <div className="drama-ep-mention-pop-list">
             {filteredAssets.length === 0 ? (
-              <p className="drama-ep-mention-pop-empty">无匹配资产</p>
+              <p className="drama-ep-mention-pop-empty">{"No matching assets"}</p>
             ) : (
               filteredAssets.map((asset, index) => {
                 const preview = resolveDramaMediaUrl(asset.cover || asset.url)
@@ -285,7 +281,7 @@ export function EpisodeEditMentionPopover({
                       )}
                     </span>
                     <span className="drama-ep-mention-pop-meta">
-                      <strong>{asset.name || `资产 ${asset.id}`}</strong>
+                      <strong>{asset.name || `Asset ${asset.id}`}</strong>
                       <em>{TYPE_LABEL[typeKey] || typeKey}</em>
                     </span>
                   </button>
@@ -303,8 +299,8 @@ export function EpisodeEditMentionPopover({
           >
             <Clapperboard size={16} />
             <span>
-              <strong>插入时长</strong>
-              <em>剩余可用 {remaining}s</em>
+              <strong>{"Insertion Duration"}</strong>
+              <em>{"Remaining {remaining}s"}{remaining}s</em>
             </span>
           </button>
           <button
@@ -314,8 +310,8 @@ export function EpisodeEditMentionPopover({
           >
             <Aperture size={16} />
             <span>
-              <strong>景别 / 运镜</strong>
-              <em>插入空镜、特写、推拉摇移等前缀</em>
+              <strong>{"Shot Type / Camera Movement"}</strong>
+              <em>{"Insert prefixes such as establishing shots, close-ups, and camera movements"}</em>
             </span>
           </button>
         </div>
@@ -327,8 +323,7 @@ export function EpisodeEditMentionPopover({
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => setToolsView('list')}
           >
-            ← 返回
-          </button>
+            {"← Back"}</button>
           <div className="drama-ep-mention-pop-duration-presets">
             {DURATION_PRESET_OPTIONS.map((sec) => {
               const disabled = sec > remaining
@@ -350,7 +345,7 @@ export function EpisodeEditMentionPopover({
               type="number"
               min={1}
               max={remaining || FRAGMENT_CONTENT_DURATION_MAX}
-              placeholder="自定义秒数"
+              placeholder={"Custom seconds"}
               value={customDuration}
               onChange={(e) => setCustomDuration(e.target.value)}
               onMouseDown={(e) => e.stopPropagation()}
@@ -364,8 +359,7 @@ export function EpisodeEditMentionPopover({
                 onSelectDuration(sec)
               }}
             >
-              插入
-            </button>
+              {"Insert"}</button>
           </div>
         </div>
       ) : (
@@ -376,14 +370,13 @@ export function EpisodeEditMentionPopover({
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => setToolsView('list')}
           >
-            ← 返回
-          </button>
+            {"← Back"}</button>
           {filteredCamera.length === 0 ? (
-            <p className="drama-ep-mention-pop-empty">无匹配词条</p>
+            <p className="drama-ep-mention-pop-empty">{"No matching entries"}</p>
           ) : (
             <>
-              {renderCameraGroup('景别', shotItems)}
-              {renderCameraGroup('运镜', moveItems)}
+              {renderCameraGroup("Shot Type", shotItems)}
+              {renderCameraGroup("Camera Movement", moveItems)}
             </>
           )}
           <ul className="drama-ep-mention-pop-camera-tips">

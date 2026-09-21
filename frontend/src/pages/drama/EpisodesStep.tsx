@@ -123,7 +123,7 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
           setEpisodes(await dramaApi.listEpisodes(projectId))
         }
       } catch (err) {
-        onError(err instanceof Error ? err.message : '分集加载失败')
+        onError(err instanceof Error ? err.message : "Failed to load episodes")
         try {
           setEpisodes(await dramaApi.listEpisodes(projectId))
         } catch {
@@ -139,10 +139,10 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
   async function handleReseed() {
     if (reseeding || planningId != null) return
     const ok = await dialog.confirm({
-      title: '规则重切全部分镜',
+      title: "Rule-Based Re-segment All Storyboards",
       message:
-        '将按规则引擎快速重切全部分镜（含已编辑、已生成视频的分集）。单集精细分镜请用「AI 分镜」。是否继续？',
-      confirmText: '继续切分',
+        "The rule engine will quickly re-segment all storyboards, including episodes that have been edited or have generated videos. For detailed storyboarding of a single episode, use “AI Storyboard.” Continue?",
+      confirmText: "Continue Segmentation",
       tone: 'danger',
     })
     if (!ok) return
@@ -150,12 +150,12 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
     try {
       const rows = await loadEpisodes(true)
       await dialog.alert({
-        title: '切分完成',
-        message: `已更新 ${rows.length} 集分镜，可进入各集编辑查看。`,
+        title: "Segmentation Complete",
+        message: `Updated ${rows.length} episodes' storyboards. You can open each episode to edit and review.`,
         tone: 'success',
       })
     } catch (err) {
-      onError(err instanceof Error ? err.message : '重新切分失败')
+      onError(err instanceof Error ? err.message : "Re-segmentation Failed")
     } finally {
       setReseeding(false)
     }
@@ -189,22 +189,22 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
           const count = Number(cur.params?.fragment_plan_count) || (cur.fragments || []).length
           const mode = String(cur.params?.fragment_plan_mode || 'llm')
           await dialog.alert({
-            title: '分镜完成',
+            title: "Storyboarding Complete",
             message:
               mode === 'rules_fallback'
-                ? `「${cur.name}」已回退规则切分，共 ${count} 条。`
-                : `「${cur.name}」AI 分镜完成，共 ${count} 条。`,
+                ? `“${cur.name}” reverted to rule-based segmentation, with ${count} shots.`
+                : `“${cur.name}” AI storyboarding complete, with ${count} shots.`,
             tone: 'success',
           })
           return
         }
         if (st === 'failed') {
-          throw new Error(String(cur.params?.fragment_plan_error || 'AI 分镜失败'))
+          throw new Error(String(cur.params?.fragment_plan_error || "AI Storyboard Failed"))
         }
       }
-      throw new Error('AI 分镜超时，请稍后刷新')
+      throw new Error("AI storyboarding timed out. Please refresh later")
     } catch (err) {
-      onError(err instanceof Error ? err.message : 'AI 分镜失败')
+      onError(err instanceof Error ? err.message : "AI Storyboard Failed")
     } finally {
       setPlanningId(null)
     }
@@ -225,10 +225,10 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
             <Film size={22} strokeWidth={1.75} />
           </div>
           <div>
-            <h2>分集视频</h2>
+            <h2>{"Episode Videos"}</h2>
             <p className="drama-episodes-hero-sub">
-              共 <strong>{episodes.length}</strong> 集 ·{' '}
-              <strong>{totalFragments}</strong> 个分镜 · 已出片{' '}
+              {"Total"}<strong>{episodes.length}</strong> {" episodes ·"}{' '}
+              <strong>{totalFragments}</strong> {" shots · Videos created"}{' '}
               <strong>{totalVideos}</strong>
             </p>
           </div>
@@ -241,18 +241,18 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
             onClick={() => void handleReseed()}
           >
             <Layers size={16} strokeWidth={1.75} aria-hidden />
-            {reseeding ? '切分中…' : '规则重切全部'}
+            {reseeding ? "Segmenting…" : "Rule-Based Re-segment All"}
           </button>
         </div>
       </header>
 
       <div className="drama-episodes-tips" role="note">
         <Sparkles size={15} strokeWidth={1.75} aria-hidden />
-        <span>单集可点 <strong>AI 分镜</strong> 精细规划；进入 <strong>编辑</strong> 可改脚本并生成视频。</span>
+        <span>{"For a single episode, click <strong>AI Storyboard</strong> for detailed planning; enter <strong>Edit</strong> to modify the script and generate video."}<strong>{"AI Storyboard"}</strong> {"detailed planning; enter"}<strong>{"Edit"}</strong> {"You can modify the script and generate video."}</span>
       </div>
 
       {loading ? (
-        <div className="drama-episode-grid" aria-busy="true" aria-label="加载分集">
+        <div className="drama-episode-grid" aria-busy="true" aria-label={"Load Episodes"}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="drama-ep-card drama-ep-card-skeleton" />
           ))}
@@ -260,7 +260,7 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
       ) : episodes.length === 0 ? (
         <div className="drama-episodes-empty">
           <Clapperboard size={40} strokeWidth={1.25} aria-hidden />
-          <p>暂无分集，请先完成分集剧本步骤。</p>
+          <p>{"No episodes yet. Please complete the episode script step first."}</p>
         </div>
       ) : (
         <div className="drama-episode-grid">
@@ -272,16 +272,16 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
                 ? Math.round((summary.videoDone / summary.fragmentCount) * 100)
                 : 0
             const epLabel =
-              summary.epNo > 0 ? `第 ${summary.epNo} 集` : `分集 ${ep.id}`
+              summary.epNo > 0 ? `Episode ${summary.epNo}` : `Episode ${ep.id}`
             const statusLabel = planning
-              ? 'AI 分镜中'
+              ? "AI Storyboarding"
               : summary.videoRunning > 0
-                ? `${summary.videoRunning} 条生成中`
+                ? `${summary.videoRunning} generating`
                 : summary.videoFailed > 0
-                  ? `${summary.videoFailed} 条失败`
+                  ? `${summary.videoFailed} failed`
                   : summary.videoDone > 0
-                    ? `已出片 ${summary.videoDone}/${summary.fragmentCount}`
-                    : `${summary.fragmentCount} 个分镜`
+                    ? `Videos created ${summary.videoDone}/${summary.fragmentCount}`
+                    : `${summary.fragmentCount} shots`
 
             return (
               <article
@@ -294,7 +294,7 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
                   type="button"
                   className="drama-ep-card-poster"
                   onClick={() => navigate(`/drama/projects/${projectId}/episodes/${ep.id}`)}
-                  aria-label={`编辑 ${ep.name}`}
+                  aria-label={`Edit ${ep.name}`}
                 >
                   {summary.previewUrl ? (
                     <img src={summary.previewUrl} alt="" className="drama-ep-card-poster-img" />
@@ -326,7 +326,7 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
                     {summary.totalSec > 0 ? (
                       <span className="drama-ep-card-meta-item">
                         <Clapperboard size={14} strokeWidth={1.75} aria-hidden />
-                        约 {summary.totalSec}s
+                        {"Approx."}{summary.totalSec}s
                       </span>
                     ) : null}
                   </div>
@@ -348,7 +348,7 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
                     onClick={() => void handlePlanEpisode(ep)}
                   >
                     <Wand2 size={15} strokeWidth={1.75} aria-hidden />
-                    {planning ? '分镜中…' : 'AI 分镜'}
+                    {planning ? "Storyboarding…" : "AI Storyboard"}
                   </button>
                   <button
                     type="button"
@@ -356,8 +356,7 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
                     disabled={planning}
                     onClick={() => navigate(`/drama/projects/${projectId}/episodes/${ep.id}`)}
                   >
-                    编辑
-                  </button>
+                    {"Edit"}</button>
                 </div>
               </article>
             )
@@ -366,7 +365,7 @@ export function EpisodesStep({ projectId, onError }: EpisodesStepProps) {
       )}
       <FragmentPlanSkillModal
         open={planTarget != null}
-        message={`将调用大模型重新规划「${planTarget?.name || ''}」的分镜（覆盖本集现有分镜与视频），通常需要数十秒。可勾选本次使用的 Skill。字幕方式沿用该集当前设置。`}
+        message={`The AI model will replan the storyboard for “${planTarget?.name || ''}”, replacing the existing storyboards and videos in this episode. This usually takes several dozen seconds. You can select the Skill(s) to use this time. The subtitle method will follow the episode’s current setting.`}
         onCancel={() => setPlanTarget(null)}
         onConfirm={(skillIds) => {
           if (planTarget) void startPlanEpisode(planTarget, skillIds)

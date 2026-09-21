@@ -103,7 +103,7 @@ async def create_task(
     await _validate_task_scope(db, user, body)
     handler = get_task_handler(body.domain, body.task_type)
     if handler is None:
-        raise ValueError("当前任务类型尚未接入任务平台")
+        raise ValueError('This task type has not yet been integrated with the task platform')
     from app.services.billing.settlement import ensure_balance_for_task
 
     balance_probe = TaskRun(
@@ -170,7 +170,7 @@ async def create_task(
                 event_type="task.created",
                 status=task.status,
                 phase=task.current_step_key,
-                message=f"创建任务 {task.task_type}",
+                message=f'Creating task {task.task_type}',
                 payload={"domain": task.domain},
             ),
         )
@@ -213,7 +213,7 @@ async def activate_next_sequential_task(db: AsyncSession, batch_key: str | None,
             event_type="task.activated",
             status=task.status,
             phase=task.current_step_key,
-            message=f"前置分镜已完成，激活 batch 第 {next_index + 1} 镜",
+            message=f'The preceding storyboard is complete; activating shot {next_index + 1} in the batch',
         )
         await db.commit()
         return
@@ -424,7 +424,7 @@ async def reconcile_stale_pending_tasks(db: AsyncSession) -> int:
                     event_type="task.poll_resumed",
                     status=task.status,
                     phase=task.current_step_key,
-                    message="释放异常过长的收尾认领，恢复上游轮询",
+                    message='Released an abnormally long finalization claim; resuming upstream polling',
                 )
                 changed += 1
                 continue
@@ -582,7 +582,7 @@ async def reconcile_sequential_batches(db: AsyncSession) -> int:
                     event_type="task.activated",
                     status=task.status,
                     phase=task.current_step_key,
-                    message=f"并发空位可用，激活排队任务（上限 {limit}）",
+                    message=f'A concurrency slot is available; activating queued tasks (limit {limit})',
                 )
                 changed += 1
                 activated += 1
@@ -652,7 +652,7 @@ async def reconcile_sequential_batches(db: AsyncSession) -> int:
                 event_type="task.activated",
                 status=first.status,
                 phase=first.current_step_key,
-                message="串行批次首镜激活",
+                message='First shot of the serial batch activated',
             )
             changed += 1
     for pid, uid in frag_video_projects.items():
@@ -728,7 +728,7 @@ async def rebalance_project_fragment_video_queue(
                 event_type="task.activated",
                 status=task.status,
                 phase=task.current_step_key,
-                message="已关闭镜间衔接，恢复并发生成",
+                message='Shot-to-shot transitions disabled; resuming concurrent generation',
             )
         if activated or deferred or pending:
             await db.commit()
@@ -805,7 +805,7 @@ async def rebalance_project_fragment_video_queue(
                     event_type="task.deferred",
                     status=task.status,
                     phase=task.current_step_key,
-                    message="已开启镜间衔接，后镜改回排队等待上一镜",
+                    message='Shot-to-shot transitions enabled; subsequent shots returned to the queue to await the previous shot',
                 )
             else:
                 deferred += 1
@@ -829,7 +829,7 @@ async def rebalance_project_fragment_video_queue(
             event_type="task.activated",
             status=task.status,
             phase=task.current_step_key,
-            message="已开启镜间衔接，按镜序激活当前首镜",
+            message='Shot-to-shot transitions enabled; activating the current first shot in sequence',
         )
 
     await db.commit()
@@ -857,59 +857,59 @@ async def _validate_task_scope(db: AsyncSession, user: User, body: TaskCreateReq
     if body.project_id is not None:
         project = await db.get(Project, body.project_id)
         if not project or int(project.user_id) != int(user.id):
-            raise ValueError("科普项目不存在或无权限")
+            raise ValueError('Short Video project does not exist or you do not have permission')
     if body.shot_id is not None:
         shot = await db.get(Shot, body.shot_id)
         if not shot:
-            raise ValueError("镜头不存在")
+            raise ValueError('Shot does not exist')
         project = await db.get(Project, int(shot.project_id))
         if not project or int(project.user_id) != int(user.id):
-            raise ValueError("镜头不存在或无权限")
+            raise ValueError('Shot does not exist or you do not have permission')
         if body.project_id is not None and int(shot.project_id) != int(body.project_id):
-            raise ValueError("镜头与项目不匹配")
+            raise ValueError('Shot does not match the project')
 
     drama_project_id: int | None = body.drama_project_id
     if drama_project_id is not None:
         drama_project = await db.get(DramaProject, drama_project_id)
         if not drama_project or int(drama_project.user_id) != int(user.id):
-            raise ValueError("漫剧项目不存在或无权限")
+            raise ValueError('AI Drama project does not exist or you do not have permission')
     if body.script_id is not None:
         script = await db.get(DramaScript, body.script_id)
         if not script:
-            raise ValueError("剧本不存在")
+            raise ValueError('Script does not exist')
         drama_project = await db.get(DramaProject, int(script.project_id))
         if not drama_project or int(drama_project.user_id) != int(user.id):
-            raise ValueError("剧本不存在或无权限")
+            raise ValueError('Script does not exist or you do not have permission')
         if drama_project_id is not None and int(script.project_id) != int(drama_project_id):
-            raise ValueError("剧本与漫剧项目不匹配")
+            raise ValueError('Script does not match the AI Drama project')
     if body.episode_id is not None:
         episode = await db.get(DramaEpisode, body.episode_id)
         if not episode:
-            raise ValueError("分集不存在")
+            raise ValueError('Episode does not exist')
         drama_project = await db.get(DramaProject, int(episode.project_id))
         if not drama_project or int(drama_project.user_id) != int(user.id):
-            raise ValueError("分集不存在或无权限")
+            raise ValueError('Episode does not exist or you do not have permission')
         if drama_project_id is not None and int(episode.project_id) != int(drama_project_id):
-            raise ValueError("分集与漫剧项目不匹配")
+            raise ValueError('Episode does not match the AI Drama project')
     if body.fragment_id is not None:
         fragment = await db.get(DramaEpisodeFragment, body.fragment_id)
         if not fragment:
-            raise ValueError("分镜不存在")
+            raise ValueError('Shot does not exist')
         episode = await db.get(DramaEpisode, int(fragment.episode_id))
         drama_project = await db.get(DramaProject, int(episode.project_id)) if episode else None
         if not episode or not drama_project or int(drama_project.user_id) != int(user.id):
-            raise ValueError("分镜不存在或无权限")
+            raise ValueError('Storyboard does not exist or you do not have permission')
         if body.episode_id is not None and int(fragment.episode_id) != int(body.episode_id):
-            raise ValueError("分镜与分集不匹配")
+            raise ValueError('Storyboard does not match the episode')
     if body.asset_id is not None:
         asset = await db.get(DramaAsset, body.asset_id)
         if not asset:
-            raise ValueError("资产不存在")
+            raise ValueError('Asset does not exist')
         drama_project = await db.get(DramaProject, int(asset.project_id))
         if not drama_project or int(drama_project.user_id) != int(user.id):
-            raise ValueError("资产不存在或无权限")
+            raise ValueError('Asset does not exist or you do not have permission')
         if drama_project_id is not None and int(asset.project_id) != int(drama_project_id):
-            raise ValueError("资产与漫剧项目不匹配")
+            raise ValueError('Asset does not match the AI Drama project')
 
 
 async def get_task_for_user(db: AsyncSession, user: User, task_id: int) -> TaskRun:
@@ -920,7 +920,7 @@ async def get_task_for_user(db: AsyncSession, user: User, task_id: int) -> TaskR
     )
     task = (await db.execute(stmt)).scalar_one_or_none()
     if not task:
-        raise LookupError("任务不存在")
+        raise LookupError('Task does not exist')
     return task
 
 
@@ -993,9 +993,9 @@ async def count_active_tasks_for_user(
 async def cancel_task_for_user(db: AsyncSession, user: User, task_id: int) -> TaskRun:
     task = await get_task_for_user(db, user, task_id)
     if not task.cancelable:
-        raise ValueError("任务不支持取消")
+        raise ValueError('Task cancellation is not supported')
     if task.status in TERMINAL_TASK_STATUSES:
-        raise ValueError("任务已结束，不能取消")
+        raise ValueError('Task has ended and cannot be canceled')
     task.cancel_requested = True
     task.status = "cancel_requested"
     task.next_action_at = datetime.now(UTC)
@@ -1006,7 +1006,7 @@ async def cancel_task_for_user(db: AsyncSession, user: User, task_id: int) -> Ta
                 event_type="task.cancel_requested",
                 status=task.status,
                 phase=task.current_step_key,
-                message="已提交取消请求",
+                message='Cancellation request submitted',
             ),
         )
     )
@@ -1075,7 +1075,7 @@ async def cancel_tasks_for_scope(
                     event_type="task.cancel_requested",
                     status=task.status,
                     phase=task.current_step_key,
-                    message="由业务范围取消接口触发",
+                    message='Triggered by the business-scope cancellation endpoint',
                 ),
             )
         )
@@ -1095,7 +1095,7 @@ async def get_task_admin(db: AsyncSession, task_id: int) -> TaskRun:
     stmt = select(TaskRun).options(*task_detail_options()).where(TaskRun.id == task_id)
     task = (await db.execute(stmt)).scalar_one_or_none()
     if not task:
-        raise LookupError("任务不存在")
+        raise LookupError('Task does not exist')
     return task
 
 
@@ -1157,9 +1157,9 @@ async def cancel_task_admin(db: AsyncSession, task_id: int) -> TaskRun:
     """Cancel any task as admin."""
     task = await get_task_admin(db, task_id)
     if not task.cancelable:
-        raise ValueError("任务不支持取消")
+        raise ValueError('Task cancellation is not supported')
     if task.status in TERMINAL_TASK_STATUSES:
-        raise ValueError("任务已结束，不能取消")
+        raise ValueError('Task has ended and cannot be canceled')
     task.cancel_requested = True
     task.status = "cancel_requested"
     task.next_action_at = datetime.now(UTC)
@@ -1170,7 +1170,7 @@ async def cancel_task_admin(db: AsyncSession, task_id: int) -> TaskRun:
                 event_type="task.cancel_requested",
                 status=task.status,
                 phase=task.current_step_key,
-                message="管理员已提交取消请求",
+                message='Administrator cancellation request submitted',
             ),
         )
     )

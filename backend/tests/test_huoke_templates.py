@@ -24,7 +24,7 @@ def test_huoke_templates_registered_in_seed():
         assert "获客" in item["category"]
         assert "商业" in item["category"]
         assert item["llm_system_addon"].startswith(HUOKE_IRON_RULES)
-        assert "店名" in item["llm_system_addon"]
+        assert "Store names" in item["llm_system_addon"]
         assert item["preview_cover"].endswith(f"{tid}.png")
         cfg = item["seedream_config"]
         assert cfg.get("photoreal") is True
@@ -36,11 +36,11 @@ def test_huoke_templates_registered_in_seed():
 
 def test_huoke_platform_structures_are_distinct():
     addons = {t["id"]: t["llm_system_addon"] for t in HUOKE_TEMPLATES}
-    assert "0-3秒钩子" in addons["huoke_douyin_hook"]
-    assert "第一印象" in addons["huoke_xhs_recommend"]
-    assert "性价比" in addons["huoke_review_facts"]
-    assert "轻推荐" in addons["huoke_soft_invite"]
-    assert "必须 4 镜" not in addons["huoke_douyin_hook"]
+    assert "0–3-Second Hook" in addons["huoke_douyin_hook"]
+    assert "first impression" in addons["huoke_xhs_recommend"].lower()
+    assert "value for money" in addons["huoke_review_facts"].lower()
+    assert "recommendation" in addons["huoke_soft_invite"].lower()
+    assert "must have 4 shots" not in addons["huoke_douyin_hook"].lower()
     assert addons["huoke_douyin_hook"] != addons["huoke_xhs_recommend"]
 
 

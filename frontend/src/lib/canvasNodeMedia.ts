@@ -16,12 +16,12 @@ export function isAudioUrl(url: string) {
 
 /** 从展示名生成安全文件名主干 */
 export function sanitizeMediaBasename(label: string) {
-  const cleaned = (label || '未命名')
+  const cleaned = (label || "Untitled")
     .replace(/[<>:"/\\|?*\x00-\x1f]+/g, '_')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 60)
-  return cleaned || '未命名'
+  return cleaned || "Untitled"
 }
 
 /** 从 URL 推断扩展名 */

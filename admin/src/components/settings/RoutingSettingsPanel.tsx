@@ -29,10 +29,10 @@ const TOKENFREE_CHANNEL_ID = "tokenfree";
 const DEFAULT_BASE_URL = "https://94api.dev/v1";
 
 const CAPABILITY_LABELS: Record<Capability, string> = {
-  text: "文本",
-  image: "图像",
-  video: "视频",
-  audio: "语音",
+  text: "Text",
+  image: "Image",
+  video: "Video",
+  audio: "Voice",
 };
 
 const DEFAULT_KEYS = ["text_model", "image_model", "video_model", "audio_model"] as const;
@@ -85,10 +85,10 @@ function buildReadiness(data: AdminRoutingSettings | null, hasKey: boolean) {
   const defaults = data?.default_models;
   return [
     { id: "secret", label: "API Key", ready: hasKey },
-    { id: "text", label: "文本模型", ready: Boolean(defaults?.text_model) },
-    { id: "image", label: "图像模型", ready: Boolean(defaults?.image_model) },
-    { id: "video", label: "视频模型", ready: Boolean(defaults?.video_model) },
-    { id: "audio", label: "语音模型", ready: Boolean(defaults?.audio_model) },
+    { id: "text", label: "Text model", ready: Boolean(defaults?.text_model) },
+    { id: "image", label: "Image model", ready: Boolean(defaults?.image_model) },
+    { id: "video", label: "Video model", ready: Boolean(defaults?.video_model) },
+    { id: "audio", label: "Voice model", ready: Boolean(defaults?.audio_model) },
   ] as const;
 }
 
@@ -118,7 +118,7 @@ export function RoutingSettingsPanel() {
       setApiKeyInput("");
       setUpstreamModels([]);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "加载模型配置失败");
+      toast.error(err instanceof Error ? err.message : "Failed to load model configuration");
     } finally {
       setLoading(false);
     }
@@ -220,7 +220,7 @@ export function RoutingSettingsPanel() {
 
   async function fetchUpstreamModels() {
     if (!hasKey) {
-      toast.error("请先填写 API Key");
+      toast.error("Please enter the API Key first");
       return;
     }
     setFetchingModels(true);
@@ -245,11 +245,11 @@ export function RoutingSettingsPanel() {
       }
       toast.success(
         shouldAutoPick
-          ? `已拉取 ${res.models.length} 个模型，并已勾选推荐默认项`
-          : `已拉取 ${res.models.length} 个可用模型（已补全推荐项）`,
+          ? `Fetched ${res.models.length} models and selected the recommended defaults`
+          : `Fetched ${res.models.length} available models (recommended items completed)`,
       );
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "拉取模型失败");
+      toast.error(err instanceof Error ? err.message : "Failed to fetch models");
     } finally {
       setFetchingModels(false);
     }
@@ -294,28 +294,28 @@ export function RoutingSettingsPanel() {
       });
       setData(canonicalizeRoutingSettings(res.settings));
       setApiKeyInput("");
-      toast.success("模型配置已保存");
+      toast.success("Model configuration saved");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "保存失败");
+      toast.error(err instanceof Error ? err.message : "Save failed");
     } finally {
       setSaving(false);
     }
   }
 
   if (loading && !data) {
-    return <SettingsLoading label="加载模型配置…" />;
+    return <SettingsLoading label={"Loading model configuration…"} />;
   }
 
   return (
-    <SettingsTabShell onSave={() => void handleSave()} saving={saving} saveLabel="保存">
+    <SettingsTabShell onSave={() => void handleSave()} saving={saving} saveLabel={"Save"}>
       <SettingsSurface className="settings-readiness-bar">
-        <div className="settings-readiness-title">配置就绪</div>
+        <div className="settings-readiness-title">{"Configuration Ready"}</div>
         <div className="settings-readiness-row">
           {readiness.map((item) => (
             <div key={item.id} className={cn("settings-readiness-item", item.ready && "is-ready")}>
               <span className={cn("settings-readiness-dot", item.ready ? "is-on" : "is-off")} />
               <span>{item.label}</span>
-              <em>{item.ready ? "已配置" : "未就绪"}</em>
+              <em>{item.ready ? "Configured" : "Not Ready"}</em>
             </div>
           ))}
         </div>
@@ -323,7 +323,7 @@ export function RoutingSettingsPanel() {
 
       {(data?.validation_errors.length ?? 0) > 0 ? (
         <SettingsSurface className="border-[#fde2e2] bg-[#fef0f0]">
-          <div className="text-xs font-medium text-[#f56c6c]">配置校验</div>
+          <div className="text-xs font-medium text-[#f56c6c]">{"Configuration Validation"}</div>
           <ul className="mt-1 space-y-0.5 text-xs text-[#f56c6c]">
             {data?.validation_errors.map((item) => (
               <li key={item}>· {item}</li>
@@ -334,28 +334,27 @@ export function RoutingSettingsPanel() {
 
       <SettingsPanel
         title={channel?.name || "94API"}
-        description="接口地址由部署环境 OPENAI_BASE_URL 配置。填写 Key 后拉取并选择可用模型；未配置的图像/视频能力不可用。"
+        description={"The API endpoint is configured by the deployment environment variable OPENAI_BASE_URL. Enter a Key to fetch and select available models; image/video capabilities are unavailable if not configured."}
       >
         <div className="settings-field-grid">
-          <LabeledControl label="接口地址" className="settings-field-span-full">
+          <LabeledControl label={"API Endpoint"} className="settings-field-span-full">
             <input className="settings-input" value={TOKENFREE_BASE_URL} readOnly />
             <p className="mt-1 text-xs text-[#909399]">
-              控制台：
-              <a className="ml-1 text-[#409eff] hover:underline" href={TOKENFREE_CONSOLE_URL} target="_blank" rel="noreferrer">
+              {"Console:"}<a className="ml-1 text-[#409eff] hover:underline" href={TOKENFREE_CONSOLE_URL} target="_blank" rel="noreferrer">
                 {TOKENFREE_CONSOLE_URL}
               </a>
             </p>
           </LabeledControl>
           <LabeledControl
             label="API Key"
-            hint={hasSavedKey ? "已保存，留空不修改" : "未配置"}
+            hint={hasSavedKey ? "Saved; leave blank to keep unchanged" : "Not Configured"}
             className="settings-field-span-full"
           >
             <div className="settings-secret-row">
               <input
                 className="settings-input is-secret"
                 type="password"
-                placeholder={hasSavedKey ? "已保存，留空则不修改" : "粘贴 API Key"}
+                placeholder={hasSavedKey ? "Saved; leave blank to keep unchanged" : "Paste API Key"}
                 value={apiKeyInput}
                 onChange={(e) => setApiKeyInput(e.target.value)}
               />
@@ -365,16 +364,15 @@ export function RoutingSettingsPanel() {
                   className="admin-btn admin-btn-secondary settings-mini-btn"
                   onClick={() => setApiKeyInput("")}
                 >
-                  清除
-                </button>
+                  {"Clear"}</button>
               ) : null}
             </div>
           </LabeledControl>
 
           <LabeledControl
             className="settings-field-span-full"
-            label="可用模型"
-            hint="按类型筛选、搜索 ID。Seedance 2.0 的短名/方舟接入点会合并成一条；勾选推荐默认 2.5 与 2.0 Mini。"
+            label={"Available Models"}
+            hint={"Filter by type and search IDs. Seedance 2.0 short names and Ark endpoints are merged into one entry; select Recommended to default to 2.5 and 2.0 Mini."}
           >
             <div className="settings-model-toolbar">
               <button
@@ -384,21 +382,19 @@ export function RoutingSettingsPanel() {
                 onClick={() => void fetchUpstreamModels()}
               >
                 {fetchingModels ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
-                拉取模型
-              </button>
+                {"Fetch Models"}</button>
               <button
                 type="button"
                 className="admin-btn admin-btn-secondary settings-mini-btn"
                 disabled={upstreamModels.length === 0}
                 onClick={() => applyRecommendedSelection(upstreamModels)}
               >
-                勾选推荐
-              </button>
+                {"Select Recommended"}</button>
               <span className="settings-model-count">
-                已选 {selectedModels.length}
-                {upstreamModels.length > 0 ? ` / 上游 ${upstreamModels.length}` : ""}
+                Selected {selectedModels.length}
+                {upstreamModels.length > 0 ? ` / Upstream ${upstreamModels.length}` : ""}
                 {filteredCatalogModels.length !== catalogModels.length
-                  ? ` · 当前列表 ${filteredCatalogModels.length}`
+                  ? ` · Current list ${filteredCatalogModels.length}`
                   : ""}
               </span>
             </div>
@@ -416,7 +412,7 @@ export function RoutingSettingsPanel() {
                       )}
                       onClick={() => setModelCapFilter(cap)}
                     >
-                      {cap === "all" ? "全部" : CAPABILITY_LABELS[cap]}
+                      {cap === "all" ? "All" : CAPABILITY_LABELS[cap]}
                       <span>{capCounts[cap]}</span>
                     </button>
                   ))}
@@ -427,7 +423,7 @@ export function RoutingSettingsPanel() {
                     className="settings-input"
                     value={modelSearch}
                     onChange={(e) => setModelSearch(e.target.value)}
-                    placeholder="搜索模型 ID 或名称…"
+                    placeholder={"Search model ID or name…"}
                   />
                   {modelSearch ? (
                     <button
@@ -435,17 +431,16 @@ export function RoutingSettingsPanel() {
                       className="admin-btn admin-btn-secondary settings-mini-btn"
                       onClick={() => setModelSearch("")}
                     >
-                      清除
-                    </button>
+                      {"Clear"}</button>
                   ) : null}
                 </div>
               </>
             ) : null}
             <div className="settings-model-catalog">
               {catalogModels.length === 0 ? (
-                <div className="settings-empty-hint">填写 Key 后点击「拉取模型」</div>
+                <div className="settings-empty-hint">{"Enter a Key, then click “Fetch Models”"}</div>
               ) : filteredCatalogModels.length === 0 ? (
-                <div className="settings-empty-hint">无匹配模型，请调整筛选或搜索</div>
+                <div className="settings-empty-hint">{"No matching models. Adjust the filter or search."}</div>
               ) : (
                 filteredCatalogModels.map((model) => {
                   const checked = selectedModels.includes(model.id);
@@ -469,7 +464,7 @@ export function RoutingSettingsPanel() {
                 className="settings-input"
                 value={manualModel}
                 onChange={(e) => setManualModel(e.target.value)}
-                placeholder="手动追加模型 ID"
+                placeholder={"Manually add model ID"}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
@@ -478,14 +473,13 @@ export function RoutingSettingsPanel() {
                 }}
               />
               <button type="button" className="admin-btn admin-btn-secondary settings-mini-btn" onClick={addManualModel}>
-                添加
-              </button>
+                {"Add"}</button>
             </div>
           </LabeledControl>
         </div>
       </SettingsPanel>
 
-      <SettingsPanel title="使用模型" description="按能力选择默认模型，选项来自上方已勾选列表">
+      <SettingsPanel title={"Use Models"} description={"Select default models by capability. Options come from the selected list above."}>
         <div className="settings-field-grid settings-field-grid--2">
           {DEFAULT_KEYS.map((key) => {
             const cap = key.replace("_model", "") as Capability;
@@ -493,7 +487,7 @@ export function RoutingSettingsPanel() {
             const fallback = selectedModels.filter((id) => inferCapability(id) === cap);
             const ids = options.length > 0 ? options.map((m) => m.id) : fallback;
             return (
-              <LabeledControl key={key} label={`${CAPABILITY_LABELS[cap]}默认`}>
+              <LabeledControl key={key} label={`${CAPABILITY_LABELS[cap]} Default`}>
                 <select
                   className="settings-select"
                   value={data?.default_models[key] ?? ""}
@@ -505,7 +499,7 @@ export function RoutingSettingsPanel() {
                     )
                   }
                 >
-                  <option value="">未设置</option>
+                  <option value="">{"Not Set"}</option>
                   {ids.map((id) => (
                     <option key={id} value={id}>
                       {options.find((m) => m.id === id)?.name || id}

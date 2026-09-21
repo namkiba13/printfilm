@@ -1,31 +1,31 @@
 ---
-name: CINEDANCE Seedance 镜头导演
+name: CINEDANCE Seedance
 description: >-
-  面向 Seedance 生视频的镜头导演手册：约束分镜规划（shot_plan）与
-  视频提示词（video_prompt）的运镜、第一帧与空间站位写法。
+  A shot-directing guide for Seedance video generation, covering camera movement,
+  first-frame composition and spatial blocking for shot_plan and video_prompt.
 tasks:
   - shot_plan
   - video_prompt
 ---
 
-# CINEDANCE 镜头导演手册
+# CINEDANCE Shot Director Guide
 
-## 第一帧
-- 每个镜头的第一帧必须明确可拍：人物、景别、朝向一次说清；第一帧必须有人或主体动作，不允许空镜开场。
-- 首帧描述用一句完整中文，避免堆砌形容词。
+## First Frame
+- Make the first frame of each shot filmable: specify the character, framing and orientation. Include a person or subject action rather than opening on an empty scene.
+- Describe the first frame in one complete sentence rather than a list of adjectives.
 
-## 空间站位
-- 每个镜头先交代空间站位：谁在左、谁在右、镜头与主体的距离（近景 1 米以内、中景 1-3 米、全景 3 米以上）。
-- 同一场戏内站位保持连续，人物不无故瞬移；遵守轴线，不越轴。
+## Spatial Blocking
+- Establish who is on the left and right, and the camera's distance from the subject: close shots within 1 meter, medium shots at 1–3 meters, and wide shots beyond 3 meters.
+- Maintain consistent positions within a scene. Characters must not jump between positions without reason. Respect the line of action and the 180-degree rule.
 
-## 运镜与时长
-- 一个镜头只用一种主导运镜（推、拉、摇、移、跟、固定），禁止复合花哨运镜。
-- 单镜头时长 3-8 秒；动作密集段落拆成多镜头，不塞进一个提示词。
+## Camera Movement and Duration
+- Use one primary camera movement per shot: push in, pull out, pan, track, follow or static. Avoid elaborate combinations.
+- Keep individual shots to 3–8 seconds. Split action-heavy passages into multiple shots rather than packing them into one prompt.
 
-## video_prompt 写法
-- 提示词按「主体 + 动作 + 镜头语言 + 光线氛围」顺序组织，第一帧信息放最前。
-- 不出现品牌名、水印、字幕指令；人物外貌描述与资产库保持一致。
+## Writing video_prompt
+- Organize the prompt as subject + action + camera language + lighting and atmosphere. Put first-frame information first.
+- Omit brand names, watermarks and subtitle instructions. Keep character appearance consistent with the asset library.
 
-## shot_plan 输出
-- 每个分镜给出：镜头号、景别、运镜、时长、第一帧、画面内容、是否需要台词/字幕。
-- 相邻镜头动作衔接自然：上一镜的结尾就是下一镜可接的第一帧。
+## shot_plan Output
+- Include the shot number, framing, camera movement, duration, first frame, visual content, and whether dialogue or subtitles are needed.
+- Connect adjacent shots naturally: the ending of one shot should provide a usable opening for the next.

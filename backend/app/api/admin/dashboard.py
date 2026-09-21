@@ -40,10 +40,10 @@ def _normalize_top_metric(raw: str) -> str:
 
 @router.get("/stats", response_model=AdminStatsOut)
 async def admin_stats(
-    days: int = Query(default=7, description="趋势与分布时间窗口（天），仅支持 1/7/14/30"),
-    domain: str = Query(default="all", max_length=32, description="领域筛选，all 为全部"),
-    capability: str = Query(default="all", max_length=32, description="能力筛选，all 为全部"),
-    top_metric: str = Query(default="charge", description="用户排行排序指标：charge/cost/calls"),
+    days: int = Query(default=7, description='Trend and distribution time window (days); only 1/7/14/30 are supported'),
+    domain: str = Query(default="all", max_length=32, description='Domain filter; all means all'),
+    capability: str = Query(default="all", max_length=32, description='Capability filter; all means all'),
+    top_metric: str = Query(default="charge", description='User ranking metric: charge/cost/calls'),
     _admin: User = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db),
 ) -> AdminStatsOut:

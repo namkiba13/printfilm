@@ -36,8 +36,8 @@ export function CanvasBottomControls() {
         <button
           type="button"
           className="fc-icon-btn is-sm"
-          aria-label="撤销"
-          title="撤销"
+          aria-label={"Undo"}
+          title={"Undo"}
           disabled={!canUndo}
           onClick={undo}
         >
@@ -46,8 +46,8 @@ export function CanvasBottomControls() {
         <button
           type="button"
           className="fc-icon-btn is-sm"
-          aria-label="重做"
-          title="重做"
+          aria-label={"Redo"}
+          title={"Redo"}
           disabled={!canRedo}
           onClick={redo}
         >
@@ -59,8 +59,8 @@ export function CanvasBottomControls() {
         <button
           type="button"
           className="fc-icon-btn is-sm"
-          aria-label="定位到内容"
-          title="定位到内容"
+          aria-label={"Locate Content"}
+          title={"Locate Content"}
           onClick={() => void fitView({ duration: 200 })}
         >
           <LocateFixed size={16} strokeWidth={1.8} />
@@ -68,8 +68,8 @@ export function CanvasBottomControls() {
         <button
           type="button"
           className="fc-icon-btn is-sm"
-          aria-label="适应画布"
-          title="适应画布"
+          aria-label={"Fit Canvas"}
+          title={"Fit Canvas"}
           onClick={() => void fitView({ duration: 200, padding: 0.2 })}
         >
           <Scan size={16} strokeWidth={1.8} />
@@ -80,8 +80,8 @@ export function CanvasBottomControls() {
         <button
           type="button"
           className={`fc-icon-btn is-sm${snapToGrid ? ' is-active' : ''}`}
-          aria-label={snapToGrid ? '关闭网格吸附' : '开启网格吸附'}
-          title={snapToGrid ? '关闭网格吸附' : '开启网格吸附'}
+          aria-label={snapToGrid ? "Disable Grid Snapping" : "Enable Grid Snapping"}
+          title={snapToGrid ? "Disable Grid Snapping" : "Enable Grid Snapping"}
           aria-pressed={snapToGrid}
           onClick={toggleSnapToGrid}
         >
@@ -90,8 +90,8 @@ export function CanvasBottomControls() {
         <button
           type="button"
           className={`fc-icon-btn is-sm${showMinimap ? ' is-active' : ''}`}
-          aria-label={showMinimap ? '关闭小地图' : '开启小地图'}
-          title={showMinimap ? '关闭小地图' : '开启小地图'}
+          aria-label={showMinimap ? "Hide Minimap" : "Show Minimap"}
+          title={showMinimap ? "Hide Minimap" : "Show Minimap"}
           aria-pressed={showMinimap}
           onClick={toggleMinimap}
         >
@@ -103,8 +103,8 @@ export function CanvasBottomControls() {
         <button
           type="button"
           className="fc-icon-btn is-sm"
-          aria-label="缩小"
-          title="缩小"
+          aria-label={"Zoom Out"}
+          title={"Zoom Out"}
           onClick={() => zoomOut({ duration: 150 })}
         >
           <Minus size={16} strokeWidth={1.8} />
@@ -112,8 +112,8 @@ export function CanvasBottomControls() {
         <button
           type="button"
           className="fc-zoom-label"
-          aria-label="重置缩放"
-          title="重置缩放"
+          aria-label={"Reset Zoom"}
+          title={"Reset Zoom"}
           onClick={handleResetZoom}
         >
           {zoomPercent}%
@@ -121,8 +121,8 @@ export function CanvasBottomControls() {
         <button
           type="button"
           className="fc-icon-btn is-sm"
-          aria-label="放大"
-          title="放大"
+          aria-label={"Zoom In"}
+          title={"Zoom In"}
           onClick={() => zoomIn({ duration: 150 })}
         >
           <Plus size={16} strokeWidth={1.8} />

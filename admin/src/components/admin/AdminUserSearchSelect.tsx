@@ -16,7 +16,7 @@ type AdminUserSearchSelectProps = {
 export function AdminUserSearchSelect({
   value,
   onChange,
-  placeholder = "搜索用户邮箱 / 账号 ID",
+  placeholder = "Search user email / account ID",
   className,
 }: AdminUserSearchSelectProps) {
   const [query, setQuery] = useState("");
@@ -94,16 +94,16 @@ export function AdminUserSearchSelect({
             setQuery("");
             setSelectedLabel("");
           }}
-          aria-label="清除用户"
+          aria-label={"Clear user"}
         >
           ×
         </button>
       ) : null}
       {open && (query.trim() || options.length > 0) ? (
         <div className="admin-user-search-dropdown">
-          {loading ? <div className="admin-user-search-empty">搜索中…</div> : null}
+          {loading ? <div className="admin-user-search-empty">{"Searching…"}</div> : null}
           {!loading && options.length === 0 ? (
-            <div className="admin-user-search-empty">无匹配用户</div>
+            <div className="admin-user-search-empty">{"No matching users"}</div>
           ) : null}
           {options.map((u) => (
             <button

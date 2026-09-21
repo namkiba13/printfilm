@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class ApiKeyCreateRequest(BaseModel):
-    name: str = Field(default="默认 Key", max_length=64)
+    name: str = Field(default='Default Key', max_length=64)
 
 
 class ApiKeyOut(BaseModel):
@@ -25,12 +25,12 @@ class V1ImageGenerateRequest(BaseModel):
     prompt: str = Field(min_length=1, max_length=4000)
     negative: str = Field(default="", max_length=2000)
     ratio: str = Field(default="1:1", description="1:1 | 16:9 | 9:16")
-    image_url: str | None = Field(default=None, description="参考图 URL，传入则为图生图")
+    image_url: str | None = Field(default=None, description='Reference image URL; providing this enables image-to-image generation')
 
 
 class V1VideoGenerateRequest(BaseModel):
     prompt: str = Field(min_length=1, max_length=8000)
-    image_url: str = Field(min_length=8, description="首帧图公网 URL")
+    image_url: str = Field(min_length=8, description='Public URL of the first-frame image')
     duration: int = Field(default=5, ge=4, le=15)
     resolution: str = Field(default="480p")
     generate_audio: bool = False

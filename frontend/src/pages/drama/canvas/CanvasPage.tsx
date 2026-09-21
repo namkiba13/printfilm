@@ -20,7 +20,7 @@ function CanvasPageInner() {
   if (!Number.isFinite(id) || id <= 0) {
     return (
       <div className="free-canvas-page" style={{ display: 'grid', placeItems: 'center' }}>
-        <p style={{ color: '#64748b' }}>无效的项目 ID</p>
+        <p style={{ color: '#64748b' }}>{"Invalid project ID"}</p>
       </div>
     )
   }

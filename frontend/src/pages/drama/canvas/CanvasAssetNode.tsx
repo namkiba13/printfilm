@@ -59,8 +59,8 @@ function CanvasAssetNodeComponent({ id, data, selected }: NodeProps<Node<CanvasA
   const footerLabel =
     data.kind === 'character'
       ? DRAMA_VOICE_BINDING_ENABLED && voiceLabel
-        ? `基础形象 · ${voiceLabel}`
-        : '基础形象'
+        ? `Base Image · ${voiceLabel}`
+        : "Base Image"
       : data.kind === 'scene'
         ? displayName
         : null
@@ -151,13 +151,13 @@ function CanvasAssetNodeComponent({ id, data, selected }: NodeProps<Node<CanvasA
             onBlur={commitRename}
             onKeyDown={handleRenameKeyDown}
             onMouseDown={(e) => e.stopPropagation()}
-            aria-label="节点名称"
+            aria-label={"Node Name"}
           />
         ) : (
           <button
             type="button"
             className="fc-node-title nodrag nopan"
-            title="双击重命名"
+            title={"Double-click to rename"}
             onDoubleClick={startRename}
           >
             {displayName}
@@ -167,7 +167,7 @@ function CanvasAssetNodeComponent({ id, data, selected }: NodeProps<Node<CanvasA
 
       <div
         className={`fc-asset-card${canPreview ? ' is-previewable' : ''}`}
-        title={canPreview ? '双击放大预览' : undefined}
+        title={canPreview ? "Double-click to enlarge preview" : undefined}
         onDoubleClick={handleCardDoubleClick}
       >
         <div className={`fc-asset-body is-${data.kind}`}>
@@ -177,16 +177,16 @@ function CanvasAssetNodeComponent({ id, data, selected }: NodeProps<Node<CanvasA
                 className="fc-text-editor nodrag nowheel"
                 value={data.textContent || ''}
                 onChange={handleTextChange}
-                placeholder="输入文本…"
+                placeholder={"Enter text…"}
                 rows={4}
               />
             ) : (
-              <span>{data.textContent || data.label || '文本'}</span>
+              <span>{data.textContent || data.label || "Text"}</span>
             )
           ) : data.generating ? (
             <div className="fc-generating">
               <Loader2 size={28} className="fc-spin" />
-              <span>生成中…</span>
+              <span>{"Generating…"}</span>
             </div>
           ) : mediaSrc && data.kind === 'video' && isPlayableVideoUrl(mediaSrc) ? (
             <CanvasAssetVideoPreview src={mediaSrc} />
@@ -212,8 +212,8 @@ function CanvasAssetNodeComponent({ id, data, selected }: NodeProps<Node<CanvasA
             <button
               type="button"
               className="fc-asset-expand nodrag nopan nowheel"
-              title="放大预览"
-              aria-label={`放大预览 ${displayName}`}
+              title={"Enlarge Preview"}
+              aria-label={`Zoom Preview ${displayName}`}
               onClick={handleExpandClick}
               onPointerDown={(event) => event.stopPropagation()}
             >

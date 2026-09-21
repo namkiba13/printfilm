@@ -39,9 +39,9 @@ export function resolveAssetImageVersionUrl(version: AssetImageVersion): string 
 
 export function formatAssetImageVersionLabel(version: AssetImageVersion): string {
   const src = (version.source || '').toLowerCase()
-  if (src === 'upload') return '上传'
-  if (src === 'replaced') return '被替换'
-  if (src === 'generate') return '生成'
-  if (src === 'restored') return '还原'
-  return '历史'
+  if (src === 'upload') return "Upload"
+  if (src === 'replaced') return "Replaced"
+  if (src === 'generate') return "Generate"
+  if (src === 'restored') return "Restore"
+  return "History"
 }

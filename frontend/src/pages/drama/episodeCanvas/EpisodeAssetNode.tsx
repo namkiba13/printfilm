@@ -17,9 +17,8 @@ function EpisodeAssetNodeComponent({ data, selected, onUnlinkAsset }: Props) {
       <div className="ep-asset-node-head">
         <span>{data.typeLabel}</span>
         {links.length > 1 ? (
-          <span className="ep-asset-node-count" title="关联分镜数">
-            {links.length} 镜
-          </span>
+          <span className="ep-asset-node-count" title={"Linked Shot Count"}>
+            {links.length} {"Shot"}</span>
         ) : null}
       </div>
       <div className="ep-asset-node-thumb">
@@ -37,8 +36,8 @@ function EpisodeAssetNodeComponent({ data, selected, onUnlinkAsset }: Props) {
               key={link.fragmentId}
               type="button"
               className="ep-asset-node-unlink-chip"
-              aria-label={`取消 ${link.label} 的关联`}
-              title={`取消 ${link.label} 的关联`}
+              aria-label={`Unlink ${link.label}`}
+              title={`Unlink ${link.label}`}
               onClick={() => onUnlinkAsset?.(link.fragmentId, data.assetId)}
             >
               {link.label}

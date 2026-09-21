@@ -14,8 +14,8 @@ def test_parse_cinedance_builtin_skill():
     assert parsed["slug"] == "cinedance-seedance"
     assert "shot_plan" in parsed["tasks"]
     assert "video_prompt" in parsed["tasks"]
-    assert "第一帧" in parsed["body"]
-    assert "空间站位" in parsed["body"]
+    assert "First Frame" in parsed["body"]
+    assert "Spatial Blocking" in parsed["body"]
     assert "CINEDANCE" in parsed["name"] or "CINEDANCE" in parsed["description"] or "CINEDANCE" in parsed["body"]
 
 

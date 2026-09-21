@@ -27,12 +27,12 @@ export default function PricingWalletCard({ wallet, usage, loggedIn, updatedAt, 
   return (
     <aside className="pf-pricing-wallet-dark">
       <div className="pf-pricing-wallet-dark-head">
-        <span className="pf-pricing-wallet-dark-label">可用余额</span>
+        <span className="pf-pricing-wallet-dark-label">{"Available Balance"}</span>
         <div className="pf-pricing-wallet-dark-actions">
           <button
             type="button"
             className="pf-pricing-wallet-eye"
-            aria-label={balanceVisible ? '隐藏余额' : '显示余额'}
+            aria-label={balanceVisible ? "Hide Balance" : "Show Balance"}
             onClick={() => setBalanceVisible((v) => !v)}
           >
             {balanceVisible ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -41,11 +41,10 @@ export default function PricingWalletCard({ wallet, usage, loggedIn, updatedAt, 
             type="button"
             className="pf-pricing-wallet-history"
             disabled={!loggedIn}
-            title={loggedIn ? '查看充值记录' : '请先登录'}
+            title={loggedIn ? "View Top-Up History" : "Please log in first"}
             onClick={onHistory}
           >
-            充值记录
-          </button>
+            {"Top-Up History"}</button>
         </div>
       </div>
 
@@ -55,16 +54,16 @@ export default function PricingWalletCard({ wallet, usage, loggedIn, updatedAt, 
 
       <dl className="pf-pricing-wallet-dark-meta">
         <div>
-          <dt>本次消耗</dt>
+          <dt>{"Current Usage"}</dt>
           <dd>{loggedIn ? `¥${monthCharge.toFixed(2)}` : '—'}</dd>
         </div>
         <div>
-          <dt>冻结金额</dt>
+          <dt>{"Reserved Amount"}</dt>
           <dd>{loggedIn ? `¥${frozenYuan.toFixed(2)}` : '—'}</dd>
         </div>
       </dl>
 
-      <p className="pf-pricing-wallet-dark-updated">更新于 {formatUpdated(updatedAt)}</p>
+      <p className="pf-pricing-wallet-dark-updated">{"Updated"}{formatUpdated(updatedAt)}</p>
     </aside>
   )
 }

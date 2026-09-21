@@ -136,5 +136,5 @@ async def test_parallel_videos_does_not_resubmit_skipped_shot(
     ):
         await pipeline._parallel_videos(project.id)
 
-    assert any("已跳过 AI 视频" in m for m in messages)
+    assert any('AI video was skipped' in m for m in messages)
     ark.gen_and_wait_video.assert_not_called()

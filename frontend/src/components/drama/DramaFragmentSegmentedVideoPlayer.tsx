@@ -401,7 +401,7 @@ export function DramaFragmentSegmentedVideoPlayer({
             <div className="drama-ep-video-overlay-actions">
               <button
                 type="button"
-                aria-label={isFullscreen ? '退出全屏' : '全屏预览'}
+                aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen preview"}
                 className="drama-ep-video-overlay-btn"
                 onClick={() => void handleToggleFullscreen()}
               >
@@ -413,7 +413,7 @@ export function DramaFragmentSegmentedVideoPlayer({
               </button>
               <button
                 type="button"
-                aria-label="下载视频"
+                aria-label={"Download video"}
                 className="drama-ep-video-overlay-btn"
                 onClick={handleDownloadVideo}
               >
@@ -422,10 +422,10 @@ export function DramaFragmentSegmentedVideoPlayer({
             </div>
           </>
         ) : posterUrl ? (
-          <img src={posterUrl} alt="分镜预览" />
+          <img src={posterUrl} alt={"Storyboard preview"} />
         ) : (
           <div className="drama-ep-player-placeholder">
-            <span>视频待生成</span>
+            <span>{"Video pending generation"}</span>
           </div>
         )}
       </div>
@@ -438,7 +438,7 @@ export function DramaFragmentSegmentedVideoPlayer({
         <div className="drama-ep-video-toolbar">
           <button
             type="button"
-            aria-label={isPlaying ? '暂停' : '播放'}
+            aria-label={isPlaying ? "Pause" : "Play"}
             disabled={!hasCurrentVideo}
             className="drama-ep-video-icon-btn"
             onClick={handleTogglePlay}
@@ -497,9 +497,9 @@ export function DramaFragmentSegmentedVideoPlayer({
 
           <button
             type="button"
-            aria-label={autoLinkNext ? '关闭自动衔接下一片段' : '开启自动衔接下一片段'}
+            aria-label={autoLinkNext ? "Disable auto-play next segment" : "Enable auto-play next segment"}
             title={
-              autoLinkNext ? '关闭自动衔接下一片段' : '当前片段播放完后自动播放下一片段'
+              autoLinkNext ? "Disable auto-play next segment" : "Automatically play the next segment after the current segment finishes"
             }
             disabled={!hasAnyVideo}
             className={`drama-ep-video-autolink${autoLinkNext ? ' is-on' : ''}`}
@@ -511,7 +511,7 @@ export function DramaFragmentSegmentedVideoPlayer({
 
           <button
             type="button"
-            aria-label={muted ? '取消静音' : '静音'}
+            aria-label={muted ? "Unmute" : "Mute"}
             disabled={!hasCurrentVideo}
             className="drama-ep-video-icon-btn is-muted"
             onClick={() => setMuted((value) => !value)}
@@ -525,8 +525,8 @@ export function DramaFragmentSegmentedVideoPlayer({
 
           <button
             type="button"
-            aria-label={isFullscreen ? '退出全屏' : '全屏预览'}
-            title={isFullscreen ? '退出全屏' : '全屏预览'}
+            aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen preview"}
+            title={isFullscreen ? "Exit Fullscreen" : "Fullscreen preview"}
             disabled={!hasCurrentVideo}
             className="drama-ep-video-icon-btn"
             onClick={() => void handleToggleFullscreen()}

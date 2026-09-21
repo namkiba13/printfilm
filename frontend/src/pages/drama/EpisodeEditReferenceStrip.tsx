@@ -12,13 +12,13 @@ export function EpisodeEditReferenceStrip({ items, onSelect }: Props) {
   if (items.length === 0) {
     return (
       <div className="drama-ep-ref-strip is-empty">
-        <span className="drama-ep-ref-strip-hint">暂无关联资产 · 点击左侧卡片或键入 @asset:id</span>
+        <span className="drama-ep-ref-strip-hint">{"No linked assets · Click a card on the left or type @asset:id"}</span>
       </div>
     )
   }
 
   return (
-    <div className="drama-ep-ref-strip" aria-label="本镜关联资产">
+    <div className="drama-ep-ref-strip" aria-label={"Assets linked to this shot"}>
       {items.map((item) => (
         <button
           key={item.assetId}
@@ -29,8 +29,8 @@ export function EpisodeEditReferenceStrip({ items, onSelect }: Props) {
           title={`${item.name}${item.type ? ` · ${item.type}` : ''}${
             DRAMA_VOICE_BINDING_ENABLED && item.isCharacter
               ? item.voiceLabel
-                ? ` · 音色：${item.voiceLabel}`
-                : ' · 未绑定音色'
+                ? ` · Voice: ${item.voiceLabel}`
+                : " · No voice linked"
               : ''
           }`}
           onClick={() => onSelect?.(item.assetId)}
@@ -42,7 +42,7 @@ export function EpisodeEditReferenceStrip({ items, onSelect }: Props) {
           )}
           {DRAMA_VOICE_BINDING_ENABLED && item.isCharacter ? (
             <span className={`drama-ep-ref-voice-badge${item.voiceUrl ? ' bound' : ''}`}>
-              {item.voiceUrl ? '音' : '无音'}
+              {item.voiceUrl ? "Audio" : "No audio"}
             </span>
           ) : null}
           <em>{item.name}</em>

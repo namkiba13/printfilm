@@ -17,138 +17,138 @@ export type LegalDoc = {
 export const LEGAL_DOCS: Record<'terms' | 'privacy', LegalDoc> = {
   terms: {
     slug: 'terms',
-    title: '用户协议',
+    title: "Terms of Service",
     updatedAt: '2026-08-17',
     intro:
-      '欢迎使用 PRINTFILM（以下简称「本平台」）。在注册或使用本平台服务前，请仔细阅读本协议。一旦您开始使用，即视为已阅读并同意以下条款。',
+      "Welcome to PRINTFILM (hereinafter referred to as the \"Platform\"). Before registering for or using the Platform's services, please read this agreement carefully. Once you begin using the Platform, you are deemed to have read and agreed to the following terms.",
     sections: [
       {
-        title: '1. 服务说明',
+        title: "1. Service Description",
         paragraphs: [
-          'PRINTFILM 提供 AI 漫剧、AI短视频及创作工具（含文生图、图生图、文生视频等）相关服务。服务内容可能随产品迭代调整，我们将尽可能在页面或公告中说明重大变更。',
-          '本平台按实际上游模型用量计费，余额充值后永久有效，不设强制订阅。具体价格与赠送规则以定价页及下单时展示为准。',
+          "PRINTFILM provides services related to AI Drama, AI Short Video, and creative tools, including text-to-image, image-to-image, and text-to-video. Service content may change as the product evolves. We will make every effort to announce significant changes on the relevant page or through announcements.",
+          "The platform charges based on actual usage of upstream models. Recharged balances remain valid indefinitely, with no mandatory subscription. Specific prices and bonus rules are subject to those displayed on the pricing page and at checkout.",
         ],
       },
       {
-        title: '2. 账号与安全',
+        title: "2. Account and Security",
         bullets: [
-          '您应使用真实、有效的信息进行注册，并对账号下的全部行为负责。',
-          '请妥善保管登录凭证；因账号泄露、共用导致的损失，由您自行承担。',
-          '如发现未经授权的使用，请及时通过「联系我们」告知我们。',
-          '我们有权在发现违规、欺诈或滥用时限制、冻结或注销相关账号。',
+          "You must register using accurate and valid information and are responsible for all activity under your account.",
+          "Please keep your login credentials secure. You are responsible for any losses caused by account disclosure or sharing.",
+          "If you discover unauthorized use, please notify us promptly through \"Contact Us.\"",
+          "We reserve the right to restrict, reserve, or deactivate relevant accounts upon discovering violations, fraud, or abuse.",
         ],
       },
       {
-        title: '3. 内容与知识产权',
+        title: "3. Content and Intellectual Property",
         paragraphs: [
-          '您输入的提示词、脚本、素材等仍归您或原权利人所有。您保证对上传内容拥有合法权利，不得侵犯第三方知识产权、肖像权、隐私权等。',
-          '使用 AI 生成的内容可能存在不准确、不完整或与预期不符的情况，请在正式发布前自行审核。因您对外发布、商用使用生成内容引发的纠纷，由您自行负责。',
-          '本平台的界面、商标、软件与文档等知识产权归 PRINTFILM 或相关权利人所有，未经许可不得复制、反向工程或用于与本服务无关的商业用途。',
+          "Prompts, scripts, materials, and other content you provide remain the property of you or the original rights holder. You warrant that you have lawful rights to uploaded content and must not infringe third-party intellectual property, portrait, privacy, or other rights.",
+          "AI-generated content may be inaccurate, incomplete, or inconsistent with your expectations. Please review it yourself before publishing. You are solely responsible for disputes arising from your public or commercial use of generated content.",
+          "The intellectual property rights in the platform's interface, trademarks, software, documentation, and other materials belong to PRINTFILM or the relevant rights holders. Without permission, you may not copy, reverse engineer, or use them for commercial purposes unrelated to this service.",
         ],
       },
       {
-        title: '4. 计费与充值',
+        title: "4. Billing and Top-Ups",
         bullets: [
-          '生成类任务按 TokenFree 官方成本计费（与上游一致，不再加价）；开始任务时可能预扣估算金额，结束后按实际用量结算（多退少补）。',
-          '充值通过支付宝、微信支付等渠道完成，到账以系统记录为准。',
-          '除法律法规另有规定或本平台明确约定外，已到账的充值余额一般不予退款。',
-          '若因系统故障导致重复扣款或未到账，请保留订单号并联系客服核实处理。',
+          "Generation tasks are charged at TokenFree's official cost, consistent with upstream pricing and without markup. An estimated amount may be reserved when a task starts; after completion, billing is based on actual usage, with overpayments refunded and shortfalls collected.",
+          "Top-ups are completed through Alipay, WeChat Pay, and other channels. The system records determine when funds are credited.",
+          "Unless otherwise required by law or expressly specified by the platform, credited top-up balances are generally non-refundable.",
+          "If a system error causes duplicate charges or funds not to be credited, please retain the order number and contact customer service for verification and resolution.",
         ],
       },
       {
-        title: '5. 禁止行为',
+        title: "5. Prohibited Conduct",
         bullets: [
-          '利用本服务制作、传播违法、色情、暴力、仇恨、欺诈或侵犯他人权益的内容。',
-          '对平台进行攻击、爬取、绕过计费、滥用接口或干扰其他用户。',
-          '未经授权转售账号、批量注册或从事其他损害平台公平运营的行为。',
+          "Using the service to create or distribute illegal, pornographic, violent, hateful, fraudulent, or rights-infringing content.",
+          "Attacking or scraping the platform, bypassing billing, abusing interfaces, or disrupting other users.",
+          "Reselling accounts without authorization, registering accounts in bulk, or engaging in other conduct that undermines fair platform operations.",
         ],
       },
       {
-        title: '6. 免责与责任限制',
+        title: "6. Disclaimers and Limitation of Liability",
         paragraphs: [
-          '在法律允许的范围内，本平台对因网络故障、第三方服务中断、不可抗力导致的服务中断或数据损失不承担责任。',
-          'AI 输出仅为辅助创作工具，不构成专业建议。因依赖生成内容造成的直接或间接损失，本平台不承担超出您已支付服务费范围以外的责任（法律另有强制规定的除外）。',
+          "To the extent permitted by law, the platform is not liable for service interruptions or data loss caused by network failures, third-party service interruptions, or force majeure.",
+          "AI output is provided solely as a creative aid and does not constitute professional advice. The platform is not liable for direct or indirect losses arising from reliance on generated content beyond the service fees you have paid, except where otherwise mandatorily required by law.",
         ],
       },
       {
-        title: '7. 协议变更与终止',
+        title: "7. Agreement Changes and Termination",
         paragraphs: [
-          '我们可能适时修订本协议，修订后的版本将在本页面公布，并以「更新日期」为准。若您继续使用服务，视为接受修订后的协议。',
-          '您可随时停止使用并申请注销账号；我们也可在您严重违反本协议时终止向您提供服务。',
+          "We may revise this agreement from time to time. Revised versions will be published on this page, with the \"Updated\" date controlling. Your continued use of the service constitutes acceptance of the revised agreement.",
+          "You may stop using the service and request account closure at any time. We may also terminate service to you if you seriously violate this agreement.",
         ],
       },
       {
-        title: '8. 联系方式',
+        title: "8. Contact Information",
         paragraphs: [
-          '如对本协议有疑问，请前往「联系我们」页面提交反馈，或发送邮件至 support@printfilm.com。',
+          "If you have questions about this agreement, please submit feedback on the \"Contact Us\" page or email support@printfilm.com.",
         ],
       },
     ],
   },
   privacy: {
     slug: 'privacy',
-    title: '隐私政策',
+    title: "Privacy Policy",
     updatedAt: '2026-08-17',
     intro:
-      'PRINTFILM 重视您的隐私。本政策说明我们如何收集、使用、存储与保护您的个人信息。使用本平台即表示您理解本政策所述处理方式。',
+      "PRINTFILM values your privacy. This policy explains how we collect, use, store, and protect your personal information. By using the platform, you acknowledge the practices described in this policy.",
     sections: [
       {
-        title: '1. 我们收集的信息',
+        title: "1. Information We Collect",
         bullets: [
-          '账号信息：注册邮箱、昵称、头像、登录与鉴权相关数据。',
-          '使用数据：创作项目、提示词、生成任务状态、工具运行记录、资产库内容等业务数据。',
-          '计费信息：余额、冻结金额、充值订单、用量与扣费明细（支付由第三方渠道完成，我们不存储完整银行卡号等敏感支付信息）。',
-          '技术日志：IP、浏览器类型、访问时间等用于安全与故障排查的必要日志。',
+          "Account information: registration email address, nickname, avatar, and data related to login and authentication.",
+          "Usage data: creative projects, prompts, generation task statuses, tool activity logs, asset library content, and other business data.",
+          "Billing information: balance, reserved amount, top-up orders, usage, and charge details. Payments are processed by third-party channels; we do not store complete bank card numbers or other sensitive payment information.",
+          "Technical logs: necessary logs such as IP address, browser type, and access time, used for security and troubleshooting.",
         ],
       },
       {
-        title: '2. 信息的使用目的',
+        title: "2. Purposes of Information Use",
         bullets: [
-          '提供、维护与改进漫剧、AI短视频与工具等创作服务。',
-          '完成身份验证、计费结算、订单查询与客服支持。',
-          '保障账号与系统安全，防范欺诈与滥用。',
-          '在获得同意或法律法规允许的情况下，向您发送服务通知或产品更新。',
+          "Providing, maintaining, and improving creative services such as AI Drama, AI Short Video, and tools.",
+          "Identity verification, billing and settlement, order inquiries, and customer support.",
+          "Protecting account and system security and preventing fraud and abuse.",
+          "Sending service notifications or product updates with your consent or as permitted by law.",
         ],
       },
       {
-        title: '3. 存储与第三方',
+        title: "3. Storage and Third Parties",
         paragraphs: [
-          '您的媒体与创作文件可能存储于云端对象存储（如阿里云 OSS），以便预览与下载。',
-          '支付由易支付等合作方处理；大模型推理由上游模型服务商完成。我们仅向其提供完成服务所必需的数据，并要求其按约定保护信息。',
-          '除法律法规要求、获得您明确同意，或为保护本平台及用户合法权益所必需外，我们不会向无关第三方出售您的个人信息。',
+          "Your media and creative files may be stored in cloud object storage, such as Alibaba Cloud OSS, for preview and download.",
+          "Payments are processed by partners such as YiPay, while large-model inference is performed by upstream model service providers. We provide them only with the data necessary to deliver the service and require them to protect the information as agreed.",
+          "Except as required by law, with your explicit consent, or as necessary to protect the lawful rights and interests of the platform and its users, we will not sell your personal information to unrelated third parties.",
         ],
       },
       {
-        title: '4. Cookie 与本地存储',
+        title: "4. Cookies and Local Storage",
         paragraphs: [
-          '为维持登录态与偏好设置，我们可能使用 Cookie 或浏览器本地存储（如 token）。您可在浏览器中清除，但这可能导致需要重新登录。',
+          "To maintain your sign-in status and preferences, we may use cookies or browser local storage (such as token). You can clear them in your browser, but this may require you to sign in again.",
         ],
       },
       {
-        title: '5. 您的权利',
+        title: "5. Your Rights",
         bullets: [
-          '查阅、更正账号资料（可在个人中心操作）。',
-          '导出或下载您有权访问的创作成果（在产品功能允许范围内）。',
-          '申请注销账号；注销后我们将按法规要求删除或匿名化相关个人信息，法律法规要求保留的除外。',
-          '对隐私相关问题进行咨询或投诉。',
+          "Review and correct your account information (available in your account center).",
+          "Export or download creative works you are authorized to access (within the scope permitted by product features).",
+          "Request account deletion; after deletion, we will delete or anonymize the relevant personal information as required by applicable laws and regulations, except where retention is legally required.",
+          "Submit inquiries or complaints regarding privacy-related matters.",
         ],
       },
       {
-        title: '6. 未成年人保护',
+        title: "6. Protection of Minors",
         paragraphs: [
-          '本平台主要面向具备完全民事行为能力的用户。若您为未成年人，请在监护人指导下阅读本政策并使用服务。',
+          "This platform is primarily intended for users with full civil capacity. If you are a minor, please read this policy and use the services under the guidance of your guardian.",
         ],
       },
       {
-        title: '7. 政策更新',
+        title: "7. Policy Updates",
         paragraphs: [
-          '我们可能更新本政策，并在本页公布最新版本与更新日期。重大变更时，我们会通过站内提示等方式尽量告知。',
+          "We may update this policy and publish the latest version and update date on this page. For significant changes, we will make reasonable efforts to notify you through in-app notices and other means.",
         ],
       },
       {
-        title: '8. 联系我们',
+        title: "8. Contact Us",
         paragraphs: [
-          '如对本政策有任何疑问，请访问「联系我们」或发送邮件至 support@printfilm.com。',
+          "If you have any questions about this policy, please visit \"Contact Us\" or email support@printfilm.com.",
         ],
       },
     ],
@@ -311,30 +311,30 @@ export type ContactChannel = {
 
 export const CONTACT_CHANNELS: ContactChannel[] = [
   {
-    title: '邮箱支持',
-    desc: '工作日一般 1–2 个工作日内回复；请附上账号邮箱与订单号（如有）。',
+    title: "Email Support",
+    desc: "We generally respond within 1–2 business days; please include your account email address and order number, if available.",
     href: 'mailto:support@printfilm.com',
     actionLabel: 'support@printfilm.com',
   },
   {
-    title: '帮助中心',
-    desc: '充值、下载、漫剧与工具等常见问题可先在帮助中心自助查询。',
+    title: "Help Center",
+    desc: "For common questions about top-ups, downloads, AI Drama, and tools, you can search the Help Center first.",
     href: '/help',
-    actionLabel: '前往帮助中心',
+    actionLabel: "Go to Help Center",
   },
   {
-    title: '企业合作 / 对公转账',
-    desc: '企业批量充值、API 合作或发票需求，请邮件说明公司名称与需求，我们会安排对接。',
-    href: 'mailto:support@printfilm.com?subject=PRINTFILM%20企业合作',
-    actionLabel: '发送合作邮件',
+    title: "Business Partnerships / Corporate Bank Transfers",
+    desc: "For bulk corporate top-ups, API partnerships, or invoice requests, please email us with your company name and requirements, and we will arrange a follow-up.",
+    href: "mailto:support@printfilm.com?subject=PRINTFILM%20%E4%BC%81%E4%B8%9A%E5%90%88%E4%BD%9C",
+    actionLabel: "Send Partnership Email",
   },
 ]
 
 export const CONTACT_TOPICS = [
-  '账号与登录',
-  '充值与到账',
-  '创作任务异常',
-  '下载与素材',
-  '隐私与账号注销',
-  '其他',
+  "Account and Login",
+  "Top-Ups and Credit Delivery",
+  "Creation Task Issues",
+  "Downloads and Assets",
+  "Privacy and Account Deletion",
+  "Other",
 ] as const

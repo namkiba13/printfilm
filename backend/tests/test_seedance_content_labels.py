@@ -80,7 +80,7 @@ def test_style_board_sits_after_assets_before_continuity():
     ]
     assert urls == ["https://example.com/a.jpg", board, continuity]
     assert labels == ["分镜文案", "角色「相柳」", "画风板", "上一镜尾帧"]
-    assert "只借鉴其色调、笔触、光影" in items[0]["text"]
+    assert "color palette, brushwork, lighting" in items[0]["text"]
     assert all(item.get("role") == "reference_image" for item in items if item.get("type") == "image_url")
 
 
