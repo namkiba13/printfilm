@@ -651,7 +651,7 @@ def pick_auto_project_title(
     creative_prefix = (creative or "").strip()[:20]
     looks_default = (
         not current
-        or current in {"未命名漫剧", "自由画布项目"}
+        or current in {"未命名漫剧", "自由画布项目", "Untitled AI Drama", "Free Canvas Project"}
         or len(current) > 36
         or (creative_prefix and current.startswith(creative_prefix))
         or current.endswith("…")

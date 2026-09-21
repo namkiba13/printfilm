@@ -32,3 +32,12 @@ def test_pick_auto_project_title_skips_when_user_renamed():
         current_title="我手改的剧名",
     )
     assert title is None
+
+
+def test_pick_auto_project_title_accepts_english_default_titles():
+    for placeholder in ("Untitled AI Drama", "Free Canvas Project"):
+        assert pick_auto_project_title(
+            {"seriesTitle": "The Rooftop Garden"},
+            creative="A robot learns to care for a small rooftop garden.",
+            current_title=placeholder,
+        ) == "The Rooftop Garden"
