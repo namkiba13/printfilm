@@ -63,6 +63,11 @@ services:
     build: ./frontend
     restart: unless-stopped
     expose: ["80"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
     depends_on:
       api:
         condition: service_healthy
@@ -70,6 +75,11 @@ services:
     build: ./admin
     restart: unless-stopped
     expose: ["80"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
     depends_on:
       api:
         condition: service_healthy
