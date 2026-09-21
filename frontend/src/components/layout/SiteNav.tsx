@@ -162,9 +162,13 @@ export default function SiteNav({ active }: Props) {
         <div className="pf-nav-drawer" role="dialog" aria-label={t('nav.mobileNav')}>
           <nav className="pf-nav-drawer-links">
             {centerLinks}
+            <Link to="/help">{t('nav.help')}</Link>
             <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer">
               {t('nav.github')}
             </a>
+            <Button variant="lime" size="sm" onClick={() => { setMenuOpen(false); goCreate() }}>
+              {t('nav.startCreate')}
+            </Button>
           </nav>
         </div>
       ) : null}
