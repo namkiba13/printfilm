@@ -90,6 +90,7 @@ def test_multilingual_titles_names_and_scene_markers():
     assert classify_voice_body("Người dẫn chuyện: Khu vườn đã xanh trở lại.") == "narration"
     scenes = split_episode_content_into_scenes("### Scene 1-1\nDAY EXT Sân thượng\nCast: Nguyễn Minh Anh, Mai Lan\n△ Hai người tưới cây.")
     assert extract_scene_meta(scenes[0]["body"]) == {"sceneName": "Sân thượng", "characterNames": ["Nguyễn Minh Anh", "Mai Lan"]}
+    assert extract_scene_meta("SÁNG INT Sân thượng\nCast: Nguyễn Minh Anh, Mai Lan") == {"sceneName": "Sân thượng", "characterNames": ["Nguyễn Minh Anh", "Mai Lan"]}
 
 
 async def test_voice_description_and_sample_keep_generated_language(monkeypatch):

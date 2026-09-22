@@ -27,7 +27,7 @@ SCENE_HEADER_RE = re.compile(r"^###\s*(?:场(?:景)?|Scene)\s*\d+\s*[-－—]\s*
 SCENE_HEADER_LOOSE_RE = re.compile(r"^###\s*(?:场(?:景)?|Scene)\s*\d+\s*[-－—]\s*\d+", re.I)
 # 时间内外景行
 SCENE_LOCATION_RE = re.compile(
-    r"^(?:日|夜|晨|黄昏|傍晚|凌晨|清晨|午|晚|DAY|NIGHT|DAWN|DUSK|MORNING|EVENING)?\s*(?:内外|内|外|INT\.?/EXT\.?|INT\.?|EXT\.?)\s+(.+)$", re.I
+    r"^(?:日|夜|晨|黄昏|傍晚|凌晨|清晨|午|晚|DAY|NIGHT|DAWN|DUSK|MORNING|AFTERNOON|EVENING|SÁNG|CHIỀU|TRƯA|TỐI|ĐÊM|BÌNH MINH|HOÀNG HÔN)?\s*(?:内外|内|外|INT\.?/EXT\.?|INT\.?|EXT\.?)\s+(.+)$", re.I
 )
 # 出场人物行
 CAST_LINE_RE = re.compile(r"^(?:出场人物|Cast|Characters|Nhân vật)[：:]\s*(.+)$", re.I)

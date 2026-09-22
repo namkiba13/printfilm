@@ -44,6 +44,9 @@ const LINE_DURATION_MIN = 3
 const LINE_DURATION_MAX = 15
 const FRAGMENT_SOFT_MAX = 15
 const FRAGMENT_TOTAL_MAX = 15
+const CAST_LINE_RE = /^(?:出场人物|Cast|Characters|Nhân vật)[：:]\s*(.+)$/i
+const LOCATION_LINE_RE = /^(?:日|夜|晨|黄昏|傍晚|凌晨|清晨|午|晚|DAY|NIGHT|DAWN|DUSK|MORNING|AFTERNOON|EVENING|SÁNG|CHIỀU|TRƯA|TỐI|ĐÊM|BÌNH MINH|HOÀNG HÔN)?\s*(?:内外|内|外|INT\.?\/EXT\.?|INT\.?|EXT\.?)\s+(.+)$/i
+const VISUAL_LINE_RE = /^(?:空镜|画面|远景|近景|中景|全景|特写|Establishing Shot|Wide Shot|Long Shot|Medium Shot|Close Shot|Close-up|Extreme Close-up|Visual|Action|Toàn cảnh|Cận cảnh|Trung cảnh|Đặc tả|Hành động|Góc rộng)\s*[：:]/i
 
 // 角色名稳定配色
 export function speakerColor(name: string): string {
@@ -56,16 +59,16 @@ export function speakerColor(name: string): string {
 export function parseOutlineSceneBlocks(text: string): OutlineSceneBlock[] {
   const raw = (text || '').trim()
   if (!raw) return []
-  const parts = raw.split(/(?=^#{1,3}\s*场)/m).map((p) => p.trim()).filter(Boolean)
-  if (parts.length <= 1 && !/^#{1,3}\s*场/.test(raw)) {
+  const parts = raw.split(/(?=^#{1,3}\s*(?:场(?:景)?|Scene)\s*\d)/mi).map((p) => p.trim()).filter(Boolean)
+  if (parts.length <= 1 && !/^#{1,3}\s*(?:场(?:景)?|Scene)\s*\d/i.test(raw)) {
     return [{ raw, label: "Full Text", title: '', body: raw }]
   }
   return parts.map((part, index) => {
     const lines = part.split(/\r?\n/)
     const head = (lines[0] || '').replace(/^#+\s*/, '').trim()
-    const labelMatch = head.match(/^场\s*([^\s：:]+)/)
+    const labelMatch = head.match(/^(?:场(?:景)?|Scene)\s*([^\s：:]+)/i)
     const label = labelMatch ? `Scene ${labelMatch[1]}` : `Scene ${index + 1}`
-    const title = head.replace(/^场\s*[^\s：:]+[：:\s]*/, '').trim()
+    const title = head.replace(/^(?:场(?:景)?|Scene)\s*[^\s：:]+[：:\s]*/i, '').trim()
     const body = lines.slice(1).join('\n').trim()
     return { raw: part, label, title, body }
   })
@@ -82,18 +85,19 @@ export function parseScriptLine(line: string): ParsedScriptLine {
   const trimmed = text.trim()
   if (!trimmed) return { kind: 'empty', text }
   if (
-    /^(出场人物|时间|地点|内外景)/.test(trimmed) ||
+    CAST_LINE_RE.test(trimmed) || LOCATION_LINE_RE.test(trimmed) ||
+    /^(时间|地点|内外景)/.test(trimmed) ||
     /^[日夜早晚晨黄昏傍晚凌晨清晨午晚]\s*[内外]/.test(trimmed)
   ) {
     return { kind: 'meta', text: trimmed }
   }
-  if (/^[△▲■□●○]/.test(trimmed) || trimmed.startsWith('△')) {
+  if (/^[△▲■□●○]/.test(trimmed) || VISUAL_LINE_RE.test(trimmed)) {
     return { kind: 'action', text: trimmed }
   }
   if (/^【/.test(trimmed)) {
     return { kind: 'action', text: trimmed }
   }
-  const dlg = trimmed.match(/^([^：:(（]{1,20})\s*(?:[（(]([^)）]*)[)）])?\s*[：:]\s*(.*)$/)
+  const dlg = trimmed.match(/^([^：:(（]{1,80}?)\s*(?:[（(]([^)）]*)[)）])?\s*[：:]\s*(.*)$/)
   if (dlg) {
     return {
       kind: 'dialogue',
@@ -181,11 +185,9 @@ export function summarizeOutlineScene(body: string): OutlineSceneStats {
     if (line.kind === 'dialogue') dialogueCount += 1
     if (line.kind === 'action') actionCount += 1
     if (line.kind === 'meta') {
-      const castMatch = line.text.match(/^出场人物[：:]\s*(.+)$/)
+      const castMatch = line.text.match(CAST_LINE_RE)
       if (castMatch) cast = parseCastNames(castMatch[1])
-      const locMatch = line.text.match(
-        /^(?:日|夜|晨|黄昏|傍晚|凌晨|清晨|午|晚)?\s*(?:内|外|内外)\s+(.+)$/,
-      )
+      const locMatch = line.text.match(LOCATION_LINE_RE)
       if (locMatch && !location) location = locMatch[1].split(/[／/]/)[0].trim()
       else if (/^[日夜早晚]/.test(line.text) && !location) location = line.text
     }
