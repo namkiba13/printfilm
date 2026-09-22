@@ -897,6 +897,25 @@ class ArkGateway:
                 ref_urls=subject_refs,
                 style_ref_urls=style_refs,
             )
+        elif upstream_model.lower().startswith("gpt-image"):
+            # Native GPT Image uses pixel sizes and base64 output, not Ark fields.
+            from app.services.drama.seedream_options import SEEDREAM_SIZE_MAP
+
+            tier = str(resolved_size or "").strip().upper()
+            if tier in SEEDREAM_SIZE_MAP:
+                sizes = SEEDREAM_SIZE_MAP[tier]
+                resolved_size = sizes.get(aspect_ratio or "1:1", sizes["1:1"])
+                if str(resolved_size).upper() == tier:
+                    resolved_size = "auto"
+            path = "/images/edits" if refs else "/images/generations"
+            body = {
+                "model": upstream_model,
+                "prompt": full_prompt,
+                "size": resolved_size,
+                "output_format": "png",
+            }
+            if refs:
+                body["images"] = [{"image_url": await self._resolve_image_ref(ref)} for ref in refs]
         else:
             path = "/images/generations"
             body = {
@@ -955,17 +974,29 @@ class ArkGateway:
         remote = extract_tokenfree_image_url(data) if on_tokenfree else self._extract_image_url(data)
         if not remote:
             remote = self._extract_image_url(data) or extract_tokenfree_image_url(data)
-        if not remote:
+        images = data.get("data")
+        first = images[0] if isinstance(images, list) and images and isinstance(images[0], dict) else {}
+        encoded = first.get("b64_json")
+        if not remote and not encoded:
             logger.warning("出图响应无图片地址: %s", json.dumps(data, ensure_ascii=False)[:500])
             raise RuntimeError('No image URL was returned. Please try again later')
 
         dest_dir = storage.project_dir(project_id or 0)
         name = f"shot_{(shot_no or 0):03d}_{uuid.uuid4().hex[:12]}.png"
         dest = dest_dir / name
-        dl_headers = None
-        if is_tokenfree_image_url(remote) or is_tokenfree_content_url(remote):
-            dl_headers = {"Authorization": f"Bearer {self._ark_api_key()}"}
-        await storage.download_to(remote, dest, headers=dl_headers)
+        if encoded:
+            try:
+                image_bytes = base64.b64decode(encoded, validate=True)
+            except (ValueError, TypeError) as exc:
+                raise RuntimeError("Invalid base64 image returned by upstream") from exc
+            if not image_bytes:
+                raise RuntimeError("Empty image returned by upstream")
+            dest.write_bytes(image_bytes)
+        else:
+            dl_headers = None
+            if is_tokenfree_image_url(remote) or is_tokenfree_content_url(remote):
+                dl_headers = {"Authorization": f"Bearer {self._ark_api_key()}"}
+            await storage.download_to(remote, dest, headers=dl_headers)
         merged_usage = dict(raw_usage or {})
         if resolved_size:
             merged_usage.setdefault("size", str(resolved_size))
@@ -1098,7 +1129,7 @@ class ArkGateway:
     def _extract_image_url(self, data: dict[str, Any]) -> str | None:
         if "data" in data and data["data"]:
             item = data["data"][0]
-            return item.get("url") or item.get("b64_json")
+            return item.get("url")
         if "url" in data:
             return data["url"]
         return None
