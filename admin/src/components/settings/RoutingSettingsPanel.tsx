@@ -44,7 +44,7 @@ function inferCapability(model: string): Capability {
   if (mid.includes("tts") || mid.startsWith("zh_") || mid.includes("speaker") || mid.startsWith("s_")) {
     return "audio";
   }
-  if (mid.includes("seedance") || mid.includes("veo") || mid.includes("video") || mid.includes("i2v")) {
+  if (mid.includes("seedance") || mid.includes("sora") || mid.includes("veo") || mid.includes("video") || mid.includes("i2v")) {
     return "video";
   }
   if (

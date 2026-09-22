@@ -141,6 +141,8 @@ def _bootstrap_channels_from_env(settings: Settings | None = None) -> list[Syste
 def _seedance_logical_meta(upstream: str) -> tuple[str, str]:
     """按接入点 ID 推断 Seedance 逻辑模型（2.0 vs 2.5 vs Mini）。"""
     mid = (upstream or "").strip().lower()
+    if "seedance" not in mid:
+        return upstream.strip(), upstream.strip()
     if "mini" in mid:
         return "seedance-2-0-mini", "Seedance 2.0 Mini"
     if any(token in mid for token in ("2-5", "2.5", "260628")):

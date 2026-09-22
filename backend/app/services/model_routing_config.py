@@ -42,6 +42,7 @@ def infer_model_capability(model: str) -> LogicalModelCapability:
         return "audio"
     if (
         "seedance" in mid
+        or "sora" in mid
         or "veo" in mid
         or "video" in mid
         or "i2v" in mid
@@ -179,7 +180,8 @@ def synchronize_logical_models_with_channels(
             LogicalModel(
                 id=logical_id,
                 name=(existing.name if existing and existing.name else catalog_model["upstream_model"]),
-                capability=(existing.capability if existing else catalog_model["capability"]),
+                # Text is the inference fallback; refresh it when a media family becomes known.
+                capability=(existing.capability if existing and existing.capability != "text" else catalog_model["capability"]),
                 enabled=existing.enabled if existing else True,
                 bindings=bindings,
             )
