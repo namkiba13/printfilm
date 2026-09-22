@@ -100,6 +100,11 @@ async def chat_completions(
             {"role": "user", "content": user},
         ],
     }
+    # Modern OpenAI models count reasoning in the completion budget; Astra/o-series reject sampling.
+    if model.lower().startswith(("gpt-5", "gpt-6", "o1", "o3", "o4")):
+        payload["max_completion_tokens"] = payload.pop("max_tokens")
+    if model.lower().startswith(("gpt-6", "o1", "o3", "o4")):
+        payload.pop("temperature")
     if language_source and language_source.strip():
         payload["messages"].append({
             "role": "user",
