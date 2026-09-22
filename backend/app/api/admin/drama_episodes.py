@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, selectinload
@@ -13,11 +13,13 @@ from app.deps import get_current_admin
 from app.models import User
 from app.models_drama import DramaEpisode, DramaEpisodeFragment, DramaProject
 from app.schemas import PageMeta
+from app.services.system_text import english_system_text
 
 router = APIRouter()
 
 
 class AdminDramaFragmentBriefOut(BaseModel):
+    _english_notation = field_validator("content", mode="before")(english_system_text)
     id: int
     sort_order: int = 0
     content: str = ""

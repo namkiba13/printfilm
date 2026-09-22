@@ -1076,7 +1076,7 @@ title={"Reassemble using Current Shots"}
                                 <span className="pf-muted" style={{ display: 'block', fontSize: '0.75rem' }}>
                                   {cues[0]?.replace(/^【|】$/g, '').slice(0, 28)}
                                   {cues[1]
-                                    ? ` · ${cues[1].replace(/^【BGM：|】$/g, '').slice(0, 16)}`
+                                    ? ` · ${cues[1].replace(/^【BGM[:：]\s*|】$/g, '').slice(0, 16)}`
                                     : ''}
                                 </span>
                               ) : null}

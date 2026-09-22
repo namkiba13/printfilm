@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
@@ -13,6 +13,7 @@ from app.deps import get_current_admin
 from app.models import User
 from app.models_drama import DramaAsset, DramaProject
 from app.schemas import PageMeta
+from app.services.system_text import english_system_text
 
 router = APIRouter()
 
@@ -38,6 +39,7 @@ class AdminDramaAssetOut(BaseModel):
 
 
 class AdminDramaAssetDetailOut(AdminDramaAssetOut):
+    _english_notation = field_validator("params", mode="before")(english_system_text)
     params: dict | None = None
 
 

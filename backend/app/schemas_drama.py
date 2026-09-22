@@ -5,9 +5,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.schemas_tasks import TaskRunBriefOut
+from app.services.system_text import canonical_system_text, english_system_text
 
 
 class DramaProjectCreate(BaseModel):
@@ -22,6 +23,7 @@ class DramaProjectCreate(BaseModel):
 
 
 class DramaProjectUpdate(BaseModel):
+    _canonical_notation = field_validator("content", "params", mode="before")(canonical_system_text)
     title: str | None = None
     description: str | None = None
     content: dict | list | None = None
@@ -29,6 +31,7 @@ class DramaProjectUpdate(BaseModel):
 
 
 class DramaScriptOut(BaseModel):
+    _english_notation = field_validator("episode_content", "params", mode="before")(english_system_text)
     id: int
     name: str
     source: str | None = None
@@ -41,6 +44,7 @@ class DramaScriptOut(BaseModel):
 
 
 class DramaAssetOut(BaseModel):
+    _english_notation = field_validator("params", mode="before")(english_system_text)
     id: int
     type: str
     asset_type: str
@@ -81,6 +85,7 @@ class SeedAssetsFromScriptOut(BaseModel):
 
 
 class DramaFragmentOut(BaseModel):
+    _english_notation = field_validator("content", "params", mode="before")(english_system_text)
     id: int
     episode_id: int
     sort_order: int
@@ -95,6 +100,7 @@ class DramaFragmentOut(BaseModel):
 
 
 class DramaEpisodeOut(BaseModel):
+    _english_notation = field_validator("params", mode="before")(english_system_text)
     id: int
     name: str
     params: dict | None = None
@@ -106,11 +112,13 @@ class DramaEpisodeOut(BaseModel):
 
 
 class DramaEpisodeUpdate(BaseModel):
+    _canonical_notation = field_validator("params", mode="before")(canonical_system_text)
     name: str | None = None
     params: dict | None = None
 
 
 class DramaProjectOut(BaseModel):
+    _english_notation = field_validator("content", "params", mode="before")(english_system_text)
     id: int
     user_id: int
     title: str
@@ -189,6 +197,7 @@ class DramaConfirmEpisodeOut(BaseModel):
 
 
 class DramaAssetCreate(BaseModel):
+    _canonical_notation = field_validator("params", mode="before")(canonical_system_text)
     project_id: int
     type: str = "none"
     asset_type: str = "image"
@@ -199,6 +208,7 @@ class DramaAssetCreate(BaseModel):
 
 
 class DramaAssetUpdate(BaseModel):
+    _canonical_notation = field_validator("params", mode="before")(canonical_system_text)
     type: str | None = None
     asset_type: str | None = None
     name: str | None = None
@@ -208,6 +218,7 @@ class DramaAssetUpdate(BaseModel):
 
 
 class DramaImageGenerateRequest(BaseModel):
+    _canonical_notation = field_validator("prompt", mode="before")(canonical_system_text)
     project_id: int
     asset_id: int | None = None
     prompt: str
@@ -224,6 +235,7 @@ class DramaImageGenerateRequest(BaseModel):
 
 
 class DramaVideoGenerateRequest(BaseModel):
+    _canonical_notation = field_validator("prompt", mode="before")(canonical_system_text)
     project_id: int
     asset_id: int
     prompt: str
@@ -256,6 +268,7 @@ class DramaVoiceGenerateRequest(BaseModel):
 
 
 class DramaFragmentSaveItem(BaseModel):
+    _canonical_notation = field_validator("content", "params", mode="before")(canonical_system_text)
     id: int | None = None
     sort_order: int = 0
     content: str = ""
@@ -303,6 +316,7 @@ class DramaActivateImageVersionRequest(BaseModel):
 
 
 class DramaCanvasSaveRequest(BaseModel):
+    _canonical_notation = field_validator("nodes", mode="before")(canonical_system_text)
     project_id: int
     nodes: list[dict[str, Any]] = Field(default_factory=list)
     edges: list[dict[str, Any]] = Field(default_factory=list)

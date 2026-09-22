@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.schemas_common import PageMeta
 from app.schemas_tasks import TaskRunBriefOut
+from app.services.system_text import canonical_system_label, canonical_system_text, english_system_label, english_system_text
 
 
 # ---- Auth ----
@@ -92,6 +93,8 @@ class TemplateDetailOut(TemplateOut):
 
 # ---- Shots / Projects ----
 class ShotOut(BaseModel):
+    _english_prompts = field_validator("img_prompt", "video_prompt", "segment_script", mode="before")(english_system_text)
+    _english_labels = field_validator("camera", "bgm_mood", mode="before")(english_system_label)
     id: int
     shot_no: int
     duration: float
@@ -119,6 +122,8 @@ class ShotReorderIn(BaseModel):
 
 
 class ShotUpdate(BaseModel):
+    _canonical_prompts = field_validator("img_prompt", "video_prompt", "segment_script", mode="before")(canonical_system_text)
+    _canonical_labels = field_validator("camera", "bgm_mood", mode="before")(canonical_system_label)
     narration: str | None = None
     overlay_title: str | None = None
     overlay_subtitle: str | None = None
@@ -131,6 +136,7 @@ class ShotUpdate(BaseModel):
 
 
 class ProjectCreate(BaseModel):
+    _canonical_prompts = field_validator("style_prompt", "character_prompt", "extra_prompt", mode="before")(canonical_system_text)
     template_id: str
     title: str = 'Untitled Work'
     source_type: str = Field(default="theme", pattern="^(theme|script)$")
@@ -152,6 +158,8 @@ class ProjectCreate(BaseModel):
 
 
 class ProjectUpdate(BaseModel):
+    _canonical_prompts = field_validator("style_prompt", "character_prompt", "extra_prompt", mode="before")(canonical_system_text)
+    _canonical_music = field_validator("bgm_lock", mode="before")(canonical_system_label)
     title: str | None = Field(default=None, max_length=200)
     source_type: str | None = Field(default=None, pattern="^(theme|script)$")
     source_text: str | None = Field(default=None, min_length=2, max_length=20000)
@@ -176,6 +184,8 @@ class ProjectUpdate(BaseModel):
 
 
 class ProjectOut(BaseModel):
+    _english_prompts = field_validator("style_prompt", "character_prompt", "extra_prompt", mode="before")(english_system_text)
+    _english_music = field_validator("bgm_lock", mode="before")(english_system_label)
     id: int
     template_id: str
     title: str

@@ -1,6 +1,7 @@
 /** 分镜字幕板：从分镜正文提取口播字幕，供预览与导出。 */
 
 import type { DramaFragment } from '../api/drama'
+import { DRAMA_SUBTITLE_CUE, PRODUCTION_META_RE, SUBTITLE_CUE_PREFIX_RE, VISUAL_CUE_PREFIX_RE, VISUAL_SHOT_LABEL_RE, VOICE_CUE_PREFIX_RE } from './productionCues'
 
 export type DramaSubtitleMode = 'model' | 'post'
 
@@ -159,34 +160,29 @@ function parseSubtitleLine(
   const normalized = String(line || '')
     .replace(/@asset:\d+\s*/g, '')
     .trim()
+  if (PRODUCTION_META_RE.test(normalized) || VISUAL_CUE_PREFIX_RE.test(normalized)) return null
   const stripped = normalized.replace(/^【[^】]+】/, '').trim()
   if (!stripped) return null
-  if (stripped.startsWith('旁白（VO）：')) {
-    return { speaker: "Narration", text: stripped.slice('旁白（VO）：'.length).trim() }
+  if (VISUAL_SHOT_LABEL_RE.test(stripped)) return null
+  const narrator = stripped.match(/^(旁白|Narrator|Narration|内心独白|Inner monologue)(?:[（(]VO[)）])?\s*[：:]\s*(.+)$/i)
+  if (narrator) {
+    return { speaker: /内心独白|Inner monologue/i.test(narrator[1]) ? 'Inner monologue' : 'Narration', text: narrator[2].trim() }
   }
-  if (stripped.startsWith('旁白：')) {
-    return { speaker: "Narration", text: stripped.slice('旁白：'.length).trim() }
+  const dialogue = stripped.match(/^([^：:\n（(]{1,80}?)\s*(?:[（(][^)）]*[)）])?\s*[：:]\s*(.+)$/)
+  if (dialogue) return { speaker: dialogue[1].trim(), text: dialogue[2].trim() }
+  if (VOICE_CUE_PREFIX_RE.test(normalized)) {
+    const speaker = /^【(?:内心独白|Inner monologue)/i.test(normalized) ? 'Inner monologue'
+      : /^【(?:对白|Dialogue)/i.test(normalized) ? 'Dialogue' : 'Narration'
+    return { speaker, text: stripped.replace(/^[（(][^)）]*[)）]\s*[：:]\s*/, '') }
   }
-  if (stripped.startsWith('内心独白：')) {
-    return { speaker: "Inner monologue", text: stripped.slice('内心独白：'.length).trim() }
-  }
-  const dialogue = stripped.match(/^([^：]{1,24})：(.+)$/)
-  if (!dialogue) return null
-  const speaker = dialogue[1].trim()
-  const text = dialogue[2].trim()
-  if (!speaker || !text) return null
-  if (['空镜', '远景', '近景', '特写', '全景', '中景', "Long Shot", "Close Shot", "Close-up", "Wide Shot", "Medium Shot"].includes(speaker)) return null
-  return { speaker, text }
+  return null
 }
 
-const DRAMA_SUBTITLE_CUE = '【字幕：底部居中·简体中文·逐句轮换·与口播同步】'
-const LEGACY_SUBTITLE_CUES = [
-  '【字幕：底部居中·简体中文·仅标记段落同步】',
-  '【字幕：底部居中·简体中文】',
-  '【字幕：全程简体中文字幕，旁白逐句同步烧录】',
-]
-
 const STRIP_PREFIX_MAP: Array<[string, string]> = [
+  ['【Dialogue·slow and clear·synced captions】', '【Dialogue·slow and clear】'],
+  ['【Narration·slow and clear·synced captions】', '【Narration·slow and clear】'],
+  ['【Narration·natural pace·synced captions】', '【Narration·natural pace】'],
+  ['【Inner monologue·synced captions】', '【Inner monologue】'],
   ['【对白·慢速清晰·同步字幕】', '【对白·慢速清晰】'],
   ['【旁白·慢速清晰·同步字幕】', '【旁白·慢速清晰】'],
   ['【旁白·自然语速·同步字幕】', '【旁白·自然语速】'],
@@ -195,13 +191,7 @@ const STRIP_PREFIX_MAP: Array<[string, string]> = [
 
 // 判断是否为字幕 cue 行（含历史文案）。
 function isSubtitleCueLine(line: string): boolean {
-  const trimmed = line.trim()
-  if (!trimmed.startsWith('【字幕')) return false
-  return (
-    trimmed === DRAMA_SUBTITLE_CUE ||
-    LEGACY_SUBTITLE_CUES.includes(trimmed) ||
-    /同步|烧录|底部居中/.test(trimmed)
-  )
+  return SUBTITLE_CUE_PREFIX_RE.test(line.trim())
 }
 
 // 从单条分镜正文去掉模型字幕提示词，保留对白/旁白本身。

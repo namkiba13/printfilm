@@ -2,6 +2,8 @@
  * 科普分镜脚本内 @duration 解析、校验与分段预览
  * 常量与后端 seedance_segments 对齐（单段 3–12s，镜合计 ≤30s）
  */
+import { NARRATION_LINE_PREFIX, NARRATION_PREFIX, PRODUCTION_META_RE, SUBTITLE_CUE } from './productionCues'
+export { NARRATION_PREFIX, SUBTITLE_CUE }
 
 /** 单段时长下限（秒） */
 export const SEGMENT_DURATION_MIN = 3
@@ -14,12 +16,6 @@ export const SHOT_DURATION_MAX = 30
 
 /** 时长快捷选项（秒） */
 export const SEGMENT_DURATION_PRESETS = [4, 6, 8, 10, 12] as const
-
-/** 与后端一致的字幕 cue（后期叠字，非模型烧录） */
-export const SUBTITLE_CUE = '【字幕：后期叠旁白字幕，简体中文逐句同步】'
-
-/** 与后端一致的旁白前缀（科普自然偏快；旧稿「慢速清晰」仍可识别） */
-export const NARRATION_PREFIX = '【旁白·自然语速·同步字幕】'
 
 /** 脚本编辑区 placeholder */
 export const SEGMENT_SCRIPT_PLACEHOLDER = '@duration:4\nDescribe the visuals for this segment…\n@duration:8\nAdd the next segment of your script…'
@@ -125,7 +121,7 @@ export function parseSegmentScript(script: string | undefined | null): {
     .filter(Boolean)
 
   for (const line of lines) {
-    if (line.startsWith('【字幕') || line.startsWith('【BGM')) {
+    if (PRODUCTION_META_RE.test(line)) {
       cues.push(line)
       continue
     }
@@ -145,12 +141,10 @@ export function parseSegmentScript(script: string | undefined | null): {
   return { cues, beats }
 }
 
-const NARRATION_LINE_PREFIX = /^【旁白[^】]*】/
-
 /** 脚本行是否为旁白口播（字幕 cue 含「旁白」二字但不算） */
 export function isNarrationScriptLine(line: string): boolean {
   const stripped = line.trim()
-  if (stripped.startsWith('【字幕') || stripped.startsWith('【BGM')) return false
+  if (PRODUCTION_META_RE.test(stripped)) return false
   return NARRATION_LINE_PREFIX.test(stripped)
 }
 
@@ -168,7 +162,7 @@ export function narrationFromScript(script: string | undefined | null): string {
       if (text) parts.push(text)
     }
   }
-  return parts.join('')
+  return parts.join(' ')
 }
 
 /** 从脚本提取首段画面（非旁白、非 cue） */
@@ -178,8 +172,7 @@ export function firstVisualFromScript(script: string | undefined | null): string
     if (
       !stripped ||
       stripped.startsWith('@duration:') ||
-      stripped.startsWith('【字幕') ||
-      stripped.startsWith('【BGM') ||
+      PRODUCTION_META_RE.test(stripped) ||
       isNarrationScriptLine(stripped)
     ) {
       continue
@@ -222,7 +215,7 @@ export function replaceFirstVisualInScript(script: string, visual: string): stri
   let cueEnd = 0
   for (let i = 0; i < lines.length; i += 1) {
     const stripped = lines[i].trim()
-    if (stripped.startsWith('【字幕') || stripped.startsWith('【BGM') || !stripped) {
+    if (PRODUCTION_META_RE.test(stripped) || !stripped) {
       cueEnd = i + 1
       continue
     }
@@ -234,8 +227,7 @@ export function replaceFirstVisualInScript(script: string, visual: string): stri
       !replaced &&
       stripped &&
       !stripped.startsWith('@duration:') &&
-      !stripped.startsWith('【字幕') &&
-      !stripped.startsWith('【BGM') &&
+      !PRODUCTION_META_RE.test(stripped) &&
       !isNarrationScriptLine(stripped)
     ) {
       out.push(text)

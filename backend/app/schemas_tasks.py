@@ -5,9 +5,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.schemas_common import PageMeta
+from app.services.system_text import canonical_system_text, english_system_text
 
 
 class TaskTargetBind(BaseModel):
@@ -21,6 +22,8 @@ class TaskTargetBind(BaseModel):
 
 class TaskCreateRequest(BaseModel):
     """Create a platform task run."""
+
+    _canonical_notation = field_validator("payload", "result_payload", mode="before")(canonical_system_text)
 
     domain: str = Field(default="drama", description="drama | kepu | tools | api | studio")
     task_type: str = Field(min_length=1, max_length=64)
@@ -50,6 +53,8 @@ class TaskCreateRequest(BaseModel):
 class TaskUpdateRequest(BaseModel):
     """Update internal task lifecycle state."""
 
+    _canonical_notation = field_validator("payload", "result_payload", mode="before")(canonical_system_text)
+
     status: str | None = Field(default=None, max_length=32)
     current_step_key: str | None = Field(default=None, max_length=64)
     current_step_status: str | None = Field(default=None, max_length=32)
@@ -78,6 +83,8 @@ class TaskEventCreate(BaseModel):
 class TaskStepCreate(BaseModel):
     """Create a planned step for a task run."""
 
+    _canonical_notation = field_validator("input_payload", mode="before")(canonical_system_text)
+
     step_key: str = Field(min_length=1, max_length=64)
     step_type: str = Field(default="job", max_length=64)
     provider_name: str | None = Field(default=None, max_length=64)
@@ -86,6 +93,8 @@ class TaskStepCreate(BaseModel):
 
 class TaskStepOut(BaseModel):
     """Task step output model."""
+
+    _english_notation = field_validator("input_payload", "output_payload", mode="before")(english_system_text)
 
     id: int
     step_key: str
@@ -110,6 +119,8 @@ class TaskStepOut(BaseModel):
 class TaskTargetOut(BaseModel):
     """Task target output model."""
 
+    _english_notation = field_validator("metadata_json", mode="before")(english_system_text)
+
     id: int
     target_type: str
     target_id: int
@@ -122,6 +133,8 @@ class TaskTargetOut(BaseModel):
 
 class TaskEventOut(BaseModel):
     """Task event output model."""
+
+    _english_notation = field_validator("payload", mode="before")(english_system_text)
 
     id: int
     event_type: str
@@ -161,6 +174,8 @@ class TaskRunBriefOut(BaseModel):
 
 class TaskRunOut(BaseModel):
     """Unified task output model."""
+
+    _english_notation = field_validator("payload", "result_payload", mode="before")(english_system_text)
 
     id: int
     domain: str

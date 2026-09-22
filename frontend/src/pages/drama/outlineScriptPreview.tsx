@@ -119,7 +119,7 @@ function estimateLineSec(line: ParsedScriptLine): number {
   if (line.kind === 'empty' || line.kind === 'meta') return 0
   if (line.kind === 'action') {
     const t = line.text.trim()
-    if (t.startsWith('【空镜')) return 4
+    if (/^【(?:空镜|Establishing shot)/i.test(t)) return 4
     if (t.startsWith('△') || /^[△▲]/.test(t)) return 2
     return Math.min(10, Math.max(2, Math.floor(compactLen(t) / 12)))
   }

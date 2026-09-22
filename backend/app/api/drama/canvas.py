@@ -11,6 +11,7 @@ from app.models import User
 from app.models_drama import DramaAsset
 from app.schemas_drama import DramaCanvasSaveRequest
 from app.services.drama.access import get_owned_drama_project
+from app.services.system_text import english_system_text
 
 router = APIRouter()
 
@@ -25,7 +26,7 @@ async def get_canvas(
     content = project.content if isinstance(project.content, dict) else {}
     return {
         "project_id": project_id,
-        "nodes": content.get("canvas_nodes") or [],
+        "nodes": english_system_text(content.get("canvas_nodes") or []),
         "edges": content.get("canvas_edges") or [],
     }
 

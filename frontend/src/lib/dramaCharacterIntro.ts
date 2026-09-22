@@ -1,4 +1,5 @@
 /** 分集人物介绍叠字开关：模型叠字 / 关闭。 */
+import { CHARACTER_INTRO_CUE_RE } from './productionCues'
 
 export type DramaCharacterIntroMode = 'model' | 'off'
 
@@ -34,7 +35,7 @@ export function readEpisodeCharacterIntroEnabled(
 
 // 判断是否为人物介绍 cue 行。
 export function isCharacterIntroCueLine(line: string): boolean {
-  return line.trim().startsWith('【人物介绍')
+  return CHARACTER_INTRO_CUE_RE.test(line.trim())
 }
 
 // 从单条分镜正文去掉人物介绍叠字行。

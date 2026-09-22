@@ -12,24 +12,11 @@ import {
 } from './dramaEpisodePromptEditor'
 import { extractDurations, sumDuration } from './segmentDuration'
 import { DRAMA_VOICE_BINDING_ENABLED } from './dramaVoiceBinding'
-
-/** 漫剧字幕 cue（与后端 DRAMA_SUBTITLE_CUE 一致） */
-export const DRAMA_SUBTITLE_CUE = '【字幕：底部居中·简体中文·逐句轮换·与口播同步】'
-
-/** 画面无配音前缀 */
-export const VISUAL_PREFIX = '【画面·无配音仅环境音】'
-
-/** 对白前缀 */
-export const DIALOGUE_PREFIX = '【对白·慢速清晰·同步字幕】'
-
-/** 旁白前缀 */
-export const DRAMA_NARRATION_PREFIX = '【旁白·慢速清晰·同步字幕】'
-
-// 空镜 / 景别冒号标签（与后端 VISUAL_SHOT_LABEL_RE 对齐）
-const VISUAL_SHOT_LABEL_RE =
-  /^(?:空镜|画面|远景|近景|中景|全景|特写|大特写|跟拍|俯拍|仰拍|航拍|推镜|拉镜|摇镜|环境|镜头|动作|转场|闪回|建立镜头|气氛镜头|Establishing Shot|Long Shot|Wide Shot|Medium Shot|Close Shot|Close-up|Extreme Close-up|Atmospheric Shot|Push-in|Pull-out|Pan|Tracking Shot|Follow Shot|High-angle Shot|Low-angle Shot|Aerial Shot)\s*[：:]/i
-
-const VOICE_CUE_PREFIX_RE = /^【(?:对白|旁白|内心独白)[^】]*】\s*/
+import {
+  DIALOGUE_PREFIX, DRAMA_NARRATION_PREFIX, DRAMA_SUBTITLE_CUE, VISUAL_PREFIX,
+  PRODUCTION_META_RE, VISUAL_CUE_PREFIX_RE, VISUAL_SHOT_LABEL_RE, VOICE_CUE_PREFIX_RE,
+} from './productionCues'
+export { DIALOGUE_PREFIX, DRAMA_NARRATION_PREFIX, DRAMA_SUBTITLE_CUE, VISUAL_PREFIX }
 
 export type DramaScriptIssue = {
   level: 'error' | 'warn'
@@ -89,7 +76,7 @@ function listFragmentAssetIds(frag: DramaFragment): number[] {
 // 判断正文是否为纯画面 / 空镜描写
 export function isVisualDescriptionBody(text: string): boolean {
   let body = stripVoiceCuePrefix((text || '').trim())
-  body = body.replace(/^【(?:画面|空镜)[^】]*】\s*/, '').trim()
+  body = body.replace(VISUAL_CUE_PREFIX_RE, '').trim()
   if (!body) return false
   if (VISUAL_SHOT_LABEL_RE.test(body)) return true
   if (body.startsWith('空镜') || body.startsWith('△') || body.startsWith('Δ')) return true
@@ -101,21 +88,15 @@ function scriptLikelyNeedsVoice(content: string): boolean {
   for (const raw of (content || '').replace(/\r\n/g, '\n').split('\n')) {
     const line = raw.trim()
     if (!line || line.startsWith('@duration:')) continue
-    if (
-      line.startsWith('【字幕') ||
-      line.startsWith('【BGM') ||
-      line.startsWith('【人物介绍') ||
-      line.startsWith('【片头') ||
-      line.startsWith('【背景介绍')
-    ) {
+    if (PRODUCTION_META_RE.test(line)) {
       continue
     }
-    if (line.startsWith('【对白') || line.startsWith('【旁白') || line.startsWith('【内心独白')) {
+    if (VOICE_CUE_PREFIX_RE.test(line)) {
       if (!isVisualDescriptionBody(line)) return true
       continue
     }
     if (isVisualDescriptionBody(line)) continue
-    if (/^[^：:\n]{1,16}[：:]/.test(line) && !VISUAL_SHOT_LABEL_RE.test(line)) {
+    if (/^[^：:\n]{1,80}[：:]/.test(line) && !VISUAL_SHOT_LABEL_RE.test(line)) {
       return true
     }
   }
@@ -161,7 +142,7 @@ export function validateDramaFragmentScript(content: string): DramaScriptIssue[]
   for (const raw of (content || '').replace(/\r\n/g, '\n').split('\n')) {
     const line = raw.trim()
     if (!line || line.startsWith('@duration:')) continue
-    if (line.startsWith('【字幕') || line.startsWith('【BGM') || line.startsWith('【人物介绍')) {
+    if (PRODUCTION_META_RE.test(line)) {
       continue
     }
     if (VOICE_CUE_PREFIX_RE.test(line) && isVisualDescriptionBody(line)) {
