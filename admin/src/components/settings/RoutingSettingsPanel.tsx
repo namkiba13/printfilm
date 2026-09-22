@@ -41,7 +41,7 @@ const DEFAULT_KEYS = ["text_model", "image_model", "video_model", "audio_model"]
 function inferCapability(model: string): Capability {
   const mid = (model || "").trim().toLowerCase().replace(/\s+/g, "");
   if (!mid) return "text";
-  if (mid.includes("tts") || mid.startsWith("zh_") || mid.includes("speaker") || mid.startsWith("s_")) {
+  if (mid.includes("tts") || mid.includes("gpt-audio") || mid.startsWith("zh_") || mid.includes("speaker") || mid.startsWith("s_")) {
     return "audio";
   }
   if (mid.includes("seedance") || mid.includes("sora") || mid.includes("veo") || mid.includes("video") || mid.includes("i2v")) {

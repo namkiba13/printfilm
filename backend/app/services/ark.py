@@ -1704,17 +1704,20 @@ class ArkGateway:
         *,
         model: str | None = None,
     ) -> bool:
-        """TokenFree 上 Qwen-TTS 的 /audio/speech 未实现，改走 Omni/Gemini chat。"""
+        """Use the model's speech or chat-audio endpoint on the configured gateway."""
         base = (self.settings.ark_base_url or "").rstrip("/")
         key = (self.settings.ark_api_key or "").strip()
         if not base or not key:
             return False
         model_id = (model or self._resolved_audio_model()).strip()
-        if uses_tokenfree_audio(base_url=base):
+        on_tokenfree = uses_tokenfree_audio(base_url=base)
+        if on_tokenfree:
             model_id = tokenfree_tts_chat_model(resolve_tokenfree_tts_model(model_id))
+        chat_audio = tokenfree_tts_uses_chat_audio(model_id)
+        if on_tokenfree or chat_audio:
             voice = tokenfree_speech_voice(voice, model_id)
-            if tokenfree_tts_uses_chat_audio(model_id):
-                return await self._tts_openai_chat_audio(text, voice, dest, model=model_id)
+        if chat_audio:
+            return await self._tts_openai_chat_audio(text, voice, dest, model=model_id)
         async with httpx.AsyncClient(timeout=120.0) as client:
             resp = await client.post(
                 f"{base}/audio/speech",
@@ -1736,8 +1739,6 @@ class ArkGateway:
                 model_id,
                 (resp.text or "")[:300],
             )
-        if uses_tokenfree_audio(base_url=base) and tokenfree_tts_uses_chat_audio(model_id):
-            return await self._tts_openai_chat_audio(text, voice, dest, model=model_id)
         return False
 
     async def _tts_openai_chat_audio(
@@ -1748,7 +1749,7 @@ class ArkGateway:
         *,
         model: str,
     ) -> bool:
-        """Gemini 非流式 chat 出音频；Qwen-Omni 必须 SSE 流式。"""
+        """GPT/Gemini return chat audio; Qwen-Omni requires streaming SSE."""
         base = (self.settings.ark_base_url or "").rstrip("/")
         if not base:
             return False
@@ -1763,6 +1764,12 @@ class ArkGateway:
                 "audio": {"voice": voice, "format": "mp3"},
             }
         )
+        if "gpt-audio" in model.lower():
+            body["modalities"] = ["text", "audio"]
+            body["messages"].insert(0, {
+                "role": "system",
+                "content": "Read the user's text aloud exactly as written, in its original language. Do not answer, rewrite, explain, or add words.",
+            })
         async with httpx.AsyncClient(timeout=120.0) as client:
             resp = await client.post(f"{base}/chat/completions", headers=self._headers(), json=body)
         if resp.status_code >= 400:
@@ -1862,23 +1869,18 @@ class ArkGateway:
             except Exception as exc:  # noqa: BLE001
                 logger.warning("openspeech TTS failed: %s", exc)
 
-        # TokenFree：默认模型 + Gemini / ElevenLabs / Qwen 其它 TTS 依次试
-        if on_tokenfree:
-            for model_id in iter_tokenfree_tts_models(audio_model):
-                try:
-                    ok = await self._tts_openai_speech(clean, speaker, dest, model=model_id)
-                    if ok:
-                        url = await _accept_if_audible("tokenfree-speech")
-                        if url:
-                            logger.info(
-                                "TTS tokenfree ok shot=%s model=%s bytes=%s",
-                                shot_no,
-                                model_id,
-                                dest.stat().st_size,
-                            )
-                            return url
-                except Exception as exc:  # noqa: BLE001
-                    logger.warning("tokenfree speech failed model=%s: %s", model_id, exc)
+        # Try the configured API model before Edge; TokenFree also has its legacy fallback list.
+        models = iter_tokenfree_tts_models(audio_model) if on_tokenfree else [audio_model]
+        for model_id in models:
+            try:
+                ok = await self._tts_openai_speech(clean, speaker, dest, model=model_id)
+                if ok:
+                    url = await _accept_if_audible("upstream-speech")
+                    if url:
+                        logger.info("TTS upstream ok shot=%s model=%s bytes=%s", shot_no, model_id, dest.stat().st_size)
+                        return url
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("upstream speech failed model=%s: %s", model_id, exc)
 
         # edge-tts：按 speaker 映射不同 neural，上游都失败时仍能分出角色声线
         try:
@@ -1889,17 +1891,6 @@ class ArkGateway:
                 return url
         except Exception as exc:  # noqa: BLE001
             logger.warning("edge-tts failed: %s", exc)
-
-        # 非 TokenFree 时再试 /audio/speech（方舟等）
-        if not on_tokenfree:
-            try:
-                ok = await self._tts_openai_speech(clean, speaker, dest, model=audio_model)
-                if ok:
-                    url = await _accept_if_audible("ark-speech")
-                    if url:
-                        return url
-            except Exception as exc:  # noqa: BLE001
-                logger.warning("Ark TTS failed: %s", exc)
 
         logger.error("TTS all providers failed shot=%s", shot_no)
         raise RuntimeError('Voiceover failed: The voice service is temporarily unavailable. Please try again later')

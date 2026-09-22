@@ -32,6 +32,7 @@ def infer_model_capability(model: str) -> LogicalModelCapability:
         return "text"
     if (
         "tts" in mid
+        or "gpt-audio" in mid
         or "text-to-speech" in mid
         or "text-to-dialogue" in mid
         or "elevenlabs" in mid

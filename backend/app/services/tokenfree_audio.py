@@ -76,8 +76,10 @@ def iter_tokenfree_tts_models(preferred: str | None) -> list[str]:
 
 
 def tokenfree_tts_uses_chat_audio(model: str) -> bool:
-    """Gemini TTS / Qwen-TTS / Qwen-Omni 都走 chat 出音频，不要打 /audio/speech。"""
+    """GPT Audio / Gemini TTS / Qwen use chat audio instead of /audio/speech."""
     low = (model or "").casefold()
+    if "gpt-audio" in low:
+        return True
     if "gemini" in low and "tts" in low:
         return True
     if "qwen-tts" in low:
@@ -94,6 +96,7 @@ def tokenfree_tts_uses_omni_stream(model: str) -> bool:
 # qwen-tts 实际认的音色名；豆包 zh_* / S_ 不在此列
 _TOKENFREE_NATIVE_VOICES = frozenset({"Cherry", "Serena", "Ethan", "Chelsie", "alloy"})
 _TOKENFREE_NATIVE_VOICES_FOLD = {v.casefold(): v for v in _TOKENFREE_NATIVE_VOICES}
+_GPT_AUDIO_VOICES = frozenset({"alloy", "ash", "ballad", "coral", "echo", "sage", "shimmer", "verse", "marin", "cedar"})
 
 
 def tokenfree_speech_honors_speaker(speaker: str) -> bool:
@@ -112,6 +115,8 @@ def tokenfree_speech_voice(speaker: str, model: str = "") -> str:
     raw = (speaker or "").strip()
     native = _TOKENFREE_NATIVE_VOICES_FOLD.get(raw.casefold())
     mid = (model or "").casefold()
+    if "gpt-audio" in mid:
+        return raw.casefold() if raw.casefold() in _GPT_AUDIO_VOICES else ("echo" if _speaker_is_male(raw) else "alloy")
     if native and "gemini" not in mid and "eleven" not in mid:
         return native
     male = _speaker_is_male(raw)
