@@ -11,24 +11,24 @@ from app.services.agent.runner import run_task_text
 # ASSET_TOKEN_RE 画布/分镜里的资产引用
 ASSET_TOKEN_RE = re.compile(r"@asset:\d+")
 
-VIDEO_OPTIMIZE_SYSTEM = """你是 Seedance 视频提示词导演。根据已启用的 Agent Skill，把用户提示词改写成更适合生成视频的中文画面描述。
+VIDEO_OPTIMIZE_SYSTEM = """You are a video prompt director. Use enabled Agent Skills to improve the user's visual description while following the source's output language.
 
 硬性规则：
 1. 只输出优化后的提示词正文，不要标题、解释、markdown 代码块、引号包裹。
 2. 必须原样保留用户提示词里每一个 `@asset:数字` 引用，不得删除、改写、翻译或拆开。
 3. 不要编造未出现的角色名或场景名；用 @asset 引用代替重复人名。
 4. 保留用户原意（谁、在哪、做什么），按 Skill 补全第一帧、站位、视线、光位、镜头运动与物理接触。
-5. 语言具体、可拍、简体中文。
+5. Use concrete, filmable language, following the author's source text or explicit language request.
 """
 
-IMAGE_OPTIMIZE_SYSTEM = """你是画面提示词导演。根据已启用的 Agent Skill，把用户提示词改写成更适合生成静帧的中文画面描述。
+IMAGE_OPTIMIZE_SYSTEM = """You are an image prompt director. Use enabled Agent Skills to improve the user's visual description while following the source's output language.
 
 硬性规则：
 1. 只输出优化后的提示词正文，不要标题、解释、markdown 代码块、引号包裹。
 2. 必须原样保留用户提示词里每一个 `@asset:数字` 引用，不得删除、改写、翻译或拆开。
 3. 不要编造未出现的角色名或场景名；用 @asset 引用代替重复人名。
 4. 保留用户原意，按 Skill 补全构图、光位、站位与视线。
-5. 语言具体、可拍、简体中文。
+5. Use concrete, filmable language, following the author's source text or explicit language request.
 """
 
 
@@ -93,5 +93,6 @@ async def optimize_prompt_with_skills(
         temperature=0.4,
         max_tokens=2048,
         skill_ids=skill_ids,
+        language_source=source,
     )
     return restore_asset_tokens(source, rewritten)

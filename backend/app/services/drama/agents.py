@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from app.services.drama.llm import drama_chat_json
+from app.services.content_language import truncate_text
 from app.services.drama.script_summary_prompt import (
     SCRIPT_SUMMARY_SYSTEM_PROMPT,
     build_script_summary_user_message,
@@ -21,119 +22,64 @@ MANUAL_EPISODE_ORIGIN = "manual"
 MAX_DRAMA_EPISODES = 120
 
 # 与 manju episodeScript 对齐：先规划全集集名
-EPISODE_OUTLINE_SYSTEM = """你是专业的短剧/网剧编剧策划，负责根据原始创意与剧本摘要，规划全部分集的「集数 + 集名」大纲。
+EPISODE_OUTLINE_SYSTEM = """Plan the complete episode outline from the original idea and story summary.
+Return exactly the requested number of episodes, numbered consecutively from 1.
+Each title must be a short, complete phrase in the original idea's output language.
+Cover the setup, escalating conflict, turning points, climax and ending. Connect adjacent
+episodes causally and avoid repetitive hooks. Preserve established names.
+Return only JSON: {"episodes":[{"episodeNumber":1,"title":"..."}]}"""
 
-输出要求：
-1. 必须严格按照用户给定的总集数生成，episodes 数组长度必须与总集数完全一致
-2. episodeNumber 从 1 开始连续递增，不得跳号、不得重复
-3. 每集 title 为 4-12 个汉字的集名，概括本集核心事件或冲突钩子，风格参考：金箍碎佛规、罪臣之子承玄圭
-4. 全剧分集须覆盖剧本摘要中的起承转合：前期立人设与世界观、中期升级矛盾与反转、后期高潮与结局，节奏适合短剧连载
-5. 相邻集名之间要有因果衔接与追剧钩子，避免重复套路
-6. 语言使用简体中文
+EPISODE_BODY_FORMAT = """
+Screenplay format for each content string:
+1. Use 2–3 scenes, headed '### Scene {episode}-{scene}', for example '### Scene 1-2'.
+2. Next line: DAY/NIGHT/DAWN followed by INT or EXT and the location name.
+3. Next line: 'Cast: name, name'. Include on-screen characters only, using their full established names.
+4. Start each action line with △. Describe concrete framing, blocking, props and expressions.
+5. Dialogue: 'Character name (emotion/vo/os): spoken words'. Use vo for voiceover and os for inner monologue.
+6. Optional visual-only lines start 'Establishing Shot:' or 'Wide Shot:'. Do not read these as narration.
+7. Do not repeat the episode title inside content. Write a full filmable episode, not a synopsis.
+8. Include 2–3 action beats and 2–3 lines of dialogue per scene. Keep it concise but at least
+   450 characters overall, targeting 60–90 seconds of screen time without padding.
+9. Keep the machine labels Scene, Cast, DAY/NIGHT, INT/EXT, △, vo/os as written.
+   All actual titles, descriptions and spoken content follow the original idea's output language.
+Return only a JSON object, never a bare array or Markdown fence.
+"""
 
-必须输出严格 JSON：
-{"episodes":[{"episodeNumber":1,"title":"集名"}, ...]}"""
+EPISODE_BATCH_CONTENT_SYSTEM = """Write the requested batch of complete episode screenplays.
+Return only the requested episode numbers, with no omissions or extras. Use the original
+idea, summary, full episode plan and previous scripts to preserve continuity. End the batch
+with a suitable hook. Include a brief creative idea and plot summary for each episode.
+JSON: {"episodes":[{"episodeNumber":1,"title":"...","creative":"...","summary":"...","content":"..."}]}
+""" + EPISODE_BODY_FORMAT
 
-# 与 manju episodeScript 对齐：逐集撰写拍摄正文
-EPISODE_BATCH_CONTENT_SYSTEM = """你是专业的短剧/网剧编剧，负责根据原始创意、剧本摘要、分集规划与已有剧集正文，撰写指定集数的拍摄剧本正文。
+EPISODE_OPTIMIZE_SYSTEM = """Turn the author's episode draft into a filmable screenplay.
+Preserve characters, conflicts, scene intentions and key dialogue. If the draft is already
+a screenplay, improve structure rather than inventing another story. If it is an outline,
+expand its events into complete scenes. Respect the series context and adjacent episodes.
+Return exactly one requested episode: {"episodes":[{"episodeNumber":1,"title":"...","content":"..."}]}
+""" + EPISODE_BODY_FORMAT
 
-输出要求：
-1. 每次任务只输出用户指定批次范围内的集数，episodes 数组长度必须与批次集数完全一致
-2. episodeNumber 须与用户指定的集数一一对应，不得遗漏、不得额外生成
-3. 须携带并参考「已有剧集正文」保持剧情、人设与世界观连贯；首批次无已有正文时从第 1 集开篇写起
-4. 批次内各集之间须有因果衔接，末集结尾留追剧钩子
-5. 必须输出对象格式：{"episodes":[{"episodeNumber":数字,"title":"集名","creative":"本集创意","summary":"本集摘要","content":"..."}]}，不要直接输出数组
-6. creative 为本集 80-200 字创意梗概；summary 为本集 120-300 字剧情摘要；content 为正文主字段；不要把正文写得过短
+EPISODE_SUMMARY_FROM_CREATIVE_SYSTEM = """Write a plot summary for the single requested episode.
+Use its original idea plus the series context and adjacent episodes. Describe characters,
+conflict, turning point and ending hook in one substantial paragraph, not screenplay form.
+Preserve established character names; give full names for new characters. You may improve
+the short episode title. Use the original idea's output language throughout.
+Return only JSON: {"episodes":[{"episodeNumber":1,"title":"...","summary":"..."}]}
+Do not return content/body."""
 
-格式要求（每集 content 须严格遵守）：
-1. 按场次组织，场号格式为 ### 场{集数}-{场次}，如第 1 集第 2 场：### 场1-2
-2. 场头下一行写时间内外景，如：日 内 灵山大雄宝殿 / 夜 外 妖寨大门外 / 晨外 羽山刑场
-3. 下一行写：出场人物：角色A、角色B（只写可出镜人物名；不要写「某某（声音）」「某某音色」等音色标注）
-4. 动作用 △ 开头，独占一行；动作须具体可拍（景别、调度、道具、表情），禁止一句带过
-5. 台词格式：角色名（情绪/vo/os/动作）：台词内容；旁白用 vo，内心独白用 os；台词要有潜台词与冲突；括号内写情绪/vo/os，不要写「声音」「音色」
-6. 关键镜头可用【空镜：描述】收尾一场或一段
-7. content 内不要输出「第X集」或「X.集名：」标题行，只输出场戏正文
-8. 每集 2-3 场；每场 2-3 段 △ 动作与 2-3 句台词（或对白+vo）；整集 content 约 450-600 汉字，节奏紧凑、不注水
-9. 语言使用简体中文，偏影视剧本风格，动作与台词可拍摄、有张力"""
+EPISODE_BODY_FROM_BRIEF_SYSTEM = """Write a complete filmable screenplay for the single requested episode.
+Follow its idea and summary rather than starting a different story. Preserve continuity
+with the series context and adjacent episodes. Use established character names and introduce
+any new character by full name in the cast list.
+Return {"episodes":[{"episodeNumber":1,"title":"...","content":"..."}]} with exactly one episode.
+""" + EPISODE_BODY_FORMAT
 
-# 把用户草稿改写成可拍摄分集正文
-EPISODE_OPTIMIZE_SYSTEM = """你是专业的短剧/网剧编剧，负责把用户提供的分集剧本草稿，改写成可拍摄的分集正文。
-
-工作原则：
-1. 以用户草稿为剧情与台词的主要依据，保留人物、冲突、场次意图和关键对白，不要另起一套故事
-2. 草稿已经接近拍摄格式时，做结构整理、补全场头/动作/台词，不要大幅改情节
-3. 草稿只是梗概或提纲时，按草稿情节扩写成完整场戏，不得跑题
-4. 须参考原始创意、剧本摘要与前后集，保持人设与世界观连贯
-5. 只输出用户指定的那一集，episodes 数组必须恰好 1 项
-
-格式要求（content 须严格遵守）：
-1. 按场次组织，场号格式为 ### 场{集数}-{场次}，如第 2 集第 1 场：### 场2-1
-2. 场头下一行写时间内外景，如：日 内 教室 / 夜 外 天台
-3. 下一行写：出场人物：角色A、角色B（只写可出镜人物名；不要写音色标注）
-4. 动作用 △ 开头，独占一行；动作须具体可拍
-5. 台词格式：角色名（情绪/vo/os/动作）：台词内容；旁白用 vo，内心独白用 os
-6. 关键镜头可用【空镜：描述】
-7. content 内不要输出「第X集」或「X.集名：」标题行，只输出场戏正文
-8. 每集 2-3 场；整集 content 约 450-600 汉字，节奏紧凑
-9. 语言使用简体中文
-
-必须输出严格 JSON：
-{"episodes":[{"episodeNumber":数字,"title":"集名","content":"..."}]}"""
-
-
-# 本集创意 → 集级摘要
-EPISODE_SUMMARY_FROM_CREATIVE_SYSTEM = """你是专业的短剧/网剧编剧策划，根据整剧设定与本集原始创意，撰写本集「剧情摘要」。
-
-输出要求：
-1. 只输出用户指定的那一集，episodes 数组必须恰好 1 项
-2. summary 为本集 120-300 字剧情摘要：人物、冲突、转折、结尾钩子；不要写成场戏正文
-3. 可顺带优化 title（4-12 字集名）；不要输出 content/body
-4. 须参考整剧创意、全剧摘要、全集集名、邻集正文与邻集摘要，保持人设与世界观连贯
-5. 若提供「已有定妆角色名」，摘要中人物称呼须优先使用这些定妆名；新角色须写清全名
-6. 语言使用简体中文
-
-必须输出严格 JSON：
-{"episodes":[{"episodeNumber":数字,"title":"集名","summary":"..."}]}"""
-
-
-# 本集创意+摘要 → 拍摄正文（约束与批量 EPISODE_BATCH_CONTENT_SYSTEM 对齐）
-EPISODE_BODY_FROM_BRIEF_SYSTEM = """你是专业的短剧/网剧编剧，根据本集原始创意与剧情摘要，撰写可拍摄的分集正文。
-
-输出要求：
-1. 只输出用户指定的那一集，episodes 数组必须恰好 1 项
-2. 以本集创意与摘要为情节依据，不要另起故事
-3. 须参考整剧设定、全集集名与邻集正文，保持剧情、人设与世界观连贯
-4. content 为正文主字段；不要把正文写得过短
-5. 若提供「已有定妆角色名」，出场人物与台词角色名须优先使用这些定妆名；新角色须在出场人物行写清全名
-
-格式要求（content 须严格遵守）：
-1. 按场次组织，场号格式为 ### 场{集数}-{场次}，如第 2 集第 1 场：### 场2-1
-2. 场头下一行写时间内外景，如：日 内 教室 / 夜 外 天台 / 晨外 操场
-3. 下一行写：出场人物：角色A、角色B（只写可出镜人物名；不要写「某某（声音）」「某某音色」等音色标注）
-4. 动作用 △ 开头，独占一行；动作须具体可拍（景别、调度、道具、表情），禁止一句带过
-5. 台词格式：角色名（情绪/vo/os/动作）：台词内容；旁白用 vo，内心独白用 os；台词要有潜台词与冲突；括号内写情绪/vo/os，不要写「声音」「音色」
-6. 关键镜头可用【空镜：描述】收尾一场或一段
-7. content 内不要输出「第X集」或「X.集名：」标题行，只输出场戏正文
-8. 每集 2-3 场；每场 2-3 段 △ 动作与 2-3 句台词（或对白+vo）；整集 content 约 450-600 汉字
-9. 语言使用简体中文，偏影视剧本风格，动作与台词可拍摄、有张力
-
-必须输出严格 JSON：
-{"episodes":[{"episodeNumber":数字,"title":"集名","content":"..."}]}"""
-
-
-# 已有正文 → 反推本集创意 + 摘要
-EPISODE_BRIEF_FROM_BODY_SYSTEM = """你是专业的短剧/网剧编剧策划。根据已有拍摄正文，反推本集「原始创意」与「剧情摘要」。
-
-输出要求：
-1. 只输出用户指定的那一集，episodes 数组必须恰好 1 项
-2. creative 为本集 80-200 字原始创意：故事起点、核心冲突、看点；不要写成场戏
-3. summary 为本集 120-300 字剧情摘要：人物、冲突、转折、结尾钩子；不要写成场戏正文
-4. 可顺带优化 title（4-12 字集名）；不要输出 content/body
-5. 须忠实于正文已有情节，不要另起故事
-6. 语言使用简体中文
-
-必须输出严格 JSON：
-{"episodes":[{"episodeNumber":数字,"title":"集名","creative":"...","summary":"..."}]}"""
+EPISODE_BRIEF_FROM_BODY_SYSTEM = """Infer a concise original idea and plot summary from the supplied episode screenplay.
+Stay faithful to its existing events. The creative field explains the starting situation,
+central conflict and hook; summary covers characters, conflict, turning point and ending.
+Use the original idea's output language. You may improve the short title, but do not rewrite
+or return content/body. Return exactly one requested episode in this JSON object:
+{"episodes":[{"episodeNumber":1,"title":"...","creative":"...","summary":"..."}]}"""
 
 
 def _format_neighbor_episode_briefs(episodes: list[dict[str, Any]], number: int, limit: int = 3) -> str:
@@ -254,6 +200,7 @@ async def run_episode_summary_from_creative(
         EPISODE_SUMMARY_FROM_CREATIVE_SYSTEM,
         "\n\n".join(user_parts),
         max_tokens=4096,
+        language_source=project_source or brief,
     )
     episodes = data.get("episodes") if isinstance(data, dict) else None
     if not isinstance(episodes, list) or not episodes:
@@ -309,6 +256,7 @@ async def run_episode_body_from_brief(
         EPISODE_BODY_FROM_BRIEF_SYSTEM,
         "\n\n".join(user_parts),
         max_tokens=8192,
+        language_source=project_source or brief or syn,
     )
     episodes = data.get("episodes") if isinstance(data, dict) else None
     if not isinstance(episodes, list):
@@ -327,11 +275,12 @@ async def run_episode_body_from_brief(
             "\n\n".join(
                 user_parts
                 + [
-                    f"上一稿过短（不足 {MIN_EPISODE_CONTENT_CHARS} 字），请扩写至约 {TARGET_EPISODE_CONTENT_CHARS} 汉字，"
+                    f"The previous draft was too short. Expand to at least {MIN_EPISODE_CONTENT_CHARS} characters in the same output language; "
                     f"含 {EPISODE_SCENE_COUNT_HINT}、每场 2-3 段 △ 与 2-3 句台词，仍只输出第 {number} 集。"
                 ]
             ),
             max_tokens=8192,
+            language_source=project_source or brief or syn,
         )
         retry_eps = retry.get("episodes") if isinstance(retry, dict) else None
         if isinstance(retry_eps, list):
@@ -412,6 +361,7 @@ async def run_episode_brief_from_body(
         EPISODE_BRIEF_FROM_BODY_SYSTEM,
         "\n\n".join(user_parts),
         max_tokens=4096,
+        language_source=project_source or script_body,
     )
     episodes = data.get("episodes") if isinstance(data, dict) else None
     if not isinstance(episodes, list) or not episodes:
@@ -454,6 +404,7 @@ async def run_script_summary(
         SCRIPT_SUMMARY_SYSTEM_PROMPT,
         user_message,
         max_tokens=8192,
+        language_source=trimmed,
     )
     if episode_count:
         data["episodeCount"] = episode_count
@@ -629,10 +580,7 @@ def normalize_series_title(raw: str | None) -> str:
         return ""
     title = title.strip("「」『』《》\"'“”‘’").strip()
     title = title.splitlines()[0].strip()
-    # 截到合理项目名长度（中文短剧名）
-    if len(title) > 24:
-        title = title[:24].rstrip("，。；、…·-— ")
-    return title
+    return truncate_text(title, 80 if " " in title else 24).rstrip("，。；、…·-— ")
 
 
 def pick_auto_project_title(
@@ -758,7 +706,7 @@ async def run_episode_outline(
             "请输出全部分集的 episodeNumber 与 title。",
         ]
     )
-    data = await drama_chat_json(EPISODE_OUTLINE_SYSTEM, user, max_tokens=4096)
+    data = await drama_chat_json(EPISODE_OUTLINE_SYSTEM, user, max_tokens=4096, language_source=creative or summary_text)
     episodes = data.get("episodes") if isinstance(data, dict) else data
     if not isinstance(episodes, list) or not episodes:
         raise ValueError('Invalid episode outline response format')
@@ -829,7 +777,7 @@ async def run_episode_script_batch(
             f"当前任务：撰写第 {start} 集至第 {end} 集（共 {batch_size_n} 集）的完整剧本正文",
             f"全剧共 {target} 集",
             f"episodes 输出数组必须恰好 {batch_size_n} 项，episodeNumber 从 {start} 到 {end}",
-            f"每集 content 约 {TARGET_EPISODE_CONTENT_CHARS} 汉字（不少于 {MIN_EPISODE_CONTENT_CHARS}），含 {EPISODE_SCENE_COUNT_HINT}、精简 △ 与台词",
+            f"Each content must be at least {MIN_EPISODE_CONTENT_CHARS} characters in the output language, with {EPISODE_SCENE_COUNT_HINT}, concise △ actions and dialogue.",
             "",
             f"原始创意：\n{(creative or '').strip() or '（无额外创意，以摘要为准）'}",
             "",
@@ -850,6 +798,7 @@ async def run_episode_script_batch(
         user,
         temperature=0.6,
         max_tokens=16384,
+        language_source=creative or summary_text,
     )
 
     episodes = data.get("episodes") if isinstance(data, dict) else data
@@ -868,13 +817,14 @@ async def run_episode_script_batch(
             user
             + "\n\n上次输出过短。请重写本批次，每集 content 约 "
             + str(TARGET_EPISODE_CONTENT_CHARS)
-            + f" 汉字（不少于 {MIN_EPISODE_CONTENT_CHARS}），含 {EPISODE_SCENE_COUNT_HINT}、精简 △ 与台词，不得压缩成梗概。"
+            + f" characters in the same output language (at least {MIN_EPISODE_CONTENT_CHARS}), with {EPISODE_SCENE_COUNT_HINT}, actions and dialogue; do not reduce it to a synopsis."
         )
         retry = await drama_chat_json(
             EPISODE_BATCH_CONTENT_SYSTEM,
             retry_user,
             temperature=0.6,
             max_tokens=16384,
+            language_source=creative or summary_text,
         )
         retry_eps = retry.get("episodes") if isinstance(retry, dict) else retry
         if isinstance(retry_eps, list):
@@ -919,7 +869,7 @@ async def run_episode_script_from_draft(
             f"当前任务：把用户草稿优化为第 {number} 集完整拍摄剧本",
             f"episodeNumber 必须为 {number}，episodes 数组必须恰好 1 项",
             f"当前集名：{current_title}（可按草稿核心事件微调 title）",
-            f"每集 content 约 {TARGET_EPISODE_CONTENT_CHARS} 汉字（不少于 {MIN_EPISODE_CONTENT_CHARS}），含 {EPISODE_SCENE_COUNT_HINT}、精简 △ 与台词",
+            f"Each content must be at least {MIN_EPISODE_CONTENT_CHARS} characters in the output language, with {EPISODE_SCENE_COUNT_HINT}, concise △ actions and dialogue.",
             *ctx,
             f"用户提供的第 {number} 集草稿：\n{draft_text}",
             f"请输出第 {number} 集的 title 与 content。",
@@ -930,6 +880,7 @@ async def run_episode_script_from_draft(
         user,
         temperature=0.55,
         max_tokens=16384,
+        language_source=creative or draft_text,
     )
     episodes = data.get("episodes") if isinstance(data, dict) else data
     if not isinstance(episodes, list):
@@ -947,13 +898,14 @@ async def run_episode_script_from_draft(
             + str(number)
             + " 集，content 约 "
             + str(TARGET_EPISODE_CONTENT_CHARS)
-            + f" 汉字（不少于 {MIN_EPISODE_CONTENT_CHARS}），含 {EPISODE_SCENE_COUNT_HINT}、精简 △ 与台词。"
+            + f" characters in the same output language (at least {MIN_EPISODE_CONTENT_CHARS}), with {EPISODE_SCENE_COUNT_HINT}, concise actions and dialogue."
         )
         retry = await drama_chat_json(
             EPISODE_OPTIMIZE_SYSTEM,
             retry_user,
             temperature=0.55,
             max_tokens=16384,
+            language_source=creative or draft_text,
         )
         retry_eps = retry.get("episodes") if isinstance(retry, dict) else retry
         if isinstance(retry_eps, list):

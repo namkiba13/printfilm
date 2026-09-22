@@ -443,8 +443,9 @@ async def ai_chat(
 
         try:
             reply = await drama_chat_text(
-                'You are the PRINTFILM AI Drama creation assistant, helping users develop short drama ideas, characters, and episode structures. Answer concisely in English.',
+                'You are the PRINTFILM AI Drama creation assistant, helping users develop short drama ideas, characters, and episode structures. Answer concisely in the language of the user’s idea or their explicitly requested language.',
                 body.message,
+                language_source=body.message,
             )
         except DramaLlmUnavailableError as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc

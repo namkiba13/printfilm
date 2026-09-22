@@ -76,7 +76,7 @@ def _ensure_json_word_in_prompt(system: str, user: str) -> tuple[str, str]:
     blob = f"{system or ''}\n{user or ''}".lower()
     if "json" in blob:
         return system, user
-    suffix = "\n\n请只输出合法 JSON 对象，不要 markdown 代码围栏。"
+    suffix = "\n\nReturn only a valid JSON object without Markdown fences."
     return (system or "").rstrip() + suffix, user
 
 
@@ -86,6 +86,7 @@ async def drama_chat_json(
     *,
     temperature: float = 0.6,
     max_tokens: int = DEFAULT_MAX_TOKENS,
+    language_source: str | None = None,
 ) -> Any:
     """Call text LLM and parse JSON from the reply."""
     system, user = _ensure_json_word_in_prompt(system, user)
@@ -98,6 +99,7 @@ async def drama_chat_json(
             max_tokens=max_tokens,
             timeout=300.0,
             response_format=json_format,
+            language_source=language_source,
         )
     except RuntimeError as exc:
         # 部分兼容网关不支持 response_format，降级为普通调用
@@ -110,6 +112,7 @@ async def drama_chat_json(
             temperature=temperature,
             max_tokens=max_tokens,
             timeout=300.0,
+            language_source=language_source,
         )
 
     try:
@@ -122,8 +125,8 @@ async def drama_chat_json(
         )
         retry_user = (
             f"{user}\n\n"
-            "【重要】上次输出不是合法 JSON。请只输出一个完整、可 json.loads 的 JSON 对象，"
-            "不要 markdown、不要代码围栏、字符串内不要未转义换行。"
+            "The previous response was not valid JSON. Return one complete JSON object, "
+            "without Markdown fences or unescaped newlines inside strings. Keep the requested output language."
         )
         content = await chat_completions(
             system,
@@ -132,6 +135,7 @@ async def drama_chat_json(
             max_tokens=max_tokens,
             timeout=300.0,
             response_format=json_format,
+            language_source=language_source,
         )
         return _extract_json(content)
 
@@ -142,6 +146,7 @@ async def drama_chat_text(
     *,
     temperature: float = 0.6,
     max_tokens: int = 8192,
+    language_source: str | None = None,
 ) -> str:
     """Call text LLM and return plain text."""
     return await chat_completions(
@@ -150,4 +155,5 @@ async def drama_chat_text(
         temperature=temperature,
         max_tokens=max_tokens,
         timeout=180.0,
+        language_source=language_source,
     )

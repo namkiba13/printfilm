@@ -940,6 +940,7 @@ async def run_episode_fragment_plan_job(
                 summary=summary,
                 episode_bodies=all_bodies,
                 story_type=str(summary.get("storyType") or "") or None,
+                language_source=script.source if script else body,
             )
             if include_character_intro
             else {}
@@ -949,6 +950,7 @@ async def run_episode_fragment_plan_job(
             drafts = await plan_fragments_with_llm(
                 episode_name=episode.name or "",
                 episode_body=body,
+                language_source=script.source if script else body,
                 assets=assets,
                 episode_number=ep_no,
                 project_title=project.title or "",

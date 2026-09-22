@@ -5,10 +5,12 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from app.services.content_language import truncate_text
 from app.services.seedance_segments import (
     DRAMA_SUBTITLE_CUE,
     DIALOGUE_PREFIX,
     VISUAL_PREFIX,
+    VISUAL_SHOT_LABEL_RE,
     classify_voice_body,
     is_production_meta_line,
 )
@@ -20,16 +22,16 @@ from app.services.drama.fragment_asset_limit import (
 )
 
 # 场次标题：### 场1-2 / ### 场景1-2
-SCENE_HEADER_RE = re.compile(r"^###\s*场(?:景)?\s*\d+\s*[-－—]\s*\d+\s*$")
+SCENE_HEADER_RE = re.compile(r"^###\s*(?:场(?:景)?|Scene)\s*\d+\s*[-－—]\s*\d+\s*$", re.I)
 # 兼容无空格、或标题后带说明
-SCENE_HEADER_LOOSE_RE = re.compile(r"^###\s*场(?:景)?\s*\d+\s*[-－—]\s*\d+")
+SCENE_HEADER_LOOSE_RE = re.compile(r"^###\s*(?:场(?:景)?|Scene)\s*\d+\s*[-－—]\s*\d+", re.I)
 # 时间内外景行
 SCENE_LOCATION_RE = re.compile(
-    r"^(?:日|夜|晨|黄昏|傍晚|凌晨|清晨|午|晚)?\s*(?:内|外|内外)\s+(.+)$"
+    r"^(?:日|夜|晨|黄昏|傍晚|凌晨|清晨|午|晚|DAY|NIGHT|DAWN|DUSK|MORNING|EVENING)?\s*(?:内外|内|外|INT\.?/EXT\.?|INT\.?|EXT\.?)\s+(.+)$", re.I
 )
 # 出场人物行
-CAST_LINE_RE = re.compile(r"^出场人物[：:]\s*(.+)$")
-EMPTY_CAST = {"无", "无出场", "无人物", "-", "—", "无。"}
+CAST_LINE_RE = re.compile(r"^(?:出场人物|Cast|Characters|Nhân vật)[：:]\s*(.+)$", re.I)
+EMPTY_CAST = {"无", "无出场", "无人物", "-", "—", "无。", "None", "none", "Không", "không"}
 
 FRAGMENT_DURATION_MIN = 3
 # 单行/单块 @duration 上限（对白、空镜等；整镜硬上限见 FRAGMENT_TOTAL_MAX）
@@ -57,18 +59,9 @@ CHARACTER_INTRO_LINE_RE = re.compile(
     r"^【人物介绍·画面叠字(?:·角色身旁)?】\s*([^｜\|\n]+?)(?:\s*[｜|].*)?$"
 )
 LEGACY_CHARACTER_INTRO_CUE = "【人物介绍·画面叠字】"
-# 纯画面/空镜标签（冒号前）：禁止当成「角色名：对白」
-VISUAL_SHOT_LABEL_RE = re.compile(
-    r"^(?:"
-    r"空镜|画面|远景|近景|中景|全景|特写|大特写|"
-    r"跟拍|俯拍|仰拍|航拍|推镜|拉镜|摇镜|环境|镜头|动作|转场|闪回|"
-    r"建立镜头|气氛镜头|Establishing Shot|Long Shot|Wide Shot|Medium Shot|Close Shot|Close-up|Extreme Close-up|"
-    r"Atmospheric Shot|Push-in|Pull-out|Pan|Tracking Shot|Follow Shot|High-angle Shot|Low-angle Shot|Aerial Shot"
-    r")\s*[：:]", re.I
-)
 # 「角色名（动作）：台词」——动作应走画面行，冒号后才是口播
 DIALOGUE_WITH_ACTION_BODY_RE = re.compile(
-    r"^(?P<speaker>[^（(:：\n]{1,16})"
+    r"^(?P<speaker>[^（(:：\n]{1,80}?)"
     r"[（(](?P<action>[^）)]+)[）)]"
     r"\s*[：:]\s*"
     r"(?P<text>.+)$"
@@ -269,7 +262,7 @@ def is_wrapped_continuation_line(line: str) -> bool:
         return False
     if VISUAL_SHOT_LABEL_RE.match(body):
         return False
-    if re.match(r"^[^：:\n]{1,16}[：:]", body):
+    if re.match(r"^[^：:\n]{1,80}[：:]", body):
         return False
     return body[0] in _CONTINUATION_START
 
@@ -491,9 +484,9 @@ def _format_narrative_line(line: str) -> str:
     if kind == "narration":
         return f"【旁白·慢速清晰·同步字幕】{trimmed}"
     # 角色对白：排除空镜/景别等冒号标签，避免「空镜：…」被当成「角色名：台词」
-    if re.match(r"^[^（(:：\n]{1,16}[（(][^）)]*[）)]\s*[：:].+", trimmed):
+    if re.match(r"^[^（(:：\n]{1,80}[（(][^）)]*[）)]\s*[：:].+", trimmed):
         return f"{DIALOGUE_PREFIX}{trimmed}"
-    colon_speaker = re.match(r"^([^：:\n]{1,16})[：:](.+)$", trimmed)
+    colon_speaker = re.match(r"^([^：:\n]{1,80})[：:](.+)$", trimmed)
     if colon_speaker and not VISUAL_SHOT_LABEL_RE.match(trimmed):
         return f"{DIALOGUE_PREFIX}{trimmed}"
     # 纯画面/动作描述：明确禁止配音，避免被全局字幕 cue 误读为旁白
@@ -503,7 +496,7 @@ def _format_narrative_line(line: str) -> str:
 def _speakable_body(line: str) -> str:
     """估算口播时长用：去掉生产前缀与「角色名：」标签，只计真正念出的字。"""
     body = re.sub(r"^【[^】]*】\s*", "", (line or "").strip()).strip()
-    speaker = re.match(r"^([^：:\n]{1,16})[：:](.+)$", body)
+    speaker = re.match(r"^([^：:\n]{1,80})[：:](.+)$", body)
     if speaker:
         return speaker.group(2).strip()
     return body
@@ -600,13 +593,13 @@ def _is_generic_intro_text(text: str) -> bool:
 
 
 def _shorten_intro(text: str, max_len: int = 24) -> str:
-    # 叠字描述截断：去空白、取首句、限长
-    cleaned = re.sub(r"\s+", "", (text or "").strip())
+    # Preserve word separators and Unicode accents in overlay introductions.
+    cleaned = re.sub(r"\s+", " ", (text or "").strip())
     if not cleaned:
         return ""
     first = re.split(r"[。！？；;]", cleaned, maxsplit=1)[0].strip()
     if len(first) > max_len:
-        return first[: max_len - 1] + "…"
+        return truncate_text(first, max_len - 1) + "…"
     return first
 
 
@@ -651,7 +644,7 @@ def _extract_intro_sentence_for_name(name: str, text: str) -> str | None:
     for sent in re.split(r"[。！？\n]", blob):
         if char_name not in sent:
             continue
-        cleaned = re.sub(r"\s+", "", sent.strip())
+        cleaned = re.sub(r"\s+", " ", sent.strip())
         if len(cleaned) < 6:
             continue
         if CAST_LINE_RE.match(cleaned) or cleaned.startswith("出场人物"):

@@ -24,13 +24,15 @@ LEGACY_NARRATION_PREFIX = "【旁白·慢速清晰·同步字幕】"
 DIALOGUE_PREFIX = "【对白·慢速清晰·同步字幕】"
 VISUAL_PREFIX = "【画面·无配音仅环境音】"
 EMPTY_SHOT_PREFIX = "【空镜·可仅环境音与 BGM】"
-SUBTITLE_CUE = "【字幕：后期叠旁白字幕，简体中文逐句同步】"
-DRAMA_SUBTITLE_CUE = "【字幕：底部居中·简体中文·逐句轮换·与口播同步】"
+SUBTITLE_CUE = "【字幕：post-production captions in the narration's language, synchronized sentence by sentence】"
+DRAMA_SUBTITLE_CUE = "【字幕：bottom-center captions in the dialogue's language, synchronized sentence by sentence】"
 # 历史 cue，提交前统一替换为现行文案
 LEGACY_KEPU_SUBTITLE_CUES = (
+    "【字幕：后期叠旁白字幕，简体中文逐句同步】",
     "【字幕：全程简体中文字幕，旁白逐句同步烧录】",
 )
 LEGACY_DRAMA_SUBTITLE_CUES = (
+    "【字幕：底部居中·简体中文·逐句轮换·与口播同步】",
     "【字幕：底部居中·简体中文·仅标记段落同步】",
     "【字幕：底部居中·简体中文】",
 )
@@ -42,24 +44,26 @@ VISUAL_SHOT_LABEL_RE = re.compile(
     r"^(?:"
     r"空镜|画面|远景|近景|中景|全景|特写|大特写|"
     r"跟拍|俯拍|仰拍|航拍|推镜|拉镜|摇镜|环境|镜头|动作|转场|闪回|"
-    r"建立镜头|气氛镜头"
-    r")\s*[：:]"
+    r"建立镜头|气氛镜头|Establishing Shot|Long Shot|Wide Shot|Medium Shot|Close Shot|Close-up|Extreme Close-up|"
+    r"Atmospheric Shot|Push-in|Pull-out|Pan|Tracking Shot|Follow Shot|High-angle Shot|Low-angle Shot|Aerial Shot|"
+    r"Visual|Action|Toàn cảnh|Cận cảnh|Trung cảnh|Đặc tả|Hành động|Góc rộng"
+    r")\s*[：:]", re.I
 )
 VOICE_CUE_PREFIX_RE = re.compile(
     r"^【(?:对白|旁白|内心独白)[^】]*】\s*"
 )
 # 角色（vo，低落）。——只有舞台指示、没有台词
 STAGE_ONLY_SPEAKER_RE = re.compile(
-    r"^(?P<speaker>[^：:\n（(\s]{1,16})"
-    r"[（(](?P<paren>[^）)]+)[）)]\s*[。．.…]?\s*$"
+    r"^(?P<speaker>[^：:\n（(]{1,80}?)"
+    r"\s*[（(](?P<paren>[^）)]+)[）)]\s*[。．.…]?\s*$"
 )
 # 角色：台词 / 角色（vo）：台词
 SPEAKER_DIALOGUE_RE = re.compile(
-    r"^(?P<speaker>[^：:\n（(\s]{1,16})"
-    r"(?P<paren>[（(][^）)]+[）)])?"
+    r"^(?P<speaker>[^：:\n（(]{1,80}?)"
+    r"\s*(?P<paren>[（(][^）)]+[）)])?"
     r"\s*[：:]\s*(?P<text>.+)$"
 )
-GENERIC_NARRATOR_NAMES = frozenset({"旁白", "解说", "narrator", "旁白a", "旁白b", "vo", "os"})
+GENERIC_NARRATOR_NAMES = frozenset({"旁白", "解说", "narrator", "narration", "voiceover", "người dẫn chuyện", "người kể chuyện", "lời dẫn", "旁白a", "旁白b", "vo", "os"})
 _TIME_OR_DURATION_PREFIX_RE = re.compile(
     r"^(?:@duration:\d+|\d{2}:\d{2}-\d{2}:\d{2})\s*"
 )
@@ -490,7 +494,7 @@ def build_seedance_production_section(
                 f"3. 字幕：{no_burn}"
                 if not burn_subtitles
                 else (
-                    "3. 字幕：仅【旁白·…】【对白·…】口播内容烧录简体中文字幕，底部居中；"
+                    "3. Subtitles: caption only marked narration/dialogue, in the exact language being spoken, bottom-center; "
                     "同一时刻只显示一行（一句），随口播进度逐句轮换，禁止把整段对白一次性叠满屏幕；"
                     "禁止重复字、叠字、口吃式重复；字幕必须与当前正在说的那一句逐字一致；"
                     "画面描述段不出现字幕。"
@@ -542,7 +546,7 @@ def build_seedance_production_section(
             f"2. 字幕：{no_burn}"
             if not burn_subtitles
             else (
-                "2. 字幕：全程烧录简体中文字幕，位置底部居中，字号清晰可读；"
+                "2. Subtitles: use the exact narration language, bottom-center, with clearly readable text; "
                 "旁白须逐句同步显示，字幕与口播一致。"
             )
         ),

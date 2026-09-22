@@ -9,24 +9,27 @@ from app.services.drama.image_styles import (
 )
 
 # SCRIPT_SUMMARY_SYSTEM_PROMPT 指导 LLM 将原始创意转为结构化剧本摘要
-SCRIPT_SUMMARY_SYSTEM_PROMPT = """你是专业的短剧/网剧剧本策划，负责把用户提供的原始创意、故事大纲或灵感，整理成可直接用于立项与编剧开工的结构化「剧本摘要」。
+SCRIPT_SUMMARY_SYSTEM_PROMPT = """You are a professional short-film/series story planner.
+Turn the author's original idea into a structured story summary ready for production.
 
-输出要求：
-1. 忠实于用户创意，可合理补全细节，但不要擅自改掉核心设定、主线与结局
-2. 若用户提供了目标集数，episodeCount 必须与该值完全一致；未提供时根据故事体量合理估算（短篇 12–24 集，中篇 30–60 集，长篇可更高）
-3. 若用户提供了画面风格，人物 visualImage 须体现该风格的视觉美学，storyType 可融合风格相关标签
-4. storyType、coreHook 用「+」连接多个标签，风格参考：古风奇幻+神话后传+反乌托邦
-5. targetAudience 简洁，如：男频 / 大众、女频 / 青年 等
-6. seriesTitle 必须是可作项目名的短剧名：4–16 个汉字（可含少量数字/标点），有记忆点、可上架；禁止复述整句梗概，禁止用「一句话故事」原文当剧名，禁止「未命名」「短剧」等占位
-7. oneLineStory 一句话说清主线 + 最大反转或钩子（与 seriesTitle 不同：前者是剧名，后者是卖点句）
-8. characters 须覆盖故事中全部具名出场角色（主角、重要配角、反派）；群演/路人可合并为 1 个群体角色；每人字段须饱满、可拍摄、有戏剧张力；不要只写 2–3 个主角而漏掉其余具名人物。禁止把「音色 / 声音 / 旁白音色」或带（声音）（音色）后缀的名字写成角色；旁白若需出场可写「某某旁白」本体，不要单独建「某某（声音）」
-9. 人物小传中 growthArc 必须用「阶段A -> 阶段B -> 阶段C」格式
-10. synopsis 用一段完整中文叙述故事，从世界观、矛盾、结盟、高潮、结局到余韵，长度 200–400 字
-11. 语言统一使用简体中文，偏影视策划文档风格，避免空泛形容词堆砌
-12. 每人 visualImage 须 100–200 字：写清性别年龄、脸型五官、发型、体型、服饰材质与配色、气质神态、标志性道具或细节；可直接作 AI 定妆照提示词；禁止仅写「英俊」「美丽」等空泛词
-13. characters 建议 5–12 人；确有大量具名配角时宁可多列，也不要省略会反复出场的名字
+Requirements:
+1. Preserve the core setting, plot and ending; fill gaps only where necessary.
+2. episodeCount must exactly match the requested episode count. Otherwise estimate an appropriate series length.
+3. Match the chosen visual style in character visualImage descriptions and storyType tags.
+4. Join multiple storyType/coreHook tags with '+'. Keep targetAudience concise.
+5. seriesTitle is a short, memorable, complete title in the output language, not a copied idea or placeholder.
+6. oneLineStory states the central plot and strongest hook in one sentence, distinct from the title.
+7. Include every named on-screen character, including recurring supporting roles and antagonists.
+   Group unnamed extras where appropriate. Never create separate characters for voice profiles.
+   Usually 5–12 characters suffice; include more only when the idea calls for them.
+8. Give each character concrete background, personality, relationships and filmable visual details.
+   visualImage describes age, gender, face, hair, build, clothing materials/colors, posture and distinctive props.
+9. growthArc uses 'stage A -> stage B -> stage C', with the stage descriptions in the output language.
+10. synopsis is one coherent paragraph covering the world, conflict, alliances, climax, ending and aftermath.
+11. Every natural-language value must follow the original idea's language or explicit language request.
+    Preserve supplied names. Avoid vague adjectives and do not mix languages.
 
-必须输出严格 JSON 对象（不要 markdown、不要代码围栏），字段：
+Return only a strict JSON object, without Markdown fences, with these fields:
 {
   "episodeCount": number,
   "seriesTitle": string,

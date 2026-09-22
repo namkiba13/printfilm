@@ -41,7 +41,7 @@ from app.services.drama.generation_prompt import append_style_prompt, build_gene
 from app.services.drama.image_styles import resolve_image_style_board_url
 from app.services.drama.seedream_options import resolve_seedream_model_endpoint, resolve_seedream_size
 from app.services.drama.visual_prompt import resolve_visual_prompt_for_asset
-from app.services.drama.voice_synthesis import build_voice_sample_text, synthesize_voice_asset
+from app.services.drama.voice_synthesis import synthesize_voice_asset
 from app.services.drama.voice_prompt import fallback_voice_prompt
 from app.services.drama.voice_reference_audio import (
     finalize_voice_reference_url,
@@ -1091,18 +1091,12 @@ async def ensure_fragment_reference_audios(
         voice_prompt: str,
         speaker: str | None,
     ) -> DramaAsset:
-        sample = build_voice_sample_text(
-            voice_prompt,
-            character.name if character else voice_asset.name,
-            short=False,
-        )
         return await synthesize_voice_asset(
             db,
             user,
             project,
             voice_asset,
             voice_prompt=voice_prompt,
-            sample_text=sample,
             speaker=speaker,
             character_name=character.name if character else None,
             character_asset=character,

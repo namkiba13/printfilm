@@ -12,6 +12,7 @@ from app.models_drama import DramaAsset, DramaProject
 from app.services.billing import record_llm_chat_line
 from app.services.drama.llm import drama_chat_text
 from app.services.llm_client import LlmUnavailableError
+from app.services.content_language import truncate_text
 from app.services.drama.seed import _episode_bodies
 from app.services.drama.seed_asset_params import (
     build_scene_params,
@@ -44,41 +45,32 @@ MIN_PROMPT_LEN: dict[str, int] = {
     "material": 70,
 }
 
-CHARACTER_VISUAL_SYSTEM = """你是短剧美术造型指导，为 Seedream 生图写「视觉形象描述」。
+CHARACTER_VISUAL_SYSTEM = """You are a film character art director writing a visual description for image generation.
+Return one detailed paragraph entirely in the original idea's output language; no JSON,
+title, quotes or field labels. Describe age, gender, facial features, hair, build, layered
+clothing with materials/colors/patterns, accessories, props, posture and expression.
+Turn personality and background into visible details. Match the story's setting and style.
+The description will be used for a white-background character sheet with front/side/back,
+face and half-body views, but do not write layout instructions. Avoid vague praise,
+plot summaries and dialogue. Include enough concrete detail for a consistent character."""
 
-优秀示例（仅作密度与写法参考，勿照抄）：
-「男性，二十岁左右，身形清瘦，面容带有山野少年的质朴与英气，肤色健康小麦色。头发用简单木簪束起，身穿以禽羽编织的轻甲，外罩粗麻短褐，腰系兽皮绳，脚踏草编凉鞋。气质机敏幽默，眼神明亮，嘴角常带笑意，像能辨兽语的青年猎手。」
+SCENE_VISUAL_SYSTEM = """You are a film environment art director writing a location description.
+Return one detailed paragraph entirely in the original idea's output language, without
+JSON, title or quotes. Describe the space, era, walls/windows/doors, functional areas,
+furnishings, materials, lighting, color and mood. Focus on the environment rather than
+portraits. Use actions and props from the scene excerpts to make the space filmable.
+The result is for an environment reference sheet with elevations and detail views;
+describe the location, not the sheet layout. Avoid generic cinematic-quality claims."""
 
-输出要求：
-1. 只输出一条简体中文，150–380 字，不要 JSON、不要标题、不要引号、不要「性格：」类字段标签
-2. 必须具体可拍：性别年龄、脸型五官、发型、体型、服饰分层（材质/颜色/纹样）、配饰道具、站姿气质、神态
-3. 把身份、性格、关系转化为可见视觉特征（如「沉稳」→ 肩背挺直、眼神低垂）
-4. 贴合故事类型与项目美学；描述须适配白底角色设定板（正/左侧/背三视图 + 面部大头 + 半身像），勿写构图指令本身
-5. 禁止空泛套话（如「五官清晰」「气质出众」），禁止剧情梗概与台词"""
+PROP_VISUAL_SYSTEM = """You are a film prop designer. Return one concrete paragraph entirely
+in the original idea's output language, without JSON, title or quotes. Describe the
+object's form, proportions, layered materials, color, mechanisms, markings, wear and
+dramatic significance. It will be used for a white-background multi-view reference sheet;
+do not describe its layout or add a person holding the object."""
 
-SCENE_VISUAL_SYSTEM = """你是短剧场景美术指导，为 Seedream 生图写「环境空间描述」。
-
-优秀示例（仅作密度参考）：
-「上古治水工地临时营帐区，午后偏硬的自然光。前景是泥泞夯土与散落的竹编筐、绳索，中景多顶粗麻营帐错落，帐外竖木桩挂兽皮与羽旗。背景可见疏朗山林与远处河滩反光，空气里有尘土与烟火气，色调偏土黄与灰绿，压抑中透出劳作紧迫感的横屏影视场景。」
-
-输出要求：
-1. 只输出一条简体中文，150–380 字，不要 JSON、不要标题、不要引号
-2. 须写清：空间类型、时代感、围合与立面要素（门窗/墙面/装修）、功能分区、关键陈设、光影、色调、氛围
-3. 以环境为主体，不写人物特写；可写无人痕迹（脚印、余烬、法阵光痕）
-4. 描述须适配「平视+俯视合图、左侧多面立面、右侧 2～4 处区域细节」的设计参考图，勿写构图指令本身
-5. 结合场戏摘录中的 △ 动作与道具，还原可拍摄的空间
-6. 禁止「影视级写实」「构图层次分明」等空泛套话"""
-
-PROP_VISUAL_SYSTEM = """你是短剧道具美术，为 Seedream 写「道具本体视觉描述」。
-
-输出要求：
-1. 只输出一条简体中文，100–220 字，不要 JSON、不要标题、不要引号
-2. 须写清：物件类型、整体外形与比例、材质分层、颜色、关键结构（开口/机关/铭文/纹样）、磨损做旧、戏剧符号
-3. 描述须适配白底道具设定板（正/左侧/背三视图 + 关键局部特写 + 材质结构特写），勿写构图指令本身
-4. 以物件为主体，不写人物手持或肖像；禁止空泛套话"""
-
-MATERIAL_VISUAL_SYSTEM = """你是短剧气氛美术，为 Seedream 写空镜/气氛静帧描述。
-输出 100–220 字简体中文：景别、构图、光影、色调、氛围情绪、运动暗示（烟/水/光），适合 16:9 横屏。不要人物正脸。不要 JSON。"""
+MATERIAL_VISUAL_SYSTEM = """You are a film atmosphere art director. In the original idea's
+output language, describe framing, composition, lighting, color, mood and implied motion
+for a 16:9 atmospheric still. Use concrete details, no portraits, title or JSON."""
 
 
 # 是否命中模板套话且整体偏短
@@ -173,11 +165,7 @@ def fallback_character_visual_prompt(
     text = compose_character_visual_text(merged)
     if text:
         return normalize_visual_prompt_text(text)
-    name = asset.name or 'Role'
-    return normalize_visual_prompt_text(
-        f"{name}，青年，身形匀称，面容清晰，发型与服饰符合上古神话短剧设定，"
-        f"白底全身站立，神态自然，影视定妆照。"
-    )
+    return normalize_visual_prompt_text(asset.name or "")
 
 
 # 从场戏正文提取与场景名相关的摘录
@@ -189,7 +177,7 @@ def collect_scene_excerpts(bodies: list[str], scene_name: str, max_chars: int = 
     for body in bodies:
         if target not in body:
             continue
-        for block in re.split(r"(?=###\s*场)", body):
+        for block in re.split(r"(?=###\s*(?:场|Scene))", body, flags=re.I):
             head = block[:280]
             if target in head or target in block[:160]:
                 snippet = block.strip()
@@ -214,7 +202,7 @@ def fallback_scene_visual_prompt(
     base = build_scene_params(asset.name or "场景", story_type)["visualPrompt"]
     excerpt = collect_scene_excerpts(episode_bodies or [], asset.name or "")
     if excerpt:
-        return normalize_visual_prompt_text(f"{base}。场戏环境与动作参考：{excerpt[:400]}")
+        return normalize_visual_prompt_text(f"{base}\n{truncate_text(excerpt, 400)}")
     return normalize_visual_prompt_text(base)
 
 
@@ -224,7 +212,7 @@ def normalize_visual_prompt_text(raw: str) -> str:
     text = re.sub(r"^[\"'「『]|[\"'」』]$", "", text).strip()
     text = re.sub(r"^(视觉形象描述|环境描述|道具描述)[:：]\s*", "", text)
     text = re.sub(r"\s+", " ", text)
-    return text[:680]
+    return truncate_text(text, 680)
 
 
 # 合并规则稿与 LLM 稿，避免过短
@@ -248,8 +236,9 @@ async def _llm_visual_prompt(
     db: AsyncSession | None = None,
     user_id: int | None = None,
     drama_project_id: int | None = None,
+    language_source: str | None = None,
 ) -> str:
-    raw = await drama_chat_text(system, user, temperature=0.6, max_tokens=1024)
+    raw = await drama_chat_text(system, user, temperature=0.6, max_tokens=1024, language_source=language_source)
     prompt = normalize_visual_prompt_text(raw)
     if db is not None and user_id is not None:
         await record_llm_chat_line(
@@ -287,7 +276,10 @@ async def resolve_visual_prompt_for_asset(
         return stored
 
     min_len = MIN_PROMPT_LEN.get(kind, 80)
-    llm_bill = {"db": db, "user_id": project.user_id, "drama_project_id": project.id}
+    llm_bill = {
+        "db": db, "user_id": project.user_id, "drama_project_id": project.id,
+        "language_source": (project.script.source if project.script else None) or incoming_prompt or stored or name,
+    }
 
     if kind == "character":
         summary_char = find_summary_character(summary, name)
@@ -351,10 +343,7 @@ async def resolve_visual_prompt_for_asset(
         return rule_prompt
 
     if kind in {"prop", "material", "none"}:
-        rule_prompt = stored or normalize_visual_prompt_text(
-            f"{name}，{'关键道具' if kind == 'prop' else '气氛空镜'}，"
-            f"材质细节清晰，戏剧感强，背景简洁。"
-        )
+        rule_prompt = stored or normalize_visual_prompt_text(name)
 
         system = PROP_VISUAL_SYSTEM if kind == "prop" else MATERIAL_VISUAL_SYSTEM
         ctx = f"名称：{name}\n"
@@ -382,4 +371,4 @@ async def resolve_visual_prompt_for_asset(
 
     if stored and len(stored) >= min_len:
         return stored
-    return normalize_visual_prompt_text(f"{name}，影视级静物/空镜，材质与氛围清晰，构图简洁。")
+    return normalize_visual_prompt_text(name)

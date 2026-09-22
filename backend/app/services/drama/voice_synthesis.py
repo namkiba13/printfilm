@@ -19,6 +19,7 @@ from app.services.drama.voice_design import (
 )
 from app.services.drama.voice_reference_audio import finalize_voice_reference_url
 from app.services.voices import infer_drama_speaker_from_prompt
+from app.services.content_language import truncate_text
 logger = logging.getLogger(__name__)
 NAME_SUFFIX_PATTERN = re.compile(r"(音色|的声音|语音)$")
 # 从 voice 资产名还原角色名（如「禹音色」→「禹」）
@@ -144,7 +145,7 @@ async def synthesize_voice_asset(
         raise ValueError('Voice description prompt is missing')
     display_name = normalize_character_name(character_name or asset.name)
     # Seedance reference_audio 须 ≥1.8s（落盘目标 ≥2s）；默认用较长试听句
-    text = (sample_text or "").strip() or build_voice_sample_text(prompt, display_name, short=False)
+    text = (sample_text or "").strip() or truncate_text(prompt, 240)
     image_url = resolve_character_image_url(character_asset)
     audio_url: str | None = None
     resolved_speaker = (speaker or "").strip()

@@ -18,7 +18,7 @@ SYSTEM_PROMPT = """你是短剧美术统筹，负责从剧本摘要与分集正�
 - 不要把地点、角色、天气现象、气氛空镜当成道具
 
 输出要求：
-1. 名称简短有辨识度；visualPrompt 用简体中文，每条 90–200 字，可直接作生图提示词
+1. Use short, recognizable names and concrete visualPrompt descriptions in the original idea's output language.
 2. visualPrompt 须含：材质/形制、色彩、尺度、磨损或做旧、戏剧符号、建议构图（特写/俯拍等）
 3. 必须输出严格 JSON 对象（不要 markdown）：{"props":[{"name":"...","visualPrompt":"..."}]}
 4. 不要输出 materials / 素材字段
@@ -63,6 +63,7 @@ async def extract_props_materials(
     *,
     summary: dict[str, Any] | None,
     episode_bodies: list[str],
+    language_source: str | None = None,
 ) -> dict[str, list[dict[str, str]]]:
     """调用 LLM 抽取道具（materials 恒为空，兼容旧调用方）。
 
@@ -88,7 +89,7 @@ async def extract_props_materials(
             "请抽取 props（不要输出 materials）。",
         ]
     )
-    raw = await drama_chat_json(SYSTEM_PROMPT, user, max_tokens=4096)
+    raw = await drama_chat_json(SYSTEM_PROMPT, user, max_tokens=4096, language_source=language_source or summary_text)
     normalized = _normalize_payload(raw)
     return {
         "props": _dedupe_by_name(normalized["props"]),

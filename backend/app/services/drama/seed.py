@@ -564,7 +564,7 @@ async def seed_assets_from_script(
     if should_extract_props:
         llm_calls_props = 1
         try:
-            extracted = await extract_props_materials(summary=summary, episode_bodies=bodies)
+            extracted = await extract_props_materials(summary=summary, episode_bodies=bodies, language_source=script.source)
         except Exception:
             if reextract_props:
                 raise
@@ -1450,21 +1450,17 @@ def _character_stub_from_cast(
     """分集出场但摘要未写小传时的角色 stub（供建资产 + 后续 AI 补提示词）。"""
     from app.services.drama.build_fragments import infer_character_intro_text
 
-    genre = (story_type or "").strip() or "短剧"
     stub_params = {
         "name": name,
         "title": 'Featured character',
         "roleType": "配角",
-        "visualImage": (
-            f"{name}，{genre}人物定妆，可辨识面容与服饰，体态与气质贴合身份，"
-            "影视级写实，白底全身可拍摄"
-        ),
+        "visualImage": name,
         "coreTags": "出场人物",
         "personality": "",
-        "identityBackground": f"剧本分集出场人物「{name}」",
+        "identityBackground": "",
         "growthExperience": "",
         "relationships": "",
-        "growthArc": "出场 -> 卷入冲突 -> 结局余韵",
+        "growthArc": "",
     }
     intro = infer_character_intro_text(name, stub_params, summary, bodies)
     if intro:

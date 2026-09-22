@@ -43,12 +43,12 @@ def manju_join_character_prompt(character: dict[str, Any]) -> str:
     personality = str(character.get("personality") or "").strip()
     parts = [
         visual,
-        f"身份：{title}" if title else "",
-        f"定位：{role_type}" if role_type else "",
-        f"标签：{core_tags}" if core_tags else "",
-        f"性格：{personality}" if personality else "",
+        title,
+        role_type,
+        core_tags,
+        personality,
     ]
-    return "。".join(part for part in parts if part)
+    return "\n".join(part for part in parts if part)
 
 
 # 从摘要人物 dict 拼角色生图提示词正文（refresh/fallback 时可叙事化扩展）
@@ -70,7 +70,7 @@ def compose_character_visual_text(character: dict[str, Any]) -> str:
         segments.append(growth)
     if relationships and relationships not in joined:
         segments.append(relationships)
-    return "。".join(s for s in segments if s)
+    return "\n".join(s for s in segments if s)
 
 
 # 组装角色资产 params（形象名 + 生图提示词，对齐 manju buildCharacterParams）
@@ -102,5 +102,5 @@ def build_character_params(character: dict[str, Any]) -> dict[str, Any]:
 # 组装场景资产 params（对齐 manju buildSceneParams）
 def build_scene_params(scene_name: str, story_type: str = "") -> dict[str, Any]:
     _ = story_type  # manju 场景 seed 未使用 storyType，保留参数供 refresh 扩展
-    prompt = f"场景：{scene_name.strip()}，影视级写实场景，构图清晰，适合短剧拍摄"
+    prompt = scene_name.strip()
     return build_named_image_params(prompt, "16:9", kind="scene")

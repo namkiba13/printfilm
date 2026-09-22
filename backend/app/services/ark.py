@@ -18,6 +18,7 @@ from urllib.parse import urlparse
 import httpx
 
 from app.config import Settings, get_settings
+from app.services.content_language import truncate_text
 from app.services.billing.pricing import parse_upstream_cost_fen, parse_usage_dict
 from app.schemas_routing import ResolvedModelRoute
 from app.services.logical_model_router import (
@@ -141,21 +142,25 @@ def _raise_seedream_http_error(
 
 def _fallback_overlay_title(text: str, shot_no: int) -> str:
     """Last resort when LLM omits title — never blind-slice mid-word (e.g. ERP→ER)."""
-    raw = re.sub(r"\s+", "", (text or "").strip())
+    raw = re.sub(r"\s+", " ", (text or "").strip())
     if not raw:
-        return f"场景{shot_no}"
+        return f"Scene {shot_no}"
     clause = re.split(r"[，。；！？、,:;]", raw, maxsplit=1)[0].strip()
+    if " " in clause:
+        return truncate_text(clause, 32)
     if 2 <= len(clause) <= 10 and not _looks_truncated_token(clause, raw):
         return clause
-    return f"场景{shot_no}"
+    return f"Scene {shot_no}"
 
 
 def _fallback_overlay_subtitle(text: str) -> str:
     raw = (text or "").strip()
     if not raw:
         return ""
-    cleaned = re.sub(r"\s+", "", raw)
+    cleaned = re.sub(r"\s+", " ", raw)
     clause = re.split(r"[，。；！？、,:;]", cleaned, maxsplit=1)[0].strip()
+    if " " in clause:
+        return truncate_text(clause, 64)
     if 4 <= len(clause) <= 22:
         return clause
     if len(clause) > 22:
@@ -176,17 +181,17 @@ def _fallback_overlay_subtitle(text: str) -> str:
 
 def _looks_truncated_token(title: str, full_text: str) -> bool:
     """True if title is a prefix of narration that cuts a Latin/数字专有词 mid-way."""
-    t = re.sub(r"\s+", "", (title or "").strip())
-    full = re.sub(r"\s+", "", (full_text or "").strip())
+    t = re.sub(r"\s+", " ", (title or "").strip())
+    full = re.sub(r"\s+", " ", (full_text or "").strip())
     if not t or not full.startswith(t):
         return False
     if len(full) <= len(t):
         return False
     # Truncated mid-ASCII token: title ends with alnum and next char is alnum
-    if re.search(r"[A-Za-z0-9]$", t) and re.match(r"[A-Za-z0-9]", full[len(t)]):
+    if t[-1].isalnum() and full[len(t)].isalnum():
         return True
     # Obvious raw prefix grab of long narration
-    if len(t) <= 12 and len(full) > len(t) + 8 and full.startswith(t):
+    if " " not in full and len(t) <= 12 and len(full) > len(t) + 8 and full.startswith(t):
         return True
     return False
 
@@ -195,14 +200,14 @@ def _normalize_overlay_title(title: str, text: str, shot_no: int) -> str:
     t = (title or "").strip()
     if not t or _looks_truncated_token(t, text):
         return _fallback_overlay_title(text, shot_no)
-    return t[:32]
+    return truncate_text(t, 32)
 
 
 def _normalize_overlay_subtitle(subtitle: str, text: str) -> str:
     s = (subtitle or "").strip()
     if not s or _looks_truncated_token(s, text):
         return _fallback_overlay_subtitle(text)[:64]
-    return s[:64]
+    return truncate_text(s, 64)
 
 
 # Soften brand / IP names that Seedream often rejects as copyright
@@ -534,7 +539,7 @@ class ArkGateway:
         shot_range_override: tuple[int, int] | None = None,
         allow_source_names: bool = False,
     ) -> StoryboardResult:
-        if self.mock:
+        if self.settings.ark_mock:
             return await asyncio.to_thread(
                 self._mock_storyboard,
                 source_text,
@@ -642,7 +647,7 @@ class ArkGateway:
             ratio = (output_ratio or "16:9").strip() or "16:9"
             orient = "竖屏" if ratio == "9:16" else ("方形" if ratio == "1:1" else "横屏")
             system = (
-                f"你是{orient}图文短视频编剧。所有字段必须使用简体中文。"
+                f"你是{orient}图文短视频编剧。Follow the original idea's language or its explicit output-language request. "
                 f"{consistency}{llm_system_addon}"
                 f"每镜 duration 在 {duration_min}-{shot_cap} 秒。"
                 "这是「静图+叠字+配音」模式：不生成 AI 视频，但需要旁白配音；"
@@ -669,8 +674,8 @@ class ArkGateway:
                 else f"画风与人物必须全片一致；拆成 {shot_range} 镜，短镜快切。"
             )
             system = (
-                "你是短视频分镜编剧。所有字段必须使用简体中文"
-                "（包括 title、text、img_prompt、video_prompt、camera、bgm、segments）。"
+                "You are a short-video storyboard writer. Follow the original idea's output language "
+                "for title, text, img_prompt, video_prompt, camera, bgm, and segment text. "
                 f"{consistency}{llm_system_addon}"
                 f"每镜 duration 在 {duration_min}-{shot_cap} 秒，不要为凑满上限而注水。"
                 "shots 字段说明："
@@ -680,11 +685,11 @@ class ArkGateway:
                 "subtitle(可选，一句要点概括 8-22字)、"
                 "text(旁白台词，与 segments 中 narration 文案一致或为其摘要)、"
                 "segments(必填数组，精确到每一段：每项 duration、kind=visual|narration|action、text)、"
-                "img_prompt(与首段 visual 一致的中文首帧提示词，含具体景物与构图)、"
+                "img_prompt(first-frame description matching the first visual segment, with concrete scenery and composition)、"
                 "video_prompt(可与 segments 画面摘要一致)、"
                 "camera(运镜，如：缓慢上摇/轻推/横移)、bgm(情绪，全片同一氛围)。"
                 "顶层另输出 bgm_lock(全片统一 BGM 氛围一句，与各镜 bgm 一致)。"
-                "img_prompt 与 video_prompt 禁止英文句子，专有名词可保留原文。"
+                "Preserve proper names; image and video descriptions follow the same output language as narration. "
                 f"{segment_rules}"
                 f"{diversity_note}"
             )
@@ -700,12 +705,13 @@ class ArkGateway:
                 temperature=0.6,
                 timeout=120.0,
                 response_format=json_format,
+                language_source=source_text,
             )
         except RuntimeError as exc:
             if "response_format" not in str(exc).lower():
                 raise
             logger.warning("分镜 LLM 不支持 response_format，降级普通调用: %s", exc)
-            content = await chat_completions(system, user, temperature=0.6, timeout=120.0)
+            content = await chat_completions(system, user, temperature=0.6, timeout=120.0, language_source=source_text)
 
         if not (content or "").strip():
             logger.warning("分镜 LLM 返回空内容，重试一次 source_type=%s", source_type)
@@ -721,12 +727,13 @@ class ArkGateway:
                     temperature=0.6,
                     timeout=120.0,
                     response_format=json_format,
+                    language_source=source_text,
                 )
             except RuntimeError as exc:
                 if "response_format" not in str(exc).lower():
                     raise
                 content = await chat_completions(
-                    system, retry_user, temperature=0.6, timeout=120.0
+                    system, retry_user, temperature=0.6, timeout=120.0, language_source=source_text
                 )
 
         if not (content or "").strip():
@@ -2292,34 +2299,39 @@ class ArkGateway:
 
     async def expand_content(self, topic: str, mode: str = "theme") -> dict[str, str]:
         """Expand a short topic into title + theme brief or full narration script."""
-        topic = (topic or "").strip() or "人工智能如何改变日常生活"
+        topic = (topic or "").strip()
+        if not topic:
+            raise ValueError("Please enter an idea first")
         mode = "script" if mode == "script" else "theme"
-        if self.mock:
+        if self.settings.ark_mock:
             return self._mock_expand_content(topic, mode)
 
         if mode == "script":
             system = (
-                "你是科普短视频文案作者。根据用户主题写一篇可直接用于旁白的完整口播文案。"
-                "只输出严格 JSON：{\"title\":\"作品名\",\"content\":\"完整文案\"}。"
-                "title：8-18 字，吸引人、无标点堆砌。"
-                "content：300-700 字，口语化，分 4-8 个自然段，有开场钩子、知识点、收尾；"
-                "不要 markdown、不要分镜编号、不要标题行。"
+                "Write a compact, complete short-video narration from the author's idea in its output language. "
+                'Return only JSON: {"title":"...","content":"..."}. '
+                "Use a short, complete title. Write 4–8 natural spoken paragraphs with an opening hook, "
+                "clear points and a closing. Do not include Markdown, shot numbers or a heading in content."
             )
         else:
             system = (
-                "你是科普短视频选题策划。把用户输入扩写成一句清晰具体的创作主题。"
-                "只输出严格 JSON：{\"title\":\"作品名\",\"content\":\"主题句\"}。"
-                "title：8-18 字。"
-                "content：一句话主题，40-90 字，写清受众与要讲清的核心知识点；不要换行。"
+                "Turn the author's idea into one clear, specific short-video topic in its output language. "
+                'Return only JSON: {"title":"...","content":"..."}. '
+                "Use a short, complete title. Keep content to one sentence of at most 100 characters, "
+                "including spaces, identifying the audience and central point; no line breaks."
             )
-        content = await chat_completions(
-            system,
-            f"主题/素材：{topic}",
-            temperature=0.6,
-            max_tokens=4096,
-            timeout=90.0,
-        )
-        return self._parse_expand_content(content or "{}", topic, mode)
+        user = f"Original idea:\n{topic}"
+        for attempt in range(2):
+            content = await chat_completions(
+                system, user, temperature=0.6, max_tokens=4096, timeout=90.0,
+                language_source=topic,
+            )
+            try:
+                return self._parse_expand_content(content, topic, mode)
+            except ValueError:
+                if attempt:
+                    raise
+                user += '\nReturn a valid JSON object with nonempty title and content strings. Keep the same output language.'
 
     def _mock_expand_content(self, topic: str, mode: str) -> dict[str, str]:
         short = topic[:18].rstrip("？?。.!！") or "科普短片"
@@ -2341,29 +2353,19 @@ class ArkGateway:
         return {"title": title[:24], "content": content}
 
     def _parse_expand_content(self, raw: str, topic: str, mode: str) -> dict[str, str]:
-        text = (raw or "").strip()
-        if text.startswith("```"):
-            text = re.sub(r"^```(?:json)?\s*", "", text)
-            text = re.sub(r"\s*```$", "", text)
         try:
-            data = json.loads(text)
-        except json.JSONDecodeError:
-            m = re.search(r"\{[\s\S]*\}", text)
-            if not m:
-                return self._mock_expand_content(topic, mode)
-            try:
-                data = json.loads(m.group(0))
-            except json.JSONDecodeError:
-                return self._mock_expand_content(topic, mode)
-        title = str(data.get("title") or "").strip() or topic[:18]
-        content = str(data.get("content") or "").strip()
-        if not content:
-            return self._mock_expand_content(topic, mode)
+            data = _extract_json(raw or "")
+        except json.JSONDecodeError as exc:
+            raise ValueError("The idea model returned invalid JSON. Please try again") from exc
+        if not isinstance(data, dict) or not isinstance(data.get("content"), str) or not data["content"].strip():
+            raise ValueError("The idea model returned no usable content. Please try again")
+        title = str(data.get("title") or "").strip() or topic
+        content = data["content"].strip()
         if mode == "theme":
-            content = content.replace("\n", " ").strip()[:100]
+            content = truncate_text(content.replace("\n", " "), 100)
         else:
-            content = content[:8000]
-        return {"title": title[:24], "content": content}
+            content = truncate_text(content, 8000)
+        return {"title": truncate_text(title, 120), "content": content}
 
 
 _gateway: ArkGateway | None = None

@@ -177,7 +177,7 @@ function deriveTitle(text: string) {
     .replace(/[。！？!?：:].*$/, '')
     .trim()
   if (!line) return "Untitled project"
-  return line.slice(0, 18)
+  return line.length <= 120 ? line : line.slice(0, 120).replace(/\s+\S*$/, '')
 }
 
 export default function CreateProjectPage() {
@@ -244,7 +244,7 @@ export default function CreateProjectPage() {
       setInputTab("One-Sentence Topic")
       setSourceText(item.theme.slice(0, 100))
     }
-    setTitle(item.title.slice(0, 24))
+    setTitle(deriveTitle(item.title))
     setTitleTouched(false)
     setError('')
   }
@@ -262,7 +262,7 @@ export default function CreateProjectPage() {
       const result = await api.expandContent(seed, mode)
       setSourceText(result.content.slice(0, mode === 'theme' ? 100 : 8000))
       if (!titleTouched || isDefaultTitle(title)) {
-        setTitle(result.title.slice(0, 24))
+        setTitle(deriveTitle(result.title))
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "AI generation failed")
@@ -285,7 +285,7 @@ export default function CreateProjectPage() {
       const pipeline_mode: 'full' | 'image_text' =
         modeParam === 'image_text' || modeParam === 'full' ? modeParam : 'full'
       const finalTitle =
-        title.trim() || deriveTitle(sourceText) || sourceText.trim().slice(0, 24) || "Untitled project"
+        title.trim() || deriveTitle(sourceText) || "Untitled project"
       const project = await api.createProject({
         template_id: templateId,
         title: finalTitle,
@@ -482,7 +482,7 @@ export default function CreateProjectPage() {
           </div>
           <div className="pf-summary-row">
             <span>{"Language"}</span>
-            <span>{"Chinese (Mandarin)"}</span>
+            <span>{"Same as your idea or requested language"}</span>
           </div>
           <div className="pf-summary-row">
             <span>{"Input Method"}</span>

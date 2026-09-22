@@ -29,7 +29,7 @@ def test_build_segment_script_and_time_ranges():
         ],
         bgm_mood="轻快专业",
     )
-    assert "【字幕：后期叠旁白字幕" in script
+    assert "post-production captions in the narration's language" in script
     assert "【BGM：后期混音" in script
     assert "@duration:4" in script
     assert "@duration:8" in script
@@ -257,7 +257,7 @@ def test_apply_segment_script_edit_normalizes_legacy_kepu_cue():
         "@duration:4\n过肩演示\n"
         f"@duration:8\n{NARRATION_PREFIX}口播一句"
     )
-    assert "后期叠旁白字幕" in edited["segment_script"]
+    assert "post-production captions in the narration's language" in edited["segment_script"]
     assert "烧录" not in edited["segment_script"]
     assert "后期混音" in edited["segment_script"]
     assert edited["narration"]

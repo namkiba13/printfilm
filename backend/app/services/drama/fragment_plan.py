@@ -565,6 +565,7 @@ async def plan_fragments_with_llm(
     *,
     episode_name: str,
     episode_body: str,
+    language_source: str | None = None,
     assets: list[Any],
     episode_number: int | None = None,
     project_title: str | None = None,
@@ -614,6 +615,7 @@ async def plan_fragments_with_llm(
         user=user_prompt,
         temperature=0.4,
         skill_ids=skill_ids,
+        language_source=language_source or episode_body,
     )
     items: list[Any] = []
     if isinstance(raw, dict):

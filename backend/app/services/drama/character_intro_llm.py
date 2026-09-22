@@ -26,7 +26,7 @@ CHARACTER_INTRO_SYSTEM = """你是影视编剧助理，为短剧/漫剧角色写
 用途：角色本剧首次出场时，画面在**该角色身旁**叠字一行「角色名｜身份头衔」（非口播、非底部字幕）。
 
 要求：
-1. 每条介绍 8~24 个汉字，突出身份、地位或与主线关系的一句话
+1. Write one short, complete phrase in the original idea's output language, describing identity, status, or connection to the plot. Preserve word boundaries.
 2. 风格贴合故事类型与剧本语境，可用「/」连接两个短语（如「治水首领/夏朝始祖」）
 3. 禁止占位废话：「出场人物」「剧本分集出场人物」「配角」等
 4. 只写给定名单中的角色；不要编造名单外人物
@@ -139,6 +139,7 @@ async def llm_enrich_character_intros(
     summary: dict[str, Any] | None = None,
     episode_bodies: list[str] | None = None,
     story_type: str | None = None,
+    language_source: str | None = None,
 ) -> dict[str, str]:
     """批量 LLM 生成人物介绍叠字；失败时返回空 dict。"""
     unique: list[str] = []
@@ -162,6 +163,7 @@ async def llm_enrich_character_intros(
             user,
             temperature=0.35,
             max_tokens=1024,
+            language_source=language_source or _summary_blob(summary) or _bodies_sample(episode_bodies),
         )
         parsed = _parse_intro_response(raw, unique)
         logger.info("LLM 人物介绍补齐 count=%s names=%s", len(parsed), list(parsed.keys()))
@@ -202,6 +204,7 @@ async def prepare_character_intro_overrides(
     summary: dict[str, Any] | None = None,
     episode_bodies: list[str] | None = None,
     story_type: str | None = None,
+    language_source: str | None = None,
 ) -> dict[str, str]:
     """先规则推断，缺的再一次性 LLM 补齐。"""
     names = collect_names_needing_intro(
@@ -216,4 +219,5 @@ async def prepare_character_intro_overrides(
         summary=summary,
         episode_bodies=episode_bodies,
         story_type=story_type,
+        language_source=language_source,
     )

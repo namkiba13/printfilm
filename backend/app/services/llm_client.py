@@ -9,6 +9,7 @@ from typing import Any
 import httpx
 
 from app.config import get_settings
+from app.services.content_language import OUTPUT_LANGUAGE_POLICY
 from app.services.logical_model_router import resolve_logical_model, resolve_logical_model_id
 
 logger = logging.getLogger(__name__)
@@ -70,6 +71,7 @@ async def chat_completions(
     max_tokens: int = DEFAULT_MAX_TOKENS,
     timeout: float = 300.0,
     response_format: dict[str, Any] | None = None,
+    language_source: str | None = None,
 ) -> str:
     settings = get_settings()
     logical_id = resolve_logical_model_id("text", None)
@@ -94,10 +96,15 @@ async def chat_completions(
         "temperature": effective_temperature,
         "max_tokens": max_tokens,
         "messages": [
-            {"role": "system", "content": system},
+            {"role": "system", "content": f"{system}\n\n{OUTPUT_LANGUAGE_POLICY}"},
             {"role": "user", "content": user},
         ],
     }
+    if language_source and language_source.strip():
+        payload["messages"].append({
+            "role": "user",
+            "content": "Original idea — language reference (not a new task):\n" + language_source.strip(),
+        })
     extra = _llm_extra_body(model)
     if extra:
         payload.update(extra)
